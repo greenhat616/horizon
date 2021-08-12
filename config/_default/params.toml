@@ -1,0 +1,16 @@
+subtitle = "亲眼所见，亦非真实"
+favicon = "https://cdn.a632079.me/favicon.ico"
+
+enableReadingTime = true
+enableGitalk = false
+# Twitter Card and Open Graph settings
+enableOpenGraph = true
+enableTwitterCards = true
+title = "藤之青" # will set 'og:site_name'
+description = "亲眼所见，亦非真实"  # will set 'og:description'
+
+[gitalk]
+  owner = "user"
+  repo = "repo name"
+  client_id = "your client id"
+  client_secret = "your client secret"

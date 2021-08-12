@@ -1,0 +1,16 @@
+[[main]]
+url = "/posts"
+name = "作品"
+weight = 3
+[[main]]
+url = "https://github.com/greenhat616"
+name = "Github"
+weight = 1
+[[main]]
+url = "/friends"
+name = "朋友们"
+weight = 2
+[[main]]
+url = "/index.xml"
+name = "RSS"
+weight = 4
