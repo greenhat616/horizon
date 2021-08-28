@@ -2,7 +2,8 @@ baseURL = 'https://i.a632079.me/'
 languageCode = 'zh-cn'
 title = '藤之青'
 copyright = "2021 a632079"
-theme = 'diary'
+theme = ['diary']
+
 timeZone = 'Asia/Shanghai'
 DefaultContentLanguage = 'zh'
 [markup]

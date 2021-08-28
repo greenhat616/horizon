@@ -1,2 +1,7 @@
 dist/
 public/
+.DS_Store
+node_modules
+dist
+tmp
+resources/_gen
