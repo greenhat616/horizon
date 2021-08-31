@@ -15,18 +15,10 @@ friends:
     name: freejishu
     desc: 一个全新的境界
     hash: 998a4820101c5491c986a7faf10457c8
-  - href: '#'
-    name: ShadowMoon
-    desc: 我的闺蜜；治愈系，策略长。
-    icon: 'https://i.loli.net/2019/10/06/ZUcYmMQwBGJLXEO.jpg'
-  - href: '#'
-    name: Chocolaty
-    desc: 我的闺蜜；运算，分析，实现！
-    icon: 'https://i.loli.net/2019/10/06/9JGsVRepdcEiBx5.jpg'
   - href: 'https://xiaolin.in'
     name: 小霖
     desc: 听说是一个很软的萝莉呢~
-    icon: 'https://storage.xiaolin.in/cw.png'
+    icon: 'https://www.xiaolin.in/dist/2f/2f785114baf7f05187553ba7ec62a0ac6f49bea7.png'
   - href: 'https://about.nodebb-cn.org'
     name: NodeBB热
     desc: NodeBB 中国官方社群
@@ -47,11 +39,6 @@ friends:
     name: Ad’s Blog
     desc: 浊以静之徐清
     hash: 1f1b82f7ab1429a50424ac18dce65e37
-  - href: 'https://impuss.com'
-    name: 小桐桐
-    desc: 我不是程序员啦！(#･∀･)
-    icon: >-
-      https://impuss-1254389633.cossh.myqcloud.com/cropped-sketch1509114236865-2.png
   - href: 'https://xtaolink.cn'
     name: 深海小涛
     desc: 一个辣鸡技术博客
@@ -80,11 +67,7 @@ friends:
     name: FGHRSH
     desc: FGHRSH 的博客
     icon: 'https://fp1.fghrsh.net/2017/10/11/d383a9ad4318c5b4332fe02845f5323a.jpg'
-  - href: 'http://myloveru.cn/'
-    name: 北海
-    desc: Unfiendly
-    qq: '1273455947'
-  - href: 'https://blog.kudoran.com/'
+  - href: https://blog.moeqike.cn/
     name: YiQike’s Blog
     desc: 世界无限大.且行且珍惜w
     hash: 51a1dd78504892cbe131d08a45f3bdc9
@@ -104,14 +87,14 @@ friends:
     name: 卡秋莎的小窝
     desc: 太懒了我不想动(•̀ω•́ 」∠)
     hash: c575d632cd4409888bdf1ed06138f03d
-  - href: 'http://blog.ledemon.cn/'
-    name: Ledemon
-    desc: 时间仍在，是我们在飞逝~~~
-    icon: 'https://blog.demonxu.com/images/avatar.jpg'
+  #- href: 'http://ledemon.cn/'
+  #  name: Ledemon
+  #  desc: 时间仍在，是我们在飞逝~~~
+  #  email: 'https://blog.demonxu.com/images/avatar.jpg'
   - href: 'https://www.ohyhello.com/'
     name: ohyhello
     desc: 路过此站的人， 上船，上船！
-    icon: 'https://file.ohyhello.com/uploads/2018/07/cropped-head2.png'
+    icon: https://cdn-p.freejishu.com/img/2021/08/31/5J7.jpg
   - href: 'https://typeof.pw'
     name: '@typeof'
     desc: 你好，世界。
@@ -124,10 +107,6 @@ friends:
     name: QWQAQ
     desc: 萌新而已 (～￣▽￣)～
     icon: 'https://i.loli.net/2019/10/04/mt3eJL57oidhMTF.png'
-  - href: 'https://www.gzczy.top/'
-    name: JAM
-    desc: 不忘初心，继续前行；千里之行，始于足下！
-    hash: d35f7d5ee6a7d8bf5dfbdc60dd07e226
   - href: 'https://www.ouorz.com'
     name: TonyHe
     desc: Just A Poor Lifesinger
@@ -135,8 +114,7 @@ friends:
   - href: 'https://blog.geek-cloud.top/'
     name: Geek’s Blog
     desc: 吾之记事本
-    icon: >-
-      https://blog.geek-cloud.top/wp-content/uploads/2017/07/cropped-web-LOGOn-192x192.png
+    icon: https://blog.geek-cloud.top/wp-content/uploads/2017/07/cropped-web-LOGOn-192x192.png
   - href: 'https://daidr.me'
     name: 戴兜的小屋
     desc: 在迷失中寻找自我
@@ -149,10 +127,10 @@ friends:
     name: 辣椒の酱
     desc: 后端开发，技术分享
     icon: 'https://removeif.github.io/images/avatar.jpg'
-  - href: 'https://ni-co.moe/'
+  - href: 'https://blog.ni-co.moe/'
     name: 神楽坂 白
     desc: 二次元/死胖子(暂时)/拖延症/sony教徒/lovelive教徒/本子铺已经被我干死了
-    icon: 'https://ni-co.moe/dist/images/logo.jpg'
+    hash: 533d17d4b0d291a444a62a70a959014e
   - href: 'https://www.bysb.net/'
     name: 手柄君的小阁
     desc: OSU玩家，DIY大佬，红警赛高！
@@ -164,7 +142,7 @@ friends:
   - href: 'https://angelni.github.io'
     name: AngelNI
     desc: 愿我们能和最好的自己相遇。
-    icon: 'https://angelni.github.io/AngelNI.github.io/img/avatar.png'
+    icon: 'https://cdn.jsdelivr.net/gh/AngelNI/CDN@3.0/imgs/avatar.png'
 ---
 
 以下友人使用洗牌算法打乱，排名不分先后。如果站点无法访问，可能遭到移除。  
