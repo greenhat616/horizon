@@ -151,10 +151,14 @@ friends:
     name: AlexTechs
     desc: 厉兵秣马，砥砺前行，永远相信世界属于开发者。
     icon: https://println.org/images/logo512.png
-  - href: https://sites.link/
-    name: 站点聚合
-    desc: 因为热爱，所以相聚。
-    icon: https://bucker-for-sae.oss-cn-hangzhou.aliyuncs.com/sitesImages/82486042.jpg
+#  - href: https://sites.link/
+#    name: 站点聚合
+#    desc: 因为热爱，所以相聚。
+#    icon: https://bucker-for-sae.oss-cn-hangzhou.aliyuncs.com/sitesImages/82486042.jpg
+  - href: https://rbq.youki.work
+    name: 优纪酱的下午茶
+    desc: 一位热爱技术的咸鱼少女
+    icon: https://cdn-p.freejishu.com/img/2021/09/01/FbY.jpg
 ---
 
 以下友人使用洗牌算法打乱，排名不分先后。如果站点无法访问，可能遭到移除。  
