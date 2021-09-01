@@ -155,7 +155,7 @@ friends:
 #    name: 站点聚合
 #    desc: 因为热爱，所以相聚。
 #    icon: https://bucker-for-sae.oss-cn-hangzhou.aliyuncs.com/sitesImages/82486042.jpg
-  - href: https://rbq.youki.work
+  - href: http://rbq.youki.work
     name: 优纪酱的下午茶
     desc: 一位热爱技术的咸鱼少女
     icon: https://cdn-p.freejishu.com/img/2021/09/01/FbY.jpg
