@@ -143,6 +143,18 @@ friends:
     name: AngelNI
     desc: 愿我们能和最好的自己相遇。
     icon: 'https://cdn.jsdelivr.net/gh/AngelNI/CDN@3.0/imgs/avatar.png'
+  - href: https://www.adaxh.site/
+    name: Ada
+    desc: 卑微小前端，不太像后端
+    icon: https://tvax1.sinaimg.cn/crop.0.0.640.640.180/a99a6e98ly8ggdx2amqlaj20hs0hswsl.jpg
+  - href: https://println.org/
+    name: AlexTechs
+    desc: 厉兵秣马，砥砺前行，永远相信世界属于开发者。
+    icon: https://println.org/images/logo512.png
+  - href: https://sites.link/
+    name: 站点聚合
+    desc: 因为热爱，所以相聚。
+    icon: https://bucker-for-sae.oss-cn-hangzhou.aliyuncs.com/sitesImages/82486042.jpg
 ---
 
 以下友人使用洗牌算法打乱，排名不分先后。如果站点无法访问，可能遭到移除。  
