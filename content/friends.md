@@ -163,6 +163,10 @@ friends:
     name: 折影轻梦
     desc: 纯粹、热爱
     icon: https://avatar.mixcm.com/github/nexmoe
+  - href: https://reki.me
+    name: 羽子
+    desc: 没有猫的云养猫患者兼戒猫委员会欠费会员
+    icon: https://cdn.reki.me/images/avatar-squared.jpg
 ---
 
 以下友人使用洗牌算法打乱，排名不分先后。如果站点无法访问，可能遭到移除。  
