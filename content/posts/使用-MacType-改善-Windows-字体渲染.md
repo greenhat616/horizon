@@ -6,9 +6,11 @@ date: 2018-05-25T21:25:37+08:00
 tags: ['mactype', '字体渲染', 'windows']
 categories: 技术分享
 featured_image: https://imgcdn.a632079.me/uploads/2018/05/BushHyrax_ZH_CN9145408965_1920x1080.jpg
-toc: true
+description: 用着手机，我们常常羡慕手机上的字体清晰锐利；而电脑呢，使用 Windows 的电脑显示字体和打印出来的字体迥然不同，这使我们埋怨。那有没有一种途径能够改善 Windows 系统的渲染策略呢？答案是有的。
 ---
  
+> 21.09.02 注：**建议与去 Hinting 搭配使用哦**  
+
 Windows 10 在高分辨屏幕下 (如 4k) 开启 200% 左右的缩放， 可以发现字体渲染十分的赞。 尽管比不上 MacOS ，但也可以说是十分出色了。 但是， 穷人（比如说我） 使用着 1080 P 屏幕升级至 Windows， 开启 120% 缩放后， 尽管渲染略有改善，但依旧不堪入目。 所以就上网搜刮了一圈， 果然发现了好东西————Mactype。
 
 ## 什么是 MacType?

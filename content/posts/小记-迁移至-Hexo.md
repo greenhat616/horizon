@@ -3,9 +3,10 @@ title: '小记: 迁移至 Hexo'
 date: 2018-02-15 22:52:46
 tags: ["技术", "搬迁", "Hexo"]
 featured_image: https://imgcdn.a632079.me/uploads/2017/08/1319288,106.jpg
+description: 偷懒、节流是人类进步的源动力，鉴于静态博客能部署到 Pages 服务上，博主尝试前一到了 Hexo。
 ---
 
-今年是 2018， 狗年， 是新的一年。 咱博客自上线至今已经有 3 年， 期间使用过 WordPress, Z-Blog, Emlog, Typecho, Ghost。但总是觉得太过繁重， 毕竟个人博客嘛。  
+今年是 2018， 狗年， 新的一年。 咱博客自上线至今已经有 3 年， 期间使用过 WordPress, Z-Blog, Emlog, Typecho, Ghost。但总是觉得太过繁重， 毕竟个人博客嘛。  
 没必要搞得那么繁重 （~~竟然还需要数据库？ 竟然还需要动态编译？~~） 毕竟身为 Geeker, 不容许有这些瑕疵。 所以简单便捷， 接口清楚明了， 支持静态编译的 Hexo 便成了不二之选。
 
 # 从 Ghost 迁移至 Hexo
@@ -17,14 +18,14 @@ featured_image: https://imgcdn.a632079.me/uploads/2017/08/1319288,106.jpg
 嗯嗯嗯， 环境是运行的基础。 由于我通常使用 `Ubuntu 16.04` 作为日常开发环境， 所以以下内容完全基于 ubuntu 哦~
 
 ### Node.js
-首先呢， 就是安装 Node.js. 虽然我更想推荐 fibjs 的 (逃
+首先呢， 安装 Node.js. 虽然我更想推荐 fibjs 的 (逃
 
 ```shell
 $ curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 $ sudo apt install -y nodejs
 ```
 ### Yarn
-其次呢， 就是安装 Node.js 中绝对一流好用的包管理器 ———— Yarn 啦。 当然 pnpm 也是不二推荐， 但是 Link 方式多多少少可能存在些问题所以咱们就不推荐了。
+然后呢，安装 Node.js 中一流好用的包管理器 ———— Yarn 啦。 当然 pnpm 也是不二之选， 但是 Link 方式多多少少可能存在些问题所以咱们就不推荐了。
 
 ```shell
 $ curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -

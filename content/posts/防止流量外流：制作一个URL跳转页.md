@@ -22,17 +22,17 @@ featured_image: https://imgcdn.a632079.me/uploads/2017/08/1928477,106.jpg
    很多站点都有类似评论的功能，在评论框中留言者可以任意填写网址。但是很多时候我们不希望自己的网站存在过多杂乱的外部链接。当然，我们可以为链接加上nofollow属性。即本来链接代码是： 
  
 ```HTML
-<a href="https://i.a632079.me">藤球的窝</a>
+<a href="https://i.a632079.me">藤之青</a>
 ```
 
 当我们给这个链接加上rel="nofollow"属性时，即告诉搜索引擎此链接地址不要传权重过去。形如： 
 
 ```HTML
-<a href="https://i.a632079.me" rel="nofollow">藤球的窝</a>
+<a href="https://i.a632079.me" rel="nofollow">藤之青</a>
 ```  
 
 ### 配置页面
-但是，我们今天讲得并不是这种方法。我们的目标是将baidu.com重定向到yourdomain.com/?jump=http://baidu.com。  
+但是，我们今天讲得并不是这种方法。我们的目标是将 `baidu.com` 重定向到 `yourdomain.com/?jump=http://baidu.com`。  
 本身我是想集成腾讯的网址安全检查的，但是高中太忙了，根本没时间做完啊：（  
 亲们只需要把下面的代码保存为**url.html**放到自己站点的根目录。（什么，丑？不满意自己写啊，Doge呵斥）
 

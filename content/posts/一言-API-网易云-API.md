@@ -26,7 +26,7 @@ Emmmm, 我想这个没啥好说的。
 ### 使用
 > 项目实际是个 Live Demo，所以仅~~保证可用~~，不保证速度。  
 > 目前本接口也是 `v1.hitokoto.cn` 的子接口， 稳定性保障哦~  
-> ~~项目基于 Teng-koa (https://github.com/a632079/teng-koa) 还望使用之余给个 Star~~
+> ~~项目基于 Teng-koa (https://github.com/a632079/teng-koa) 还望使用之余给个 Star~~  
 > **2021.09.02 注：** 项目已迁移至 [hitokoto-api](https://github.com/hitokoto-osc/hitokoto-api), 大家可以在这个仓库反馈接口问题。
 
 #### 状态统计
