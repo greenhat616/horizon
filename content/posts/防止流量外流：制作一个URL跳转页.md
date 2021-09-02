@@ -16,7 +16,9 @@ featured_image: https://imgcdn.a632079.me/uploads/2017/08/1928477,106.jpg
 
    首先，权重是一个综合的因素。服务器环境，文章内容质量，域名这些因素都是既定的，我们现在也没办法改变这些，但我们可以通过**制作一个URL跳转页**来避免你的流量流失，影响权重。
 
+{{<row>}}
 <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="330" height="106" src="https://cdn.a632079.me/163music.html?playlist=41665508"></iframe>
+{{</row>}}
 
 ### 在开始之前
    很多站点都有类似评论的功能，在评论框中留言者可以任意填写网址。但是很多时候我们不希望自己的网站存在过多杂乱的外部链接。当然，我们可以为链接加上nofollow属性。即本来链接代码是： 
