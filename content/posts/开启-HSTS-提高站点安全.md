@@ -7,15 +7,16 @@ slug: hsts
 tags: ['hsts', '站点安全']
 categories: 技术分享
 featured_image: https://piccdn.freejishu.com/images/2016/04/04/1173415.jpg
+description: 有不少网站只通过 HTTPS 对外提供服务，但用户在访问某个网站的时候，在浏览器里却往往直接输入网站域名，正常情况下，用户依然能够被正确引导到安全链接上。等等，这真的安全吗？本文将通过协议的简单介绍告诉你开启 HSTS 的必要性。
 ---
 ![alt](https://imgcdn.a632079.me/uploads/2018/05/TIM截图20180526221658.png)
 
-目前咱站点已经开启全站 HSTS, 并且通过 HSTS Preload List 了。 庆祝， 撒花~
+目前咱站点已经开启全站 HSTS, 并且通过 HSTS Preload List 了。 
 这是咱的分析报告: [https://www.ssllabs.com/ssltest/analyze.html?d=a632079.me](https://www.ssllabs.com/ssltest/analyze.html?d=a632079.me)
 
 ## HSTS 是啥？
 ### 缘起： HTTPS 也不安全
-有不少网站只通过 HTTPS 对外提供服务，但用户在访问某个网站的时候，在浏览器里却往往直接输入网站域名（例如: www.example.com），而不是输入完整的URL（例如https://www.example.com），不过浏览器依然能正确的使用 HTTPS 发起请求。这背后多亏了服务器和浏览器的协作，如下图所示。  
+有不少网站只通过 HTTPS 对外提供服务，但用户在访问某个网站的时候，在浏览器里却往往直接输入网站域名（例如: www.example.com），而不是输入完整的URL（例如 https://www.example.com ），不过浏览器依然能正确的使用 HTTPS 发起请求。这背后多亏了服务器和浏览器的协作，如下图所示。  
 ![alt](https://imgcdn.a632079.me/uploads/2018/05/1968_bc295c8a2cd2e261.png)  
 
 简单来讲就是，浏览器向网站发起一次 HTTP 请求，在得到一个重定向响应后，发起一次 HTTPS 请求并得到最终的响应内容。所有的这一切对用户而言是完全透明的，所以在用户眼里看来，在浏览器里直接输入域名却依然可以用 HTTPS 协议和网站进行安全的通信，是个不错的用户体验。
@@ -33,7 +34,7 @@ featured_image: https://piccdn.freejishu.com/images/2016/04/04/1173415.jpg
 这个攻击的精妙之处在于，攻击者直接劫持了HTTP请求，并返回了内容给浏览器，根本不给浏览器同真实网站建立HTTPS连接的机会，因此浏览器会误以为真实网站通过HTTP对外提供服务，自然也就不会向用户报告当前的连接不安全。于是乎攻击者几乎可以神不知鬼不觉的对请求和响应动手脚。
 
 ### 解决: 使用 HSTS
-HSTS 的全称是 HTTP Strict-Transport-Security，它是一个 Web 安全策略机制（web security policy mechanism）。
+HSTS 的全称是 `HTTP Strict-Transport-Security`，它是一个 Web 安全策略机制（web security policy mechanism）。
 
 HSTS 最早于 2015 年被纳入到 ThoughtWorks 技术雷达，并且在 2016 年的最新一期技术雷达里，它直接从“评估（Trial）”阶段进入到了“采用（Adopt）“阶段，这意味着ThoughtWorks 强烈主张业界积极采用这项安全防御措施，并且 ThoughtWorks 已经将其应用于自己的项目。
 

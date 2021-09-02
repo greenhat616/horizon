@@ -6,15 +6,16 @@ lastmod: '2017-08-23T11:44:42+08:00'
 date: 2017-01-17T18:29:50+08:00
 categores: 技术分享
 featured_image: https://imgcdn.a632079.me/uploads/2017/08/427988,106.jpg
+description: 本文旨在分享从 typecho 迁移至 ghost 的经历
 ---
 
-> **Before All :**
-> 目前 Ghost 已发布 v1.x , 以下内容仅针对 v0.x 。
+> **在此之前 :**  
+> 目前 Ghost 已发布 v4.x , 以下内容仅针对 v0.x 。  
 > 如果您更喜欢 v0.x (LTS) 的风格，可以根据下面的内容进行尝试 :D
 
 -------------
 
-> 最近在学习Guillermo Rauch的《了不起的Node.js:将JavaScript进行到底》这一本书，便萌生了更换博客系统为Ghost的想法，于是一番折腾，终于搞定了。
+> 最近在学习Guillermo Rauch的《了不起的Node.js:将JavaScript进行到底》这一本书，便萌生了更换博客系统为Ghost的想法，于是一番折腾，搞定了。
 
 <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="330" height="106" src="https://cdn.a632079.me/163cplayer.html?playlist=410801521"></iframe>
 
@@ -24,8 +25,7 @@ featured_image: https://imgcdn.a632079.me/uploads/2017/08/427988,106.jpg
 
 #### 1.1 安装nodejs环境
 
-Ghost 推荐使用nodejs LTS V6
-我们就以Node.js V6来驱动Ghost吧。首先，使用SSH链接到你的VPS，选取合适的位置执行以下命令：
+鉴于 Ghost 推荐使用nodejs LTS V6，那就以Node.js V6来运行 Ghost 吧。我们先使用SSH链接到你的VPS，选取合适的位置执行以下命令：
 
 ```shell
 wget https://npm.taobao.org/mirrors/node/v6.9.4/node-v6.9.4.tar.gz #获得nodejs源代码
@@ -40,9 +40,13 @@ make install #安装
 
 #### 1.2获取Ghost源代码
 
-Ghost 目前官网不再提供下载，它的源代码目前托管在 GitHub 上。首先，我们需要找一个合适的位置，先创建个文件夹：
-`mkdir ghost #ghost可以替换成你喜欢的名字`
-然后，我们进入这个文件夹，获取Ghost的源代码。
+Ghost 目前官网不再提供下载，它的源代码目前托管在 GitHub 上。我们需要找一个合适的位置，先创建个文件夹：  
+
+```bash
+mkdir ghost #ghost可以替换成你喜欢的名字
+```
+
+我们进入这个文件夹，获取Ghost的源代码。
 
 ```shell
 cd ghost
@@ -53,8 +57,9 @@ rm Ghost-0.11.4.zip #删除源代码压缩包
 
 ### 2.安装
 
-好了，Ghost 已经成功获取到了。这时候我们在 Ghost 目录下执行下 `npm install --production`，完成对Ghost依赖包的获取。
-测试：执行 `npm start`，然后用浏览器访问 **你的ip:2368**，如果页面正常显示，那么初级安装操作就完成了。
+好了，Ghost 已经成功获取到了。这时候我们在 Ghost 目录下执行下 `npm install --production`，完成对Ghost依赖包的获取。  
+
+> 测试：执行 `npm start`，然后用浏览器访问 **你的ip:2368**，如果页面正常显示，那么初级安装操作就完成了。
 
 ### 3.使Ghost后台驻存
 
@@ -345,6 +350,6 @@ config = {
 module.exports = config;
 ```
 
-> *配图会在近期加入*
-> 参考：[Ghost官方Docs](http://docs.ghost.org/zh/)
-> [让 Ghost 使用 MySQL 数据库 - 王赛](http://www.ghostchina.com/useing-mysql-database-with-ghost/)
+> **参考：**  
+> [Ghost官方Docs](http://docs.ghost.org/zh/)  
+> [让 Ghost 使用 MySQL 数据库 - 王赛](http://www.ghostchina.com/useing-mysql-database-with-ghost/)  
