@@ -159,6 +159,10 @@ friends:
     name: 优纪酱的下午茶
     desc: 一位热爱技术的咸鱼少女
     icon: https://cdn-p.freejishu.com/img/2021/09/01/FbY.jpg
+  - href: https://nexmoe.com/
+    name: 折影轻梦
+    desc: 纯粹、热爱
+    icon: https://avatar.mixcm.com/github/nexmoe
 ---
 
 以下友人使用洗牌算法打乱，排名不分先后。如果站点无法访问，可能遭到移除。  
