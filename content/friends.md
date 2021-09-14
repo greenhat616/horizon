@@ -167,6 +167,10 @@ friends:
     name: 羽子
     desc: 没有猫的云养猫患者兼戒猫委员会欠费会员
     icon: https://cdn.reki.me/images/avatar-squared.jpg
+  - href: https://www.julydate.com/
+    name: 七夏浅笑
+    desc: 永远的 17 岁！热爱互联网，感兴趣的事情什么都会一点点
+    icon: https://cdn-p.freejishu.com/img/2021/09/13/ZIo.jpg
 ---
 
 以下友人使用洗牌算法打乱，排名不分先后。如果站点无法访问，可能遭到移除。  
