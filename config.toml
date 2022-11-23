@@ -6,6 +6,9 @@ theme = ['diary']
 
 timeZone = 'Asia/Shanghai'
 DefaultContentLanguage = 'zh'
+[param]
+enableVue = true
+
 [markup]
 [markup.highlight]
 codeFences = true
