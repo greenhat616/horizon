@@ -1,6 +1,6 @@
 ---
 title: '朋友们'
-lastmod: '2021-08-12T19:03:03+08:00'
+lastmod: '2022-11-23T19:03:03+08:00'
 date: 2019-10-02T23:40:03+08:00
 slug: friends
 disablePagination: true
