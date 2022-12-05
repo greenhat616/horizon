@@ -3,7 +3,7 @@ title: '小记: 迁移至 Hexo'
 date: 2018-02-15 22:52:46
 tags: ["技术", "搬迁", "Hexo"]
 featured_image: https://imgcdn.a632079.me/uploads/2017/08/1319288,106.jpg
-description: 偷懒、节流是人类进步的源动力，鉴于静态博客能部署到 Pages 服务上，博主尝试前一到了 Hexo。
+description: 偷懒、节流是人类进步的源动力，鉴于静态博客能部署到 Pages 服务上，博主尝试迁移到了 Hexo。
 ---
 
 今年是 2018， 狗年， 新的一年。 咱博客自上线至今已经有 3 年， 期间使用过 WordPress, Z-Blog, Emlog, Typecho, Ghost。但总是觉得太过繁重， 毕竟个人博客嘛。  
