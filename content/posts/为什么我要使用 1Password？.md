@@ -189,7 +189,7 @@ Enpass 我觉得算是 keePass 的上位替代品（懒癌的）吧。他也是�
 
 ### 1Password
 
-> **注：**1Password 8 在桌面端换成了 Electron + Rust <ruby>后端<rt>backend</rt></ruby> 的组合，因此风格，和交互在 Windows 和 Linux 的体验都得到了提升。
+> **注：** 1Password 8 在桌面端换成了 Electron + Rust <ruby>后端<rt>backend</rt></ruby> 的组合，因此风格，和交互在 Windows 和 Linux 的体验都得到了提升。
 >
 > 1Password 7 支持 **离线密码桶**，以及 **原生 UI** 的。在此时代，1Password 的 <ruby>Slogan<rt>标志</rt></ruby> 通常是：Apple 全家桶体验最佳的密码管理器软件~
 
