@@ -6,6 +6,10 @@ theme = ['diary']
 
 timeZone = 'Asia/Shanghai'
 DefaultContentLanguage = 'zh'
+enableEmoji = true
+enableRobotsTXT = true
+hasCJKLanguage = true
+
 [param]
 enableVue = true
 
@@ -20,6 +24,8 @@ lineNumbersInTable = true
 noClasses = true
 style = "perldoc"
 tabWidth = 4
+[markup.goldmark.renderer]
+unsafe = true
 
 [taxonomies]
 tag = "tags"
