@@ -35,9 +35,9 @@ categories: 技术分享
 
 每月，都有很多厂商因为黑客入侵，或者员工自己的疏忽导致客户的用户信息遭到泄漏，当然，其中也包含 **密码**。
 
-![image-20230103135855328](https://cdn.a632079.me/assets/images/202301031358164.png)
+![image-20230117172702262](https://cdn.a632079.me/assets/images/202301171727705.png)
 
-![image-20230103140213675](https://cdn.a632079.me/assets/images/202301031402784.png)
+![image-20230117172831950](https://cdn.a632079.me/assets/images/202301171728043.png)
 
 通常，这些密码管理软件都会从一些数据泄漏通告网站[^2]，来提醒你修改密码以确保你账户的安全。
 
@@ -73,29 +73,29 @@ categories: 技术分享
 
 多种规则，可自定义的长度，非常便捷的密码填充工具。我也经常用这个生成项目使用的 <ruby>盐<rp>（</rp><rt>Salt</rt><rp>）</rp></ruby>[^4] 以及 随机<ruby>标识<rt>I D</rt></ruby>。
 
-<img src="https://cdn.a632079.me/assets/images/202301031451869.png" alt="image-20230103145133957" style="zoom:70%;" />
+<img src="https://cdn.a632079.me/assets/images/202301171740259.png" alt="image-20230117174004858" style="zoom:70%;" />
 
 ### 密码分类
 
 我们可以给不同的站点做一个标记，甚至是为不同的项目做一些标记。
 
-![image-20230103145905410](https://cdn.a632079.me/assets/images/202301031459579.png)
+![image-20230117194503233](https://cdn.a632079.me/assets/images/202301171945625.png)
 
 ### 更多的密码笔记类型支持
 
 我们可以为不同的需求添加不同的<ruby>密码笔记<rt>Security Note</rt></ruby>，比如说软件授权、数据库连接信息，他有相对应的模板和分类来辅助你存储此类信息。
 
-![image-20230103150053328](https://cdn.a632079.me/assets/images/202301031500844.png)
+![image-20230117194547572](https://cdn.a632079.me/assets/images/202301171945588.png)
 
 ### <ruby>瞭望塔<rp>（</rp><rt>WatchTower</rt><rp>）</rp></ruby>
 
 瞭望塔即上文提到的 **密码安全检查** 功能，能够及时为你报告你的密码是否复用，是否遭到泄漏。
 
-<img src="https://cdn.a632079.me/assets/images/202301031441935.png" alt="image-20230103144057861" style="zoom:67%;" />
+![image-20230117194713585](https://cdn.a632079.me/assets/images/202301171947505.png)
 
 ### <ruby>双因素 <rp>（</rp><rt>2 Fa</rt><rp>）</rp></ruby>认证 支持
 
-![image-20230103181708960](https://cdn.a632079.me/assets/images/202301031817358.png)
+![image-20230117194810320](https://cdn.a632079.me/assets/images/202301171948364.png)
 
 不少的密码管理器软件都支持给网站添加双因素验证器的支持，但是一般我不建议在关键站点中仍然使用密码管理器。最好使用手机上的软件，或者安全令牌[^5]里的双因素认证器来完成关键网站的双因素认证。
 
@@ -171,7 +171,7 @@ LastPass 是我最开始使用的密码管理工具，也算是最老牌的。
 
 它的优势非常明显，有官方的同步、高级服务，官方的客户端，服务端也都是 **开源的**。也可以使用**三方**，**开源**，**自部署**，**基于 Rust**，**白嫖高级功能** 的版本：[VaultWarden](https://github.com/dani-garcia/vaultwarden) （早期曾叫做 `bitwarden-rs`）
 
-![image-20230103181245732](https://cdn.a632079.me/assets/images/202301031812827.png)
+![image-20230117195009308](https://cdn.a632079.me/assets/images/202301171950584.png)
 
 它几乎是最完美的密码管理器了，如果你肯折腾点，勤于维护自己的安全服务器，亦或者你愿意付一笔极低价格的月租来享受一份不错的服务的话，那他将是你的最佳选择。
 
@@ -181,7 +181,7 @@ LastPass 是我最开始使用的密码管理工具，也算是最老牌的。
 
 Enpass 我觉得算是 keePass 的上位替代品（懒癌的）吧。他也是无服务器的，需要通过存储软件，如 Google Drive、OneDrive、iCloud 来同步你的加密密码档案的，目前也提供了完善的全平台支持。
 
-![image-20230103183432053](https://cdn.a632079.me/assets/images/202301031834857.png)
+![image-20230117195044794](https://cdn.a632079.me/assets/images/202301171950920.png)
 
 这软件由于定价比较贵，我的钱包承担不起（年租、一次性付费目前定价都比较贵），我没有体验很久，因此只把此缺陷列在此处。
 
@@ -195,7 +195,7 @@ Enpass 我觉得算是 keePass 的上位替代品（懒癌的）吧。他也是�
 
 1Password 相比 Bitwarden、EnPass，目前最大的优势就是支持一个额外的 Secret Key 的因素来加密密码，这个自动生成的定长长密钥需要自己妥善保管，在新登录设备登录时需要使用，大大提高了安全性。
 
-![image-20230103185508722](https://cdn.a632079.me/assets/images/202301031855833.png)
+![image-20230117195131083](https://cdn.a632079.me/assets/images/202301171951370.png)
 
 其次，便是跨端，风格统一，操作便捷性好 :ok_hand: 了吧。
 
