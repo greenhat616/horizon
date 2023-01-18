@@ -14,7 +14,7 @@ description: 由于众所周知的原因，Navicat 16 更新后很难找到合�
 
 > 由于众所周知的原因，Navicat 16 更新后很难找到合适的破解，此前有 **tgMrz** 大佬改的 GUI 激活工具，在最新的版本中也已经失效了，本文将 ***转载*** **Doublesine** 巨佬的激活工具的使用方式，以及原理说明。
 >
-> 仓库地址：https://notabug.org/doublesine/navicat-keygen/
+> 仓库地址：<https://notabug.org/doublesine/navicat-keygen/>
 >
 > ***请注意：本工具只用于学习交流的目的，禁止商业使用，请自觉在下载 24 小时后删除。如有侵权，请联系博主。***
 
@@ -23,8 +23,8 @@ description: 由于众所周知的原因，Navicat 16 更新后很难找到合�
 本教程是以 **Windows** OS 为背景提供的 二进制编译文件 以及 使用说明。
 
 * 如果您使用的是基于 **Linux <ruby>内 核<rt>Kernel</rt></ruby>** 的操作系统：那么想必您拥有一定的动手能力，该项目也提供了 Linux 版本的支持。
-  * <ruby>克隆<rt>Clone</rt></ruby> 仓库的 Linux 分支：https://notabug.org/doublesine/navicat-keygen
-  * 按仓库的教程食用：https://notabug.org/doublesine/navicat-keygen/src/linux/doc/how-to-use.zh-CN.md
+  * <ruby>克隆<rt>Clone</rt></ruby> 仓库的 Linux 分支：<https://notabug.org/doublesine/navicat-keygen>
+  * 按仓库的教程食用：<https://notabug.org/doublesine/navicat-keygen/src/linux/doc/how-to-use.zh-CN.md>
 
 * 如果您使用的是 **MacOS**，那么很遗憾，此项目尚未更新对 MacOS 最新版本的支持
   * 您可以尝试从 macw 等商店获取成品软件
@@ -37,7 +37,7 @@ description: 由于众所周知的原因，Navicat 16 更新后很难找到合�
 
 ### 下载方式
 
-笔者采用 Mega 网盘转储：https://mega.nz/file/2rYFCKrA#2NCxrBhWugOtlBwIfww5WgMXxTnwtPmYQ_8CYEO1aqM
+笔者采用 Mega 网盘转储：<https://mega.nz/file/2rYFCKrA#2NCxrBhWugOtlBwIfww5WgMXxTnwtPmYQ_8CYEO1aqM>
 
 以下是 <ruby>哈希<rt>Hash</rt></ruby> 验证信息：
 
@@ -364,7 +364,7 @@ ap633yJNVSetY7DBTESwI+6FCO+7MEYXlZDxMD4FiOCFxFNFCYtwu3+ID5W2Je+pk2dbUWBre+FNi+p4
 
 ## 原理分析
 
-> 原文来自：https://notabug.org/doublesine/navicat-keygen/src/windows/doc/how-does-it-work.zh-CN.md
+> 原文来自：<https://notabug.org/doublesine/navicat-keygen/src/windows/doc/how-does-it-work.zh-CN.md>
 >
 > 博主只对本篇内容进行内容整理，并优化显示格式。
 
