@@ -1,7 +1,7 @@
 baseURL = 'https://i.a632079.me/'
 languageCode = 'zh-cn'
 title = '藤之青'
-copyright = "2022 a632079"
+copyright = "2023 a632079"
 theme = ['diary']
 
 timeZone = 'Asia/Shanghai'
@@ -26,6 +26,8 @@ style = "perldoc"
 tabWidth = 4
 [markup.goldmark.renderer]
 unsafe = true
+
+
 
 [taxonomies]
 tag = "tags"
