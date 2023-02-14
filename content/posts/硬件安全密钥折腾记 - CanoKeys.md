@@ -6,7 +6,7 @@ tags:
 - YubiKey
 - 物理令牌
 slug: cano-keys-first-try
-lastmod: '2023-02-13T19:51:27.683+08:00' 
+lastmod: '2023-02-14T23:00:27.683+08:00' 
 date:  '2023-02-13T19:51:27.683+08:00'
 categories: 技术分享
 featured_image: https://cdn.a632079.me/assets/images/202302091706902.png
@@ -85,15 +85,15 @@ CanoKeys 可以理解为 Yubikey 的开源实现：
 
 ### GPG PIN / Admin PIN
 
-![image-20230210012030659](C:\Users\a632079\AppData\Roaming\Typora\typora-user-images\image-20230210012030659.png)
+![image-20230210012030659](https://cdn.a632079.me/assets/images/202302142034345.png)
 
 ![image-20230210012107505](C:\Users\a632079\AppData\Roaming\Typora\typora-user-images\image-20230210012107505.png)
 
 ### PIV PIN/PUK
 
-![image-20230210012317595](C:\Users\a632079\AppData\Roaming\Typora\typora-user-images\image-20230210012317595.png)
+![image-20230210012317595](https://cdn.a632079.me/assets/images/202302142034040.png)
 
-![image-20230210012337805](C:\Users\a632079\AppData\Roaming\Typora\typora-user-images\image-20230210012337805.png)
+![image-20230210012337805](https://cdn.a632079.me/assets/images/202302142034024.png)
 
 ## OpenPGP
 
@@ -122,7 +122,7 @@ CanoKeys 可以理解为 Yubikey 的开源实现：
 
 
 
-<img src="C:\Users\a632079\AppData\Roaming\Typora\typora-user-images\image-20230211234302159.png" alt="image-20230211234302159" style="zoom: 33%;" />
+<img src="https://cdn.a632079.me/assets/images/202302142034777.png" alt="image-20230211234302159" style="zoom: 33%;" />
 
 CanoKeys 的体验是非常流畅的，签名一个提交，在插入 CanoKeys 时，只需要输入 Pin 后，然后触摸一下它（默认关闭，可选打开）），就签名成功了。通过 CanoKeys 这类硬件密钥，我们只有在它插入设备时，才可能执行签名操作的，安全性、~~逼格~~这不就起来了么？😎
 
@@ -669,7 +669,11 @@ $ gpg --card-status
 
 笔者主要用于几个常用用户的辅助认证，以及 Windows、Arch Linux 的登录认证上。
 
-<img src="C:\Users\a632079\AppData\Roaming\Typora\typora-user-images\image-20230213112450678.png" alt="image-20230213112450678" style="zoom:50%;" /> 
+{{<row>}}
+
+<img src="https://cdn.a632079.me/assets/images/202302142034740.png" alt="image-20230213112450678" style="zoom: 33%;" /> 
+
+{{</row>}}
 
 ### 配置
 
@@ -714,7 +718,7 @@ $ gpg --card-status
 
 ## 引用 & 注解
 
-[^1]:  <ruby>条 幅<rt>Banner</rt></ruby> 图片来源：https://blog.cubercsl.site/post/canokey-unboxing/，如有侵权请联系博主！
+[^1]:  <ruby>条 幅<rt>Banner</rt></ruby> 图片来源：<https://blog.cubercsl.site/post/canokey-unboxing/，如有侵权请联系博主！>
 [^2]:  指：[CanoKeys 开箱 -  CSL 讲废话](https://blog.cubercsl.site/post/canokey-unboxing/)
 
 [^3]: 指：[整了个小东西: Canokey - Steve's](https://blog.lyh.moe/2022/01/02/%E6%95%B4%E4%BA%86%E4%B8%AA%E5%B0%8F%E4%B8%9C%E8%A5%BF-Canokey/)
