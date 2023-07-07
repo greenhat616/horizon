@@ -5,6 +5,7 @@ date: 2019-10-02T23:40:03+08:00
 slug: friends
 disablePagination: true
 disableMetaInfo: true
+disableOutdatedNotice: true
 hidden: true
 friends:
   - href: 'https://blog.woc.moe'
