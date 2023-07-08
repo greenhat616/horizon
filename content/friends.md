@@ -146,10 +146,10 @@ friends:
     name: AngelNI
     desc: 愿我们能和最好的自己相遇。
     icon: 'https://cdn.jsdelivr.net/gh/AngelNI/CDN@3.0/imgs/avatar.png'
-  - href: https://www.adaxh.site/
-    name: Ada
-    desc: 卑微小前端，不太像后端
-    icon: https://tvax1.sinaimg.cn/crop.0.0.640.640.180/a99a6e98ly8ggdx2amqlaj20hs0hswsl.jpg
+  # - href: https://www.adaxh.site/
+  #   name: Ada
+  #   desc: 卑微小前端，不太像后端
+  #   icon: https://tvax1.sinaimg.cn/crop.0.0.640.640.180/a99a6e98ly8ggdx2amqlaj20hs0hswsl.jpg
   - href: https://stdout.com.cn/
     name: Alex
     desc: What's past is prologue. 
