@@ -6,6 +6,8 @@ slug: friends
 disablePagination: true
 disableMetaInfo: true
 disableOutdatedNotice: true
+disableImageViewer: true
+disableCC: true
 hidden: true
 friends:
   - href: 'https://blog.woc.moe'
@@ -19,11 +21,11 @@ friends:
   - href: 'https://xiaolin.in'
     name: 小霖
     desc: 听说是一个很软的萝莉呢~
-    icon: 'https://www.xiaolin.in/dist/2f/2f785114baf7f05187553ba7ec62a0ac6f49bea7.png'
-  - href: 'https://about.nodebb-cn.org'
-    name: NodeBB热
-    desc: NodeBB 中国官方社群
-    icon: 'https://community.nodebb-cn.org/favicon.ico'
+    icon: 'https://avatars.githubusercontent.com/u/20554060'
+  # - href: 'https://about.nodebb-cn.org'
+  #   name: NodeBB热
+  #   desc: NodeBB 中国官方社群
+  #   icon: 'https://community.nodebb-cn.org/favicon.ico'
   - href: 'https://moedog.org/'
     name: XB2016
     desc: 合法萝莉，殿堂级女装RBQ!
@@ -112,10 +114,10 @@ friends:
     name: TonyHe
     desc: Just A Poor Lifesinger
     icon: 'https://i.loli.net/2019/10/05/ELHo6cBZtbmu29W.png'
-  - href: 'https://blog.geek-cloud.top/'
-    name: Geek’s Blog
-    desc: 吾之记事本
-    icon: https://blog.geek-cloud.top/wp-content/uploads/2017/07/cropped-web-LOGOn-192x192.png
+  # - href: 'https://blog.geek-cloud.top/'
+  #   name: Geek’s Blog
+  #   desc: 吾之记事本
+  #   icon: https://blog.geek-cloud.top/wp-content/uploads/2017/07/cropped-web-LOGOn-192x192.png
   - href: 'https://daidr.me'
     name: 戴兜的小屋
     desc: 在迷失中寻找自我
@@ -148,22 +150,22 @@ friends:
     name: Ada
     desc: 卑微小前端，不太像后端
     icon: https://tvax1.sinaimg.cn/crop.0.0.640.640.180/a99a6e98ly8ggdx2amqlaj20hs0hswsl.jpg
-  - href: https://println.org/
-    name: AlexTechs
-    desc: 厉兵秣马，砥砺前行，永远相信世界属于开发者。
-    icon: https://println.org/images/logo512.png
+  - href: https://stdout.com.cn/
+    name: Alex
+    desc: What's past is prologue. 
+    icon: https://stdout.com.cn/logo.png
 #  - href: https://sites.link/
 #    name: 站点聚合
 #    desc: 因为热爱，所以相聚。
 #    icon: https://bucker-for-sae.oss-cn-hangzhou.aliyuncs.com/sitesImages/82486042.jpg
-  - href: http://rbq.youki.work
-    name: 优纪酱的下午茶
-    desc: 一位热爱技术的咸鱼少女
-    icon: https://cdn-p.freejishu.com/img/2021/09/01/FbY.jpg
+  # - href: http://rbq.youki.work
+  #   name: 优纪酱的下午茶
+  #   desc: 一位热爱技术的咸鱼少女
+  #   icon: https://cdn-p.freejishu.com/img/2021/09/01/FbY.jpg
   - href: https://nexmoe.com/
     name: 折影轻梦
     desc: 纯粹、热爱
-    icon: https://avatar.mixcm.com/github/nexmoe
+    icon: https://cravatar.cn/avatar/c7fd185f8c967dec20c29c75a40b9e09?s=400
   - href: https://reki.me
     name: 羽子
     desc: 没有猫的云养猫患者兼戒猫委员会欠费会员
