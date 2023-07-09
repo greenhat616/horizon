@@ -22,6 +22,12 @@ enableLaTeX: true
 >
 > 博文中部分内容参照了 [@CSL 讲废话](https://blog.cubercsl.site/)[^2] 和 [@Steve](https://blog.lyh.moe/)[^3] 的使用体验。
 
+{{<row>}}
+
+<iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="330" height="86" src="https://cdn.a632079.me/163music.html?playlist=28556036" style="margin:0"></iframe>
+
+{{</row>}}
+
 ## 序
 
 > 在 [@shiro]() 的推荐下，笔者于 2022 年 6 月份花费 ￥169 购买了 CanoKeys。由于那时候 ~~学业繁忙~~，密钥的使用与测试一直搁置至今。
