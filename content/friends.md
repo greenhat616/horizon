@@ -7,6 +7,7 @@ disablePagination: true
 disableMetaInfo: true
 disableOutdatedNotice: true
 disableImageViewer: true
+disableToC: true
 disableCC: true
 hidden: true
 friends:
@@ -46,10 +47,10 @@ friends:
     name: 深海小涛
     desc: 一个辣鸡技术博客
     qq: '1344089750'
-  - href: 'https://benzi.moe/'
-    name: Tomato
-    desc: Undefined.
-    hash: 2f3fbbc08f2714fa9dcfdbcb9428fb0e
+  # - href: 'https://benzi.moe/'
+  #   name: Tomato
+  #   desc: Undefined.
+  #   hash: 2f3fbbc08f2714fa9dcfdbcb9428fb0e
   - href: 'https://www.hiczp.com/'
     name: CPZ的装逼站
     desc: 快来一起装逼→_→
@@ -82,7 +83,7 @@ friends:
     name: 马铃薯田地
     desc: 土豆的摄影，土豆的随想，土豆的日常，这里是土豆哥的马铃薯田地。
     hash: ec907c506a645c1c3f97f0587bd1d7e4
-  - href: 'https://www.hcyacg.com/'
+  - href: 'https://hcyacg.com/'
     name: HCY ACG!
     desc: 萌新/大学党/黑长直控
     icon: 'https://www.hcyacg.com/1.jpg'
