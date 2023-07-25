@@ -175,6 +175,10 @@ friends:
     name: 七夏浅笑
     desc: 永远的 17 岁！热爱互联网，感兴趣的事情什么都会一点点
     icon: https://cdn-p.freejishu.com/img/2021/09/13/ZIo.jpg
+  - href: https://www.acgxt.com/
+    name: 七空幻音
+    desc: 幻音の小窝
+    icon: https://static.acgxt.com/images/favicon.png
 ---
 
 以下友人使用洗牌算法打乱，排名不分先后。如果站点无法访问，可能遭到移除。  
