@@ -7,7 +7,7 @@ date: 2023-01-18T03:04:35.182Z
 categories: 技术分享
 tags: ["转载", "Navicat 16", "cracker", "keygen", "patcher"]
 featured_image: https://cdn.a632079.me/assets/images/202301172017258.png
-description: 由于众所周知的原因，Navicat 16 更新后很难找到合适的破解，此前有 tgMrz 大佬改的 GUI 激活工具，在最新的版本中也已经失效了，本文将 转载 Doublesine 巨佬的激活工具的使用方式，以及原理说明。q请
+description: 由于众所周知的原因，Navicat 16 更新后很难找到合适的破解，此前有 tgMrz 大佬改的 GUI 激活工具，在最新的版本中也已经失效了，本文将 转载 Doublesine 巨佬的激活工具的使用方式，以及原理说明。
 ---
 
 > **请注意**：本篇攻略不再适用 ***v16.2.x*** **以及之后的版本**，如果需要使用本篇攻略激活，请 **确保** 您的 Navicat 版本低于 ***v16.2***。 
