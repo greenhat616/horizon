@@ -2,7 +2,7 @@
 title: 防止流量外流：制作一个URL跳转页
 authorLink: https://i.a632079.me
 slug: create-a-url-page
-lastmod: 2017-08-23T11:44:02+08:00'
+lastmod: 2017-08-23T11:44:02+08:00
 date: 2017-08-23T11:44:02+08:00
 categories: 技术分享
 tags: ["跳转页", "技术分享"]

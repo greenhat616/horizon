@@ -32,3 +32,8 @@ unsafe = true
 [taxonomies]
 tag = "tags"
 category = "categories"
+
+# Allow processing of in-repo HTML content files (e.g. content/workers/_index.html).
+# Hugo's default policy denies text/html content since v0.116; this re-enables it.
+[security]
+allowContent = ['.*']
