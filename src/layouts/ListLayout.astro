@@ -5,10 +5,12 @@
  * Wraps BaseLayout and renders the diary index.html structure:
  *   .post-list-container.post-list-container-no-background
  *     PostCard  × N
- *   PostPager (list variant, mobile inline)
  *
- * Pagination state is forwarded to BaseLayout so ExtraBar (desktop)
- * and Footer (mobile) render their respective paginator controls.
+ * Pagination state is forwarded to BaseLayout, which routes it to ExtraBar
+ * (desktop) and Footer (mobile) for the actual paginator controls. The mobile
+ * paginator deliberately lives in Footer — OUTSIDE .stream-container — so it
+ * is not a following sibling of .post-list-container (which would make the
+ * list's last card render a stray divider; see journal.scss).
  *
  * Props:
  *   title       — page <title> (optional; defaults to site title on home)
@@ -23,7 +25,6 @@
 
 import BaseLayout from './BaseLayout.astro';
 import PostCard from '../components/PostCard.astro';
-import PostPager from '../components/PostPager.astro';
 
 interface PostCardData {
   href: string;
@@ -84,13 +85,4 @@ const {
       />
     ))}
   </div>
-
-  {/* Mobile inline pagination — mirrors mobile-paginator.html */}
-  <PostPager
-    variant="list"
-    page={page}
-    totalPages={totalPages}
-    prevHref={prevUrl}
-    nextHref={nextUrl}
-  />
 </BaseLayout>

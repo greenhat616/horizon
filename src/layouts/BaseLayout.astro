@@ -152,7 +152,12 @@ const pathname = Astro.url.pathname;
       </ExtraBar>
 
       {/* Mobile footer (copyright + optional paginator) */}
-      <Footer prevUrl={prevUrl} nextUrl={nextUrl} />
+      <Footer
+        prevUrl={prevUrl}
+        nextUrl={nextUrl}
+        page={page}
+        totalPages={totalPages}
+      />
     </div>
 
     {/* Runtime scripts — bundled by Astro, executed after DOM ready */}
