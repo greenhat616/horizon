@@ -2,11 +2,20 @@
 /**
  * Notice.astro — Info/warning/note/tip notice box.
  * Mirrors diary's shortcodes/notice.html.
- * SVG icon sprites are inlined once; CSS class names match journal.scss.
+ *
+ * Styling is now ENCAPSULATED in this component's scoped <style> block
+ * (Tailwind v4 utilities via `@reference "tailwindcss"` + `@apply`, plus the
+ * theme's custom hex colors). Previously these `.notice*` rules lived in the
+ * diary theme's inline <style> (extended_head.html) — the sole owner is now
+ * this component. OutdatedNotice.astro composes <Notice> to inherit them.
+ *
+ * SVG icon sprites are inlined once per render.
  *
  * Props
  *   type — 'info' | 'warning' | 'note' | 'tip'
  *   id   — optional HTML id for anchor links
+ *   …rest — any extra HTML attributes (data-*, hidden, …) are spread onto the
+ *           root .notice element (used by OutdatedNotice for its data-* contract).
  *
  * Usage:
  *   <Notice type="info">内容 Markdown 在这里</Notice>
@@ -17,9 +26,11 @@ type NoticeType = 'info' | 'warning' | 'note' | 'tip';
 interface Props {
   type: NoticeType;
   id?: string;
+  /** Extra HTML attributes spread onto the root .notice element. */
+  [key: string]: unknown;
 }
 
-const { type, id } = Astro.props;
+const { type, id, ...rest } = Astro.props;
 
 // Chinese labels matching diary i18n keys
 const labels: Record<NoticeType, string> = {
@@ -48,7 +59,7 @@ const label = labels[type] ?? '注意';
   </symbol>
 </svg>
 
-<div class={`notice ${type}`} id={id}>
+<div class={`notice ${type}`} id={id} {...rest}>
   <p class="first notice-title">
     <span class="icon-notice baseline">
       <svg><use href={`#${type}-notice`}></use></svg>
@@ -57,3 +68,86 @@ const label = labels[type] ?? '注意';
   </p>
   <slot />
 </div>
+
+<style>
+  /* Tailwind v4: required so @apply resolves inside a scoped component style. */
+  @reference "tailwindcss";
+
+  /* Layout/spacing/typography → Tailwind utilities.
+     Theme palette → diary's original hex values (porting these to arbitrary
+     Tailwind values would only add noise). */
+  .notice {
+    @apply mb-6 p-4.5 leading-6;
+    color: #444;
+    background: #e7f2fa;
+  }
+
+  /* Slotted markdown paragraphs are not under this component's scope, so the
+     descendant selector must reach them with :global(). */
+  .notice :global(p:last-child) {
+    @apply mb-0;
+  }
+
+  .notice-title {
+    @apply -mx-4.5 -mt-4.5 mb-3 px-4.5 py-1 font-bold text-white flex items-center;
+    background: #6ab0de;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
+      "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  }
+
+  .notice-title * {
+    --icon-color: #fff;
+    @apply text-white;
+  }
+
+  .notice.warning .notice-title {
+    background: rgba(217, 83, 79, 0.9);
+  }
+  .notice.warning {
+    background: #fae2e2;
+  }
+
+  .notice.info .notice-title {
+    background: #f0b37e;
+  }
+  .notice.info {
+    background: #fff2db;
+  }
+
+  .notice.note .notice-title {
+    background: #6ab0de;
+  }
+  .notice.note {
+    background: #e7f2fa;
+  }
+
+  .notice.tip .notice-title {
+    background: rgba(92, 184, 92, 0.8);
+  }
+  .notice.tip {
+    background: #e6f9e6;
+  }
+
+  .icon-notice {
+    @apply mr-2 inline-flex self-center;
+  }
+  .icon-notice img,
+  .icon-notice svg {
+    @apply h-[1em] w-[1em];
+    fill: currentColor;
+    /* Optical centering: `.notice-title` is `flex items-center`, so the icon is
+       centered geometrically. CJK glyphs sit slightly high within the em box,
+       so a geometrically-centered icon reads as too high — nudge it down by a
+       small fraction (much less than the old 0.125em inline-baseline value). */
+    transform: translateY(0.05em);
+  }
+
+  /* Dark mode — html.night lives outside this component's scope. */
+  :global(html.night) .notice.info {
+    background: #373737;
+  }
+  :global(html.night) .notice.info .notice-title {
+    background: #e17d25;
+  }
+</style>
