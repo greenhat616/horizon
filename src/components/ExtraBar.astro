@@ -1,0 +1,92 @@
+---
+/**
+ * ExtraBar.astro — Right-side extra container (desktop only).
+ *
+ * Replicates themes/diary/layouts/partials/extrabar.html.
+ * Renders:
+ *   - ToC wrapper slot (content injected by PostLayout when a page has ToC)
+ *   - Back-to-top button  [data-back-to-top]
+ *   - Dark mode toggle    (calls toggleDarkMode())
+ *   - Pagination slots    (prev/next passed as props from ListLayout)
+ *
+ * DOM contracts (required by src/scripts/nav.ts):
+ *   [data-back-to-top] — back-to-top button; nav.ts shows/hides it on scroll
+ *
+ * Class names match journal.scss .extra-container styles.
+ *
+ * Props:
+ *   prevUrl  — href for the "previous page" pagination button
+ *   nextUrl  — href for the "next page" pagination button
+ *   page     — current page number (displayed in pagination indicator)
+ *   total    — total page count
+ */
+
+import DarkModeToggle from './DarkModeToggle.astro';
+
+interface Props {
+  prevUrl?: string;
+  nextUrl?: string;
+  page?: number;
+  total?: number;
+}
+
+const { prevUrl, nextUrl, page, total } = Astro.props;
+const showPagination = total !== undefined && total > 1;
+---
+
+<div id="extraContainer" class="extra-container">
+  {/* ToC — filled by the layout layer via a <slot> or portal */}
+  <div class="toc-wrapper">
+    <slot name="toc" />
+  </div>
+
+  <div class="pagination">
+    {/* Back to top — nav.ts toggles .is-visible based on scroll position */}
+    <a
+      data-back-to-top
+      id="globalBackToTop"
+      class="pagination-action animated-visibility"
+      href="#top"
+      aria-label="回到顶部"
+      aria-hidden="true"
+    >
+      <i class="material-icons pagination-action-icon" aria-hidden="true">keyboard_arrow_up</i>
+    </a>
+
+    {/* Dark mode toggle */}
+    <DarkModeToggle class="pagination-action" />
+
+    {/* List pagination (prev / indicator / next) */}
+    {showPagination && (
+      <>
+        <a
+          class="pagination-action"
+          href={prevUrl}
+          style={!prevUrl ? 'display:none' : undefined}
+          aria-label="上一页"
+        >
+          <i class="material-icons pagination-action-icon" aria-hidden="true">chevron_left</i>
+        </a>
+
+        <div class="pagination-indicator">
+          <span style="text-align:center">
+            {page}
+            <br />
+            <span style="display:inline-block;transform:rotate(-28deg)">-</span>
+            <br />
+            {total}
+          </span>
+        </div>
+
+        <a
+          class="pagination-action"
+          href={nextUrl}
+          style={!nextUrl ? 'display:none' : undefined}
+          aria-label="下一页"
+        >
+          <i class="material-icons pagination-action-icon" aria-hidden="true">chevron_right</i>
+        </a>
+      </>
+    )}
+  </div>
+</div>

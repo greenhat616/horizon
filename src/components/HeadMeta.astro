@@ -1,0 +1,129 @@
+---
+/**
+ * HeadMeta.astro — Head content fragment for every page.
+ *
+ * Replicates themes/diary/layouts/partials/head.html with these changes:
+ *   - Does NOT wrap its output in <head>…</head>; BaseLayout owns the sole <head>.
+ *   - Drops Vue / Bootstrap / dayjs / js-cookie (plan decision; replaced by
+ *     vanilla TS scripts and Astro-native rendering)
+ *   - Injects CDNFB_SCRIPT (the __cdnfb CDN fallback loader) once, inline
+ *   - Google Fonts via fonts.yecdn.com (same URL as original)
+ *   - KaTeX loaded conditionally via ExternalAsset when enableLaTeX is true
+ *   - ViewerJS is NOT loaded here; viewer.ts lazy-loads it on first image click
+ *   - Waline CSS is NOT loaded here; comments.ts lazy-loads it on scroll/click
+ *   - Animate.css loaded via ExternalAsset
+ *
+ * Title rule:
+ *   - Home page:   siteTitle only
+ *   - Other pages: "{title} - {siteTitle}"
+ *
+ * Props:
+ *   title           — page title (omit or match siteTitle for home)
+ *   description     — page description (falls back to SITE_DESCRIPTION)
+ *   canonicalUrl    — explicit canonical href when set
+ *   ogImage         — Open Graph image URL
+ *   enableLaTeX     — load KaTeX assets
+ *   isHome          — true on the home page (affects title rendering)
+ */
+
+import { CDNFB_SCRIPT } from '../lib/cdn';
+import { SITE_TITLE, SITE_DESCRIPTION, SITE_URL, FAVICON_URL } from '../site.config';
+import ExternalAsset from './ExternalAsset.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  canonicalUrl?: string;
+  /** Open Graph / Twitter Card image */
+  ogImage?: string;
+  enableLaTeX?: boolean;
+  /** True when rendering the home page (title = siteTitle only). */
+  isHome?: boolean;
+}
+
+const {
+  title,
+  description,
+  canonicalUrl,
+  ogImage,
+  enableLaTeX = false,
+  isHome = false,
+} = Astro.props;
+
+const pageTitle = isHome || !title || title === SITE_TITLE
+  ? SITE_TITLE
+  : `${title} - ${SITE_TITLE}`;
+
+const pageDescription = description || SITE_DESCRIPTION;
+
+// Canonical: use explicit prop, else current page URL.
+const canonical = canonicalUrl ?? new URL(Astro.url.pathname, SITE_URL).href;
+---
+
+<title>{pageTitle}</title>
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5, user-scalable=5" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="format-detection" content="telephone=no" />
+<meta name="renderer" content="webkit" />
+<meta name="description" content={pageDescription} />
+
+{/* Open Graph */}
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content={SITE_TITLE} />
+<meta property="og:title" content={pageTitle} />
+<meta property="og:description" content={pageDescription} />
+<meta property="og:url" content={canonical} />
+{ogImage && <meta property="og:image" content={ogImage} />}
+
+{/* Twitter Card */}
+<meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
+<meta name="twitter:title" content={pageTitle} />
+<meta name="twitter:description" content={pageDescription} />
+{ogImage && <meta name="twitter:image" content={ogImage} />}
+
+{/* Canonical */}
+<link rel="canonical" href={canonical} />
+
+{/* Favicon */}
+<link rel="icon" href={FAVICON_URL} />
+
+{/* Google Fonts via yecdn — same URL as original head.html.
+    CSS @import font loading cannot carry SRI hashes; this is a known
+    acceptable trade-off (self-hosting would be the alternative). */}
+<link
+  type="text/css"
+  rel="stylesheet"
+  href="https://fonts.yecdn.com/css?family=Lora|Fira+Mono|Montserrat|Material+Icons|ZCOOL+XiaoWei&display=swap"
+/>
+
+{/* CDN fallback loader — must appear before any CDN script/link tags */}
+<script is:inline set:html={CDNFB_SCRIPT}></script>
+
+{/* Animate.css */}
+<ExternalAsset cdnKey="animate-css" />
+
+{/* KaTeX (math) — only when the page opts in */}
+{enableLaTeX && (
+  <>
+    <ExternalAsset cdnKey="katex-css" />
+    <ExternalAsset cdnKey="katex-js" defer />
+    <ExternalAsset cdnKey="katex-auto-render" defer />
+    <script is:inline>
+      document.addEventListener('DOMContentLoaded', function () {
+        if (typeof renderMathInElement !== 'undefined') {
+          renderMathInElement(document.body, {
+            delimiters: [
+              { left: '$$', right: '$$', display: true },
+              { left: '$',  right: '$',  display: false },
+              { left: '\\(', right: '\\)', display: false },
+              { left: '\\[', right: '\\]', display: true },
+            ],
+            throwOnError: false,
+          });
+        }
+      });
+    </script>
+  </>
+)}

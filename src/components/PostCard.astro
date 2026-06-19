@@ -1,0 +1,74 @@
+---
+/**
+ * PostCard.astro — List item card for the home/taxonomy pages.
+ * Mirrors diary's layouts/index.html post-item structure.
+ *
+ * Props
+ *   href         — URL to the post
+ *   title        — post title
+ *   summary      — excerpt or description text
+ *   featuredImage — URL string (remote CDN or relative)
+ *   date         — publish date
+ *   categories   — array of category strings
+ *   tags         — array of tag strings
+ *   readingTime  — minutes (optional)
+ *   draft        — show draft badge (optional)
+ */
+import PostMeta from './PostMeta.astro';
+
+interface Props {
+  href: string;
+  title: string;
+  summary?: string;
+  featuredImage?: string | null;
+  date: Date;
+  categories?: string[];
+  tags?: string[];
+  readingTime?: number;
+  draft?: boolean;
+}
+
+const {
+  href,
+  title,
+  summary,
+  featuredImage,
+  date,
+  categories = [],
+  tags = [],
+  readingTime,
+  draft = false,
+} = Astro.props;
+---
+
+<a href={href} class="a-block">
+  <div class="post-item-wrapper">
+    <div class="post-item post-item-no-divider">
+      <div class="post-item-info-wrapper">
+        <div class="post-item-title">{title}</div>
+        {summary && (
+          <div class="post-item-summary">{summary}</div>
+        )}
+        <PostMeta
+          date={date}
+          categories={categories}
+          tags={tags}
+          readingTime={readingTime}
+          draft={draft}
+          variant="item"
+        />
+      </div>
+
+      {featuredImage && (
+        <div class="post-item-image-wrapper">
+          <div class="post-item-image">
+            <div
+              class="post-item-image-inner"
+              style={`background-image: url('${featuredImage}')`}
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+</a>

@@ -1,0 +1,77 @@
+---
+/**
+ * MobileDrawer.astro — Mobile slide-in navigation drawer.
+ *
+ * Replicates the .single-column-drawer-container portion of
+ * themes/diary/layouts/partials/mobile-header.html.
+ *
+ * DOM contracts (required by src/scripts/nav.ts):
+ *   [data-drawer]  — the drawer element; nav.ts toggles .is-open on this
+ *
+ * The drawer backdrop click-to-close is handled by nav.ts's initDrawer().
+ * Class names match journal.scss:
+ *   .single-column-drawer-container  (+ .is-open when open)
+ *   .single-column-drawer-mask       (backdrop)
+ *   .drawer-content → .drawer-menu → .drawer-menu-item (+ .active)
+ *
+ * TODO: 后续从 config 注入菜单项
+ */
+
+interface NavItem {
+  url: string;
+  name: string;
+  weight: number;
+}
+
+// Mirrors config/_default/menu.toml [main] entries, sorted by weight.
+const NAV_ITEMS: NavItem[] = [
+  { url: 'https://github.com/greenhat616', name: 'Github',  weight: 1 },
+  { url: '/friends/',                      name: '朋友们',   weight: 2 },
+  { url: '/posts/',                        name: '文章',     weight: 4 },
+  { url: '/index.xml',                     name: 'RSS',      weight: 5 },
+].sort((a, b) => a.weight - b.weight);
+
+interface Props {
+  /** Current page pathname — used to highlight the active nav item. */
+  pathname?: string;
+}
+
+const { pathname = '/' } = Astro.props;
+
+function isActive(itemUrl: string): boolean {
+  if (!itemUrl.startsWith('/')) return false;
+  return pathname === itemUrl || pathname.startsWith(itemUrl);
+}
+---
+
+{/* Slide-in drawer — nav.ts toggles .is-open */}
+<div
+  data-drawer
+  id="drawer"
+  class="single-column-drawer-container"
+  aria-hidden="true"
+>
+  <div class="drawer-content">
+    <div class="drawer-menu">
+      {NAV_ITEMS.map((item) => (
+        <a
+          class:list={['a-block', 'drawer-menu-item', isActive(item.url) ? 'active' : 'false']}
+          href={item.url}
+          target={item.url.startsWith('http') ? '_blank' : undefined}
+          rel={item.url.startsWith('http') ? 'noopener noreferrer' : undefined}
+        >
+          {item.name}
+        </a>
+      ))}
+      {/* ToC slot — PostLayout fills this via a portal or separate component */}
+    </div>
+  </div>
+</div>
+
+{/* Backdrop — clicking it closes the drawer (nav.ts initDrawer) */}
+<div
+  id="drawer-mask"
+  class="single-column-drawer-mask"
+  style="display:none"
+  aria-hidden="true"
+></div>

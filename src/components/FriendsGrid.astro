@@ -1,0 +1,134 @@
+---
+/**
+ * FriendsGrid.astro — Friends page card grid.
+ * Mirrors diary's shortcodes/friends-list.html.
+ *
+ * Avatar resolution priority (same as friends-list.html):
+ *   qq    → qq2.qlogo.cn headimg_dl
+ *   hash  → cravatar.cn/avatar/:hash
+ *   email → cravatar.cn/avatar/:md5(email)  (real MD5 via Node crypto)
+ *   icon  → direct URL
+ *
+ * Cards are rendered as <a> links opening the friend's site in a new tab.
+ * Images are lazy-loaded with a placeholder fallback.
+ *
+ * Props
+ *   friends — array of Friend objects from page frontmatter
+ */
+
+import { createHash } from 'node:crypto';
+
+interface Friend {
+  name: string;
+  href: string;
+  desc?: string;
+  qq?: string;
+  hash?: string;
+  email?: string;
+  icon?: string;
+}
+
+interface Props {
+  friends: Friend[];
+}
+
+const { friends } = Astro.props;
+
+const DEFAULT_AVATAR =
+  'https://static.a632079.me/assets/images/default_icon.png';
+
+/** MD5 hex digest — matches Go template md5 and Gravatar/Cravatar convention. */
+function md5(str: string): string {
+  return createHash('md5').update(str.trim().toLowerCase()).digest('hex');
+}
+
+function resolveAvatar(f: Friend): string {
+  if (f.qq) {
+    return `https://q2.qlogo.cn/headimg_dl?dst_uin=${f.qq}&spec=640`;
+  }
+  if (f.hash) {
+    return `https://cravatar.cn/avatar/${f.hash}?d=mm&s=640`;
+  }
+  if (f.email) {
+    return `https://cravatar.cn/avatar/${md5(f.email)}?d=mm&s=640`;
+  }
+  if (f.icon) return f.icon;
+  return DEFAULT_AVATAR;
+}
+
+/**
+ * Validate that href is an absolute http/https URL.
+ * Returns href if valid, undefined otherwise (card is skipped).
+ */
+function validateHref(href: string): string | undefined {
+  if (href.startsWith('https://') || href.startsWith('http://')) return href;
+  return undefined;
+}
+
+// Shuffle at build time (mirrors Hugo's `shuffle`)
+const shuffled = [...friends].sort(() => Math.random() - 0.5);
+---
+
+<div class="friendship">
+  <div class="row">
+    {shuffled.map((friend) => {
+      const href = validateHref(friend.href);
+      if (!href) return null; // skip cards with invalid/missing href
+
+      const avatar = resolveAvatar(friend);
+      return (
+        <div class="col-lg-6">
+          <a
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="card friend-card-link"
+          >
+            <div class="card-body">
+              <div class="friend-sheet">
+                <div class="friend-avatar">
+                  <img
+                    loading="lazy"
+                    src={DEFAULT_AVATAR}
+                    data-src={avatar}
+                    data-placeholder={DEFAULT_AVATAR}
+                    alt={friend.name}
+                    onerror={`this.src=this.dataset.placeholder`}
+                    class="lazyload"
+                  />
+                </div>
+                <div class="friend-information">
+                  <h1 title={friend.name}>{friend.name}</h1>
+                  {friend.desc && <p title={friend.desc}>{friend.desc}</p>}
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+      );
+    })}
+  </div>
+</div>
+
+<script>
+  // Native lazy-load for [data-src] images (replaces lazyload lib dependency)
+  document.addEventListener('DOMContentLoaded', () => {
+    const imgs = document.querySelectorAll<HTMLImageElement>('img.lazyload[data-src]');
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const img = entry.target as HTMLImageElement;
+            img.src = img.dataset['src'] ?? img.src;
+            io.unobserve(img);
+          }
+        });
+      }, { rootMargin: '200px' });
+      imgs.forEach((img) => io.observe(img));
+    } else {
+      imgs.forEach((img) => {
+        img.src = img.dataset['src'] ?? img.src;
+      });
+    }
+  });
+</script>

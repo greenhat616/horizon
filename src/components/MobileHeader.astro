@@ -1,0 +1,71 @@
+---
+/**
+ * MobileHeader.astro — Mobile top navigation bar + page hero.
+ *
+ * Replicates the <nav> + .single-column-header-container portion of
+ * themes/diary/layouts/partials/mobile-header.html.
+ *
+ * DOM contracts (required by src/scripts/nav.ts):
+ *   [data-nav]           — the sticky <nav> element
+ *   [data-page-head]     — the page hero whose height drives nav fade
+ *   [data-drawer-toggle] — hamburger button that opens MobileDrawer
+ *
+ * Hidden on desktop via journal.scss `.single-column-nav-container { display:none }`
+ * (shown only when viewport ≤ $single-column-max-width = 1020px).
+ *
+ * TODO: 后续从 config 注入站点标题/副标题
+ */
+
+import DarkModeToggle from './DarkModeToggle.astro';
+
+// TODO: 后续从 Astro config 注入
+const SITE_TITLE = '藤之青';
+const SITE_SUBTITLE = '亲眼所见，亦非真实';
+---
+
+{/* Sticky top nav — shown only on mobile */}
+<nav
+  data-nav
+  id="navBar"
+  class="navbar sticky-top navbar-light single-column-nav-container"
+>
+  <div id="navBackground" class="nav-background"></div>
+  <div class="container container-narrow nav-content">
+    {/* Hamburger — triggers MobileDrawer */}
+    <button
+      id="nav_dropdown_btn"
+      class="nav-dropdown-toggle"
+      type="button"
+      data-drawer-toggle
+      aria-label="打开导航菜单"
+      aria-expanded="false"
+    >
+      <i class="material-icons" aria-hidden="true">menu</i>
+    </button>
+
+    {/* Site title fades in as user scrolls down (opacity driven by nav.ts) */}
+    <a id="navTitle" class="navbar-brand" href="/">
+      {SITE_TITLE}
+    </a>
+
+    {/* Dark mode toggle on mobile nav */}
+    <DarkModeToggle
+      id="darkModeToggleButton2"
+      class="nav-darkmode-toggle"
+    />
+  </div>
+</nav>
+
+{/* Page hero — its height drives the nav transparency fade in nav.ts */}
+<div
+  data-page-head
+  class="single-column-header-container"
+  id="pageHead"
+>
+  <a href="/">
+    <div class="single-column-header-title">{SITE_TITLE}</div>
+    {SITE_SUBTITLE && (
+      <div class="single-column-header-subtitle">{SITE_SUBTITLE}</div>
+    )}
+  </a>
+</div>

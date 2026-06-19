@@ -1,0 +1,31 @@
+---
+/**
+ * Comments.astro — Waline comment widget mount point.
+ * Mirrors diary's partials/comment.html (Waline branch).
+ *
+ * The actual Waline CSS + JS are loaded lazily by src/scripts/comments.ts
+ * (IntersectionObserver + click fallback). This component only provides
+ * the mount point that comments.ts looks for via [data-comments].
+ *
+ * Layout layer is responsible for calling initComments() after DOM ready.
+ *
+ * Props
+ *   disabled — render a "comments disabled" notice instead (optional)
+ */
+
+interface Props {
+  disabled?: boolean;
+}
+
+const { disabled = false } = Astro.props;
+---
+
+<div class="post-comment-wrapper">
+  {disabled ? (
+    <p style="opacity:0.6; text-align:center">
+      <small>评论已关闭</small>
+    </p>
+  ) : (
+    <div id="waline" data-comments />
+  )}
+</div>

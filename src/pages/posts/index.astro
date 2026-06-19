@@ -1,0 +1,46 @@
+---
+/**
+ * posts/index.astro — /posts/ listing page (page 1 of the post archive).
+ *
+ * Redirects concern: /posts/ is the canonical first page; the paginated
+ * variant lives at /posts/page/N/. We render page 1 directly here so
+ * /posts/ always resolves without a redirect.
+ *
+ * Posts are filtered (no draft/hidden), sorted descending by date,
+ * then sliced to PAGE_SIZE. Maps to PostCardData for ListLayout.
+ */
+
+import { getCollection } from 'astro:content';
+import ListLayout from '../../layouts/ListLayout.astro';
+
+const PAGE_SIZE = 10;
+
+const allPosts = (await getCollection('posts')).filter(
+  (p) => !p.data.draft && !p.data.hidden,
+);
+
+const sorted = allPosts.sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+);
+
+const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
+const pagePosts = sorted.slice(0, PAGE_SIZE);
+
+const posts = pagePosts.map((p) => ({
+  href: `/posts/${p.data.slug}/`,
+  title: p.data.title,
+  summary: p.data.description ?? undefined,
+  featuredImage: p.data.featured_image ?? undefined,
+  date: p.data.date,
+  categories: p.data.categories ?? [],
+  tags: p.data.tags ?? [],
+}));
+---
+
+<ListLayout
+  title="文章"
+  posts={posts}
+  page={1}
+  totalPages={totalPages}
+  nextUrl={totalPages > 1 ? '/posts/page/2/' : undefined}
+/>

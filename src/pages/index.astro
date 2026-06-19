@@ -1,0 +1,46 @@
+---
+/**
+ * index.astro — Site home page (post list, page 1).
+ *
+ * Mirrors diary's layouts/index.html: exclude hidden posts, sort by date
+ * descending, paginate. The home page URL is / and pagination continues
+ * at /posts/page/N/.
+ *
+ * isHome=true suppresses the title prefix so BaseLayout renders the
+ * bare site title.
+ */
+
+import { getCollection } from 'astro:content';
+import ListLayout from '../layouts/ListLayout.astro';
+
+const PAGE_SIZE = 10;
+
+const allPosts = (await getCollection('posts')).filter(
+  (p) => !p.data.draft && !p.data.hidden,
+);
+
+const sorted = allPosts.sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+);
+
+const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
+const pagePosts = sorted.slice(0, PAGE_SIZE);
+
+const posts = pagePosts.map((p) => ({
+  href: `/posts/${p.data.slug}/`,
+  title: p.data.title,
+  summary: p.data.description ?? undefined,
+  featuredImage: p.data.featured_image ?? undefined,
+  date: p.data.date,
+  categories: p.data.categories ?? [],
+  tags: p.data.tags ?? [],
+}));
+---
+
+<ListLayout
+  isHome={true}
+  posts={posts}
+  page={1}
+  totalPages={totalPages}
+  nextUrl={totalPages > 1 ? '/posts/page/2/' : undefined}
+/>

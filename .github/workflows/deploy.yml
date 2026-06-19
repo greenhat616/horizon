@@ -1,6 +1,6 @@
 name: Sync
 
-on: 
+on:
   push:
     branches: [ master ]
 
@@ -8,33 +8,34 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository and submodules
+      - name: Checkout repository
         uses: actions/checkout@v7
         with:
-          submodules: true
+          # fetch full history so remark-modified-time can read git lastmod dates
           fetch-depth: 0
-      - name: Setup Hugo
-        uses: peaceiris/actions-hugo@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          hugo-version: 'latest'
-          extended: true    
-      - uses: actions/cache@v5
-        with:
-          path: /tmp/hugo_cache
-          key: ${{ runner.os }}-hugomod-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-hugomod-
+          node-version: '22'
+
+      - name: Enable corepack and setup pnpm
+        run: corepack enable pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
       - name: Build
-        run: hugo --minify
-      - name: Deploy to Staging server
+        run: pnpm build
+
+      - name: Deploy to server
         uses: easingthemes/ssh-deploy@main
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
-          ARGS: "-rltgoDzvO" 
-          SOURCE: "public/"
+          ARGS: "-rltgoDzvO"
+          SOURCE: "dist/"
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
           TARGET: ${{ secrets.REMOTE_TARGET }}
           EXCLUDE: "/dist/, /node_modules/"
-      

@@ -1,0 +1,86 @@
+---
+/**
+ * ExternalAsset.astro — Generic CDN resource renderer with SRI + fallback.
+ *
+ * Renders a script or stylesheet-link element with:
+ *   - integrity / crossorigin="anonymous" for SRI
+ *   - data-fb="<fallback>" + onerror="__cdnfb(this)" for CDN failover
+ *
+ * Usage (two modes):
+ *   1. Pass a key from cdn.ts:  <ExternalAsset cdnKey="waline-js" />
+ *   2. Pass props directly:
+ *        <ExternalAsset
+ *          primary="https://..."
+ *          fallback="https://..."
+ *          integrity="sha384-..."
+ *          type="script"
+ *          defer
+ *        />
+ *
+ * Build-time validation: assertNoBannedCdn() is called on the resolved URL —
+ * a build error is thrown if a banned CDN provider (staticfile/bytecdntp/bootcdn)
+ * is found.
+ */
+
+import { CDN, assertNoBannedCdn, type CdnResource } from '../lib/cdn';
+
+interface Props {
+  /** Look up a pre-registered resource by key. Takes priority over direct props. */
+  cdnKey?: string;
+  /** Primary URL (zstatic). Required when cdnKey is omitted. */
+  primary?: string;
+  /** Fallback URL (cdnjs). Required when cdnKey is omitted. */
+  fallback?: string;
+  /** SRI integrity hash. Required when cdnKey is omitted. */
+  integrity?: string;
+  /** 'script' | 'style'. Required when cdnKey is omitted. */
+  type?: 'script' | 'style';
+  /** Adds the defer attribute to script elements. */
+  defer?: boolean;
+}
+
+const { cdnKey, defer = false, ...directProps } = Astro.props;
+
+let resource: CdnResource;
+if (cdnKey) {
+  const entry = CDN[cdnKey];
+  if (!entry) throw new Error(`ExternalAsset: unknown cdnKey "${cdnKey}"`);
+  resource = entry;
+} else {
+  if (!directProps.primary || !directProps.fallback || !directProps.integrity || !directProps.type) {
+    throw new Error('ExternalAsset: provide either cdnKey or all of primary/fallback/integrity/type');
+  }
+  resource = {
+    primary: directProps.primary,
+    fallback: directProps.fallback,
+    integrity: directProps.integrity,
+    crossorigin: 'anonymous',
+    type: directProps.type,
+  };
+}
+
+// Build-time banned CDN check.
+assertNoBannedCdn(resource.primary);
+assertNoBannedCdn(resource.fallback);
+---
+
+{resource.type === 'script' ? (
+  <script
+    is:inline
+    src={resource.primary}
+    integrity={resource.integrity}
+    crossorigin="anonymous"
+    data-fb={resource.fallback}
+    onerror="__cdnfb(this)"
+    defer={defer || undefined}
+  ></script>
+) : (
+  <link
+    rel="stylesheet"
+    href={resource.primary}
+    integrity={resource.integrity}
+    crossorigin="anonymous"
+    data-fb={resource.fallback}
+    onerror="__cdnfb(this)"
+  />
+)}

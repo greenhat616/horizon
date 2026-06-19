@@ -1,0 +1,87 @@
+---
+/**
+ * posts/[...id].astro — Single post detail route.
+ *
+ * Uses post.data.slug as the URL segment (lowercase, matches production
+ * sitemap). Never uses post.id which is derived from the Chinese filename.
+ *
+ * Generates:  /posts/<slug>/
+ * prev/next:  adjacent posts by date (prev = older, next = newer).
+ */
+
+import { getCollection, render } from 'astro:content';
+import PostLayout from '../../layouts/PostLayout.astro';
+
+export async function getStaticPaths() {
+  const allPosts = (await getCollection('posts')).filter(
+    (p) => !p.data.draft && !p.data.hidden,
+  );
+
+  // Sort descending by date (newest first = index 0)
+  const sorted = allPosts.sort(
+    (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+  );
+
+  return sorted.map((post, index) => {
+    // "newer" post is at lower index; "older" post is at higher index.
+    // PostLayout convention: nextHref = newer, prevHref = older.
+    const newerPost = index > 0 ? sorted[index - 1] : undefined;
+    const olderPost = index < sorted.length - 1 ? sorted[index + 1] : undefined;
+
+    return {
+      params: { id: post.data.slug! },
+      props: {
+        post,
+        prevHref: olderPost ? `/posts/${olderPost.data.slug}/` : undefined,
+        prevTitle: olderPost?.data.title,
+        nextHref: newerPost ? `/posts/${newerPost.data.slug}/` : undefined,
+        nextTitle: newerPost?.data.title,
+      },
+    };
+  });
+}
+
+const { post, prevHref, prevTitle, nextHref, nextTitle } = Astro.props;
+const { data } = post;
+
+const { Content, headings, remarkPluginFrontmatter } = await render(post);
+
+// remark-reading-time-cjk writes a string like "5 分钟"; extract the integer.
+const rawReadingTime = remarkPluginFrontmatter?.readingTime as string | undefined;
+const readingTimeMinutes = rawReadingTime
+  ? parseInt(rawReadingTime, 10) || undefined
+  : undefined;
+
+// Effective lastmod: explicit frontmatter wins, then git-derived lastModified
+// from the remark plugin (exposed via remarkPluginFrontmatter after render()).
+const gitLastModified = remarkPluginFrontmatter?.lastModified as string | undefined;
+const effectiveLastmod: Date | undefined =
+  data.lastmod ??
+  data.updated ??
+  (gitLastModified ? new Date(gitLastModified) : undefined);
+---
+
+<PostLayout
+  title={data.title}
+  description={data.description ?? undefined}
+  date={data.date}
+  lastmod={effectiveLastmod}
+  categories={data.categories ?? []}
+  tags={data.tags ?? []}
+  readingTime={readingTimeMinutes}
+  featuredImage={data.featured_image ?? undefined}
+  headings={headings}
+  enableLaTeX={data.enableLaTeX}
+  disableToC={data.disableToC ?? false}
+  disableMetaInfo={data.disableMetaInfo ?? false}
+  disablePagination={data.disablePagination ?? false}
+  disableCC={data.disableCC ?? false}
+  disableOutdatedNotice={(data as { disableOutdatedNotice?: boolean }).disableOutdatedNotice ?? false}
+  comment={data.comment}
+  prevHref={prevHref}
+  prevTitle={prevTitle}
+  nextHref={nextHref}
+  nextTitle={nextTitle}
+>
+  <Content />
+</PostLayout>

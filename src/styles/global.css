@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+@theme {
+  /* Tokens derived from diary theme — expand in later layers */
+  --color-background: #fcfcfc;
+  --color-surface: #ffffff;
+  --color-accent: #01506f;
+  --color-text: #000e14; /* darken(#01506f, 50%) approx */
+  --color-link: #01506f;
+}

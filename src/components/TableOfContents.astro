@@ -1,0 +1,54 @@
+---
+/**
+ * TableOfContents.astro — Article table of contents.
+ * Mirrors diary's partials/toc.html.
+ * Build-time only — generates a nested <ul> from Astro's headings array.
+ * Zero client-side JS required.
+ *
+ * Props
+ *   headings — MarkdownHeading[] from entry.render() or Astro.props.headings
+ */
+
+interface Heading {
+  depth: number;  // 1–6
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  headings: Heading[];
+}
+
+const { headings } = Astro.props;
+
+// Filter to h1–h4 (same as diary toc.html). Skip empty text.
+const filtered = headings.filter((h) => h.depth >= 1 && h.depth <= 4 && h.text);
+
+// Determine minimum depth present; if no h1 exists, treat h2 as top level
+// (mirrors diary's $h1_n check).
+const hasH1 = filtered.some((h) => h.depth === 1);
+const minDepth = hasH1 ? 1 : 2;
+
+// Build a flat list with an adjusted `level` (0-based) for indentation.
+const items = filtered.map((h) => ({
+  ...h,
+  level: h.depth - minDepth,
+}));
+---
+
+{items.length >= 1 && (
+  <div class="toc">
+    <div class="toc-content">
+      <p style="text-align:center">- 目录 -</p>
+      <ul>
+        {items.map((item) => (
+          <li style={item.level > 0 ? `margin-left: ${item.level * 16}px` : ''}>
+            <a href={`#${item.slug}`} class={`nav-${item.slug}`}>
+              {item.text}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+)}

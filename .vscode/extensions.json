@@ -1,0 +1,7 @@
+{
+    "recommendations": [
+        "astro-build.astro-vscode",
+        "fill-labs.dependi",
+        "oxc.oxc-vscode"
+    ]
+}
