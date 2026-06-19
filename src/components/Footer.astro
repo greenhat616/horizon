@@ -60,15 +60,22 @@ const SITE_COPYRIGHT = '2026 a632079';
 
 <style>
   /*
-   * Mobile-only visibility is handled by journal.scss's
-   * #single-column-footer + media queries.
-   * These extra styles handle the paginator row layout.
+   * #single-column-footer's mobile-only visibility is handled by
+   * journal.scss. The paginator row is a sibling, so it must mirror
+   * the same gating itself: hidden by default, shown only at/below
+   * $single-column-max-width (1020px). Otherwise it leaks onto desktop.
    */
   .mobile-paginator {
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: space-between;
     padding: 8px 16px;
+  }
+
+  @media screen and (max-width: 1020px) {
+    .mobile-paginator {
+      display: flex;
+    }
   }
 
   .mobile-paginator-action {
