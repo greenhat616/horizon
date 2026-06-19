@@ -1,50 +1,51 @@
 ---
 /**
- * Footer.astro — Mobile footer (copyright + paginator row).
+ * Footer.astro — Mobile footer (paginator + copyright).
  *
- * Replicates themes/diary/layouts/partials/mobile-footer.html
- * and partials/copyright.html.
+ * Replicates themes/diary/layouts/partials/mobile-footer.html, which renders
+ *   partial "mobile-paginator.html"   → .pagination (page X/Y, mobile only)
+ *   #single-column-footer             → copyright
+ * as direct children of #app, OUTSIDE .stream-container.
  *
- * Shown only on mobile (≤ $single-column-max-width = 1020px) via
- * journal.scss — desktop copyright lives inside SidebarNav.
+ * Keeping the paginator here (not inline after the list) mirrors the original
+ * theme and is what prevents the list's last card from inheriting a stray
+ * divider — see journal.scss `.post-list-container > *:not(:last-child)`.
+ *
+ * Both children are mobile-only and self-gate via journal.scss:
+ *   .pagination          → display:none desktop / flex ≤1020px
+ *   #single-column-footer → display:none desktop / block ≤1020px
+ * (desktop copyright + pagination live in SidebarNav / ExtraBar instead.)
  *
  * Props:
- *   prevUrl — href for previous-page link (list pages)
- *   nextUrl — href for next-page link (list pages)
+ *   prevUrl    — href for previous-page link (list pages)
+ *   nextUrl    — href for next-page link (list pages)
+ *   page       — current page number (list pages)
+ *   totalPages — total page count (list pages; paginator hidden when ≤ 1)
  */
+
+import PostPager from './PostPager.astro';
 
 interface Props {
   prevUrl?: string;
   nextUrl?: string;
+  page?: number;
+  totalPages?: number;
 }
 
-const { prevUrl, nextUrl } = Astro.props;
+const { prevUrl, nextUrl, page = 1, totalPages = 1 } = Astro.props;
 
 // TODO: 后续从 config 注入
 const SITE_COPYRIGHT = '2026 a632079';
 ---
 
-{/* Mobile paginator row — mirrors mobile-paginator.html behaviour */}
-{(prevUrl || nextUrl) && (
-  <div class="mobile-paginator">
-    {prevUrl
-      ? <a class="mobile-paginator-action" href={prevUrl} aria-label="上一页">
-          <i class="material-icons" aria-hidden="true">chevron_left</i>
-        </a>
-      : <span class="mobile-paginator-action mobile-paginator-action--disabled" aria-hidden="true">
-          <i class="material-icons" aria-hidden="true">chevron_left</i>
-        </span>
-    }
-    {nextUrl
-      ? <a class="mobile-paginator-action" href={nextUrl} aria-label="下一页">
-          <i class="material-icons" aria-hidden="true">chevron_right</i>
-        </a>
-      : <span class="mobile-paginator-action mobile-paginator-action--disabled" aria-hidden="true">
-          <i class="material-icons" aria-hidden="true">chevron_right</i>
-        </span>
-    }
-  </div>
-)}
+{/* Mobile paginator (page X/Y) — mirrors mobile-paginator.html */}
+<PostPager
+  variant="list"
+  page={page}
+  totalPages={totalPages}
+  prevHref={prevUrl}
+  nextHref={nextUrl}
+/>
 
 {/* Copyright — mirrors copyright.html; preserve attribution per MIT licence */}
 <div id="single-column-footer">
@@ -57,38 +58,3 @@ const SITE_COPYRIGHT = '2026 a632079';
   <br />
   <a href="https://beian.miit.gov.cn/" target="_blank" rel="noreferrer noopener">苏ICP备17002503号</a>
 </div>
-
-<style>
-  /*
-   * #single-column-footer's mobile-only visibility is handled by
-   * journal.scss. The paginator row is a sibling, so it must mirror
-   * the same gating itself: hidden by default, shown only at/below
-   * $single-column-max-width (1020px). Otherwise it leaks onto desktop.
-   */
-  .mobile-paginator {
-    display: none;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 16px;
-  }
-
-  @media screen and (max-width: 1020px) {
-    .mobile-paginator {
-      display: flex;
-    }
-  }
-
-  .mobile-paginator-action {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 8px;
-    text-decoration: none;
-    color: inherit;
-  }
-
-  .mobile-paginator-action--disabled {
-    opacity: 0.3;
-    pointer-events: none;
-  }
-</style>

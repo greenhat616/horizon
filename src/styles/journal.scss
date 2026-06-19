@@ -771,12 +771,15 @@ a {
       .post-item-wrapper-no-hover {
         cursor: unset;
       }
+    }
 
-      &:not(:last-child) {
-        .post-item {
-          border-bottom: 1px solid rgba(128, 128, 128, 0.12);
-        }
-      }
+    // Divider between cards: every card (direct child <a.a-block>) except the
+    // last gets a bottom border. Scoped to `> *` rather than the container
+    // itself — otherwise a following sibling of .post-list-container inside
+    // .stream-container (e.g. the mobile paginator) makes the container
+    // `:not(:last-child)` and paints a stray divider under the last card.
+    > *:not(:last-child) .post-item {
+      border-bottom: 1px solid rgba(128, 128, 128, 0.12);
     }
   }
   .post-list-container-no-background {
