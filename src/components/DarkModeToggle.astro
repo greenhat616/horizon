@@ -31,9 +31,12 @@ const { class: className, id } = Astro.props;
   aria-label="切换深色模式"
 >
   {/* dark_mode icon — shown in light mode (clicking enables dark) */}
-  <i class="material-icons dark-icon" aria-hidden="true">dark_mode</i>
+  {/* pagination-action-icon: exempts the glyph from the `.pagination-action
+      :not(.pagination-action-icon)` monospace override inside .extra-container,
+      which would otherwise kill the Material Icons ligature → plain text. */}
+  <i class="material-icons pagination-action-icon dark-icon" aria-hidden="true">dark_mode</i>
   {/* light_mode icon — shown in dark mode (clicking disables dark) */}
-  <i class="material-icons light-icon" aria-hidden="true">light_mode</i>
+  <i class="material-icons pagination-action-icon light-icon" aria-hidden="true">light_mode</i>
 </button>
 
 <style>
