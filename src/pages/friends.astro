@@ -1,0 +1,56 @@
+---
+/**
+ * friends.astro — Friends page.
+ *
+ * Reads the `friends[]` array from src/content/pages/friends.md frontmatter
+ * and renders it via FriendsGrid (shuffled, lazy-loaded avatar cards).
+ * Mirrors Hugo's /friends/ page served by diary's friends-list shortcode.
+ */
+
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import FriendsGrid from '../components/FriendsGrid.astro';
+
+interface Friend {
+  name: string;
+  href: string;
+  desc?: string;
+  qq?: string;
+  hash?: string;
+  email?: string;
+  icon?: string;
+}
+
+const pages = await getCollection('pages');
+const friendsPage = pages.find((p) => p.id === 'friends.md' || p.data.slug === 'friends');
+
+// friends[] lives in frontmatter; the Zod schema doesn't define it, so
+// it is stripped from p.data. We access it via the raw entry body isn't
+// enough — we need to reach into the loader's raw data. In Astro 5 content
+// layer with glob(), unrecognised frontmatter fields are accessible on the
+// entry itself as entry.data is the Zod-parsed output only.
+// The friends list is stored in the content file's YAML frontmatter as
+// `friends[]`. Since it's not in our schema it gets dropped by Zod.
+// We re-parse via the filePath if available, otherwise fall back to empty.
+//
+// Practical workaround: extend the Zod schema or read raw via import.meta.glob.
+// Here we use import.meta.glob to get the raw frontmatter without Zod stripping.
+const rawPages = import.meta.glob<{ frontmatter: Record<string, unknown> }>(
+  '/src/content/pages/friends.md',
+  { eager: true }
+);
+const rawFriends = Object.values(rawPages)[0]?.frontmatter?.friends as Friend[] | undefined;
+const friends: Friend[] = rawFriends ?? [];
+
+// Body prose from the friends.md content (intro paragraph above the list)
+const { Content } = friendsPage ? await render(friendsPage) : { Content: null };
+---
+
+<BaseLayout title="朋友们" description="博主的朋友们">
+  <div class="post-list-container post-list-container-no-background">
+    <article class="post friends-page">
+      {Content && <Content />}
+      <FriendsGrid friends={friends} />
+    </article>
+  </div>
+</BaseLayout>

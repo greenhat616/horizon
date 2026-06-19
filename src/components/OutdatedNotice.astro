@@ -1,0 +1,78 @@
+---
+/**
+ * OutdatedNotice.astro — Build-time + runtime outdated article warning.
+ *
+ * Design (plan.md §3f / analysis.md §OutdatedNotice 双计算设计):
+ *
+ *   Build time:
+ *     staleAfter = lastmod + 6 months   (via lib/outdated.ts)
+ *     If build date >= staleAfter → render visible (SEO-friendly static HTML).
+ *     Otherwise                  → render with `hidden` attribute.
+ *     data-* attributes carry timestamps for the runtime pass.
+ *
+ *   Runtime (outdated-runtime.ts):
+ *     Re-checks against visitor's actual Date.now().
+ *     Removes `hidden` and refreshes [data-relative-time] text when stale.
+ *
+ * data-* contract (consumed by outdated-runtime.ts):
+ *   data-outdated-notice  — selector marker
+ *   data-lastmod          — lastmod as ISO-8601
+ *   data-stale-after      — staleAfter as ISO-8601
+ *   [data-relative-time]  — inner span; runtime replaces textContent
+ *
+ * Visual: mirrors the `.notice.info` box from shortcodes/notice.html
+ * (same SVG icon + journal.scss class names).
+ *
+ * Props
+ *   lastmod — last-modified Date of the article
+ */
+import { staleAfter, isStaleAt } from '../lib/outdated';
+
+interface Props {
+  lastmod: Date;
+}
+
+const { lastmod } = Astro.props;
+
+const staleAfterDate = staleAfter(lastmod);
+const buildNow = new Date();
+const staleAtBuild = isStaleAt(staleAfterDate, buildNow);
+
+// Build-time relative time fallback (zh-CN, shown until runtime updates it)
+const rtf = new Intl.RelativeTimeFormat('zh-CN', { numeric: 'auto' });
+const diffMs = lastmod.getTime() - buildNow.getTime(); // negative for past
+const diffMonths = diffMs / (1000 * 60 * 60 * 24 * 30.4375);
+let buildTimeRelative: string;
+if (Math.abs(diffMonths) >= 12) {
+  const diffYears = diffMs / (1000 * 60 * 60 * 24 * 365.25);
+  buildTimeRelative = rtf.format(Math.round(diffYears), 'year');
+} else {
+  buildTimeRelative = rtf.format(Math.round(diffMonths), 'month');
+}
+---
+
+{/* SVG sprite — same as Notice.astro; layout will deduplicate via id="notice_figure" */}
+<svg display="none" height="0" id="notice_figure" width="0" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="info-notice" preserveAspectRatio="xMidYMid meet" viewBox="0 0 512 512">
+    <path d="M256 8C119.043 8 8 119.083 8 256c0 136.997 111.043 248 248 248s248-111.003 248-248C504 119.083 392.957 8 256 8zm0 110c23.196 0 42 18.804 42 42s-18.804 42-42 42-42-18.804-42-42 18.804-42 42-42zm56 254c0 6.627-5.373 12-12 12h-88c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h12v-64h-12c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h64c6.627 0 12 5.373 12 12v100h12c6.627 0 12 5.373 12 12v24z" style="fill: var(--icon-color)"></path>
+  </symbol>
+</svg>
+
+<div
+  data-outdated-notice
+  data-lastmod={lastmod.toISOString()}
+  data-stale-after={staleAfterDate.toISOString()}
+  class="notice info"
+  hidden={staleAtBuild ? undefined : true}
+>
+  <p class="first notice-title">
+    <span class="icon-notice baseline">
+      <svg><use href="#info-notice"></use></svg>
+    </span>
+    注意
+  </p>
+  <p>
+    本文最后更新于 <span data-relative-time>{buildTimeRelative}</span>，
+    部分内容可能已经过时，请注意甄别。
+  </p>
+</div>

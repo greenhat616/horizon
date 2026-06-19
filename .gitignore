@@ -1,9 +1,13 @@
-dist/
-public/
-.DS_Store
-node_modules
-dist
-tmp
-resources/_gen
-
+# Hugo build output — ignored; Astro's source public/ dir is tracked
+# (Hugo writes its output to public/ only when running `hugo`; Astro uses dist/)
+resources/_gen/
 .hugo_build.lock
+
+# Common dev artefacts
+node_modules/
+dist/
+tmp/
+.DS_Store
+
+# Astro cache
+.astro/

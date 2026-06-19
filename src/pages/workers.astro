@@ -1,0 +1,25 @@
+---
+/**
+ * workers.astro — Workers/service-worker info page.
+ *
+ * Renders the content from src/content/pages/workers.md wrapped in
+ * BaseLayout. The original Hugo page is a bare `_index.html` with
+ * minimal body content; we preserve that via Astro content rendering.
+ */
+
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const pages = await getCollection('pages');
+const workersPage = pages.find((p) => p.id === 'workers.md' || p.data.slug === 'workers');
+
+const { Content } = workersPage ? await render(workersPage) : { Content: null };
+---
+
+<BaseLayout title={workersPage?.data.title ?? 'Workers'}>
+  <div class="post-list-container post-list-container-no-background">
+    <article class="post">
+      {Content && <Content />}
+    </article>
+  </div>
+</BaseLayout>

@@ -1,0 +1,226 @@
+---
+/**
+ * PostLayout.astro — Single article page layout.
+ *
+ * Wraps BaseLayout and renders the diary single.html structure:
+ *   .post-list-container.post-list-container-shadow
+ *     .post
+ *       .post-head-wrapper[-text-only]  (featured image or plain title bar)
+ *         .post-title
+ *           PostMeta
+ *       .post-body-wrapper
+ *         .post-body[data-viewer-scope]
+ *           OutdatedNotice   (when lastmod is set)
+ *           <slot />         (rendered Markdown body from the page)
+ *           CCLicense        (when disableCC is not set)
+ *       .post-pagination     (PostPager prev/next article)
+ *       .post-comment-wrapper
+ *           Comments
+ *
+ * The ToC is forwarded into BaseLayout's named "toc" slot so it
+ * appears in ExtraBar on desktop.
+ *
+ * Runtime init (appended after DOM ready):
+ *   initOutdatedNotices()  — reveal stale notices on the client
+ *   initViewer()           — lazy ViewerJS lightbox on .post-body images
+ *   initComments()         — lazy Waline mount (only when comment !== false)
+ *
+ * Props:
+ *   title            — article title (required)
+ *   description      — meta description
+ *   date             — publish date (required)
+ *   lastmod          — last-modified date (optional)
+ *   categories       — category array
+ *   tags             — tag array
+ *   readingTime      — minutes from remark-reading-time-cjk
+ *   featuredImage    — URL for post hero background
+ *   headings         — MarkdownHeading[] for ToC
+ *   canonicalUrl     — explicit canonical href
+ *   ogImage          — OG image URL
+ *   enableLaTeX      — load KaTeX (default false)
+ *   disableToC       — hide ToC (default false)
+ *   disableMetaInfo  — hide PostMeta row (default false)
+ *   disablePagination — hide prev/next nav (default false)
+ *   disableViewerJS  — skip ViewerJS (default false)
+ *   disableCC        — hide CC license block (default false)
+ *   disableOutdatedNotice — suppress outdated notice even when lastmod is set (default false)
+ *   comment          — false to disable comments (default: enabled)
+ *   prevHref         — URL of the older post
+ *   prevTitle        — title of the older post
+ *   nextHref         — URL of the newer post
+ *   nextTitle        — title of the newer post
+ *   draft            — show draft badge
+ */
+
+import BaseLayout from './BaseLayout.astro';
+import PostMeta from '../components/PostMeta.astro';
+import OutdatedNotice from '../components/OutdatedNotice.astro';
+import TableOfContents from '../components/TableOfContents.astro';
+import CCLicense from '../components/CCLicense.astro';
+import PostPager from '../components/PostPager.astro';
+import Comments from '../components/Comments.astro';
+
+import { SITE_TITLE, SITE_URL } from '../site.config';
+
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  title: string;
+  description?: string;
+  date: Date;
+  lastmod?: Date;
+  categories?: string[];
+  tags?: string[];
+  readingTime?: number;
+  featuredImage?: string | null;
+  headings?: Heading[];
+  canonicalUrl?: string;
+  ogImage?: string;
+  enableLaTeX?: boolean;
+  disableToC?: boolean;
+  disableMetaInfo?: boolean;
+  disablePagination?: boolean;
+  disableViewerJS?: boolean;
+  disableCC?: boolean;
+  /** Suppress the outdated-article notice even when lastmod is set. */
+  disableOutdatedNotice?: boolean;
+  /** false = comments explicitly disabled; undefined/true = enabled */
+  comment?: boolean;
+  prevHref?: string;
+  prevTitle?: string;
+  nextHref?: string;
+  nextTitle?: string;
+  draft?: boolean;
+}
+
+const {
+  title,
+  description,
+  date,
+  lastmod,
+  categories = [],
+  tags = [],
+  readingTime,
+  featuredImage,
+  headings = [],
+  canonicalUrl,
+  ogImage,
+  enableLaTeX = false,
+  disableToC = false,
+  disableMetaInfo = false,
+  disablePagination = false,
+  disableViewerJS = false,
+  disableCC = false,
+  disableOutdatedNotice = false,
+  comment,
+  prevHref,
+  prevTitle,
+  nextHref,
+  nextTitle,
+  draft = false,
+} = Astro.props;
+
+// Canonical URL for CCLicense (prefer explicit prop, else build from SITE_URL)
+const postUrl = canonicalUrl ?? new URL(Astro.url.pathname, SITE_URL).href;
+
+// Whether the post has a featured image hero
+const hasFeaturedImage = Boolean(featuredImage);
+const postHeadClass = hasFeaturedImage ? 'post-head-wrapper' : 'post-head-wrapper-text-only';
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonicalUrl={canonicalUrl}
+  ogImage={ogImage}
+  enableLaTeX={enableLaTeX}
+  disableViewerJS={disableViewerJS}
+>
+  {/* ToC forwarded to BaseLayout's ExtraBar slot */}
+  {!disableToC && headings.length > 0 && (
+    <TableOfContents slot="toc" headings={headings} />
+  )}
+
+  <div class="post-list-container post-list-container-shadow">
+    <div class="post">
+
+      {/* Post hero — featured image or plain title bar */}
+      <div
+        class={postHeadClass}
+        style={hasFeaturedImage ? `background-image: url('${featuredImage}')` : undefined}
+      >
+        <div class="post-title">
+          {title}
+          {!disableMetaInfo && (
+            <PostMeta
+              date={date}
+              categories={categories}
+              tags={tags}
+              readingTime={readingTime}
+              draft={draft}
+              variant="post"
+            />
+          )}
+        </div>
+      </div>
+
+      {/* Post body */}
+      <div class="post-body-wrapper">
+        <div class="post-body" data-viewer-scope>
+          {/* Outdated notice — build-time rendered, runtime-revealed.
+               Suppressed when the post sets disableOutdatedNotice: true. */}
+          {lastmod && !disableOutdatedNotice && <OutdatedNotice lastmod={lastmod} />}
+
+          {/* Rendered Markdown */}
+          <slot />
+
+          {/* CC License block */}
+          {!disableCC && (
+            <CCLicense title={title} siteTitle={SITE_TITLE} url={postUrl} />
+          )}
+        </div>
+      </div>
+
+      {/* Prev/next article navigation */}
+      {!disablePagination && (
+        <PostPager
+          variant="post"
+          prevHref={prevHref}
+          prevTitle={prevTitle}
+          nextHref={nextHref}
+          nextTitle={nextTitle}
+        />
+      )}
+
+      {/* Comment section */}
+      <Comments disabled={comment === false} />
+
+    </div>
+  </div>
+</BaseLayout>
+
+{/* Runtime scripts for article pages */}
+<script>
+  import { initOutdatedNotices } from '../scripts/outdated-runtime';
+  import { initViewer } from '../scripts/viewer';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    initOutdatedNotices();
+    initViewer();
+  });
+</script>
+
+{/* Comments script — only when comment is not explicitly disabled */}
+{comment !== false && (
+  <script>
+    import { initComments } from '../scripts/comments';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initComments();
+    });
+  </script>
+)}

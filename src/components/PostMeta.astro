@@ -1,0 +1,82 @@
+---
+/**
+ * PostMeta.astro — Post metadata row (date, categories, reading time).
+ * Mirrors diary's partials/post-item-meta.html and the .post-meta block
+ * inside single.html.
+ *
+ * Props
+ *   date        — publish date (required)
+ *   categories  — array of category strings (optional)
+ *   tags        — array of tag strings (optional)
+ *   readingTime — minutes, from remark-reading-time-cjk (optional)
+ *   draft       — show draft badge when true (optional)
+ *   variant     — 'item' (list card) | 'post' (article header, default)
+ */
+import { formatDate } from '../lib/dates';
+import { urlizeTerm } from '../lib/taxonomy';
+
+interface Props {
+  date: Date;
+  categories?: string[];
+  tags?: string[];
+  readingTime?: number;
+  draft?: boolean;
+  variant?: 'item' | 'post';
+}
+
+const {
+  date,
+  categories = [],
+  tags = [],
+  readingTime,
+  draft = false,
+  variant = 'post',
+} = Astro.props;
+
+const formattedDate = formatDate(date);
+const cssClass = variant === 'item' ? 'post-item-meta' : 'post-meta';
+---
+
+<div class={cssClass}>
+  <time itemprop="datePublished" datetime={date.toISOString()}>
+    {formattedDate}
+  </time>
+
+  {categories.length > 0 && (
+    <>
+      &emsp;
+      <i class="material-icons" style="font-size:14px; vertical-align:middle">folder</i>
+      {categories.map((cat) => (
+        <a href={`/categories/${urlizeTerm(cat)}/`}>{cat}</a>
+      ))}
+    </>
+  )}
+
+  {tags.length > 0 && (
+    <>
+      &emsp;
+      <i class="material-icons" style="font-size:14px; vertical-align:middle">label</i>
+      {tags.map((tag, i) => (
+        <>
+          <a href={`/tags/${urlizeTerm(tag)}/`}>{tag}</a>
+          {i < tags.length - 1 && <> </>}
+        </>
+      ))}
+    </>
+  )}
+
+  {readingTime != null && readingTime > 0 && (
+    <>
+      &emsp;
+      <i class="material-icons" style="font-size:10px; vertical-align:middle">schedule</i>
+      {readingTime} min
+    </>
+  )}
+
+  {draft && (
+    <>
+      &emsp;
+      <span class="draft-label">草稿</span>
+    </>
+  )}
+</div>

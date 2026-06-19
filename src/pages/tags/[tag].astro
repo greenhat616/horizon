@@ -1,0 +1,71 @@
+---
+/**
+ * tags/[tag].astro — Per-tag post list page.
+ *
+ * Generates a static route for every unique urlized tag found in published
+ * posts. The route param is the urlized (lowercase ASCII, CJK preserved) form
+ * produced by urlizeTerm(), matching Hugo's /tags/<slug>/ pattern.
+ *
+ * Multiple raw tags that collapse to the same slug are merged into one page;
+ * the page title shows the first canonical raw term encountered.
+ *
+ * Uses ListLayout to render the filtered post list.
+ */
+
+import { getCollection } from 'astro:content';
+import ListLayout from '../../layouts/ListLayout.astro';
+import { urlizeTerm } from '../../lib/taxonomy';
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection('posts');
+  const published = allPosts.filter((p) => !p.data.draft && !p.data.hidden);
+
+  // Map urlized slug → { canonical raw term, posts[] }
+  const tagMap = new Map<string, { label: string; posts: typeof published }>();
+
+  for (const post of published) {
+    for (const rawTag of post.data.tags ?? []) {
+      const slug = urlizeTerm(rawTag);
+      if (!tagMap.has(slug)) {
+        tagMap.set(slug, { label: rawTag, posts: [] });
+      }
+      tagMap.get(slug)!.posts.push(post);
+    }
+  }
+
+  return [...tagMap.entries()].map(([slug, { label, posts: tagPosts }]) => {
+    const sorted = tagPosts
+      .slice()
+      .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+    return {
+      params: { tag: slug },
+      props: { tag: label, tagPosts: sorted },
+    };
+  });
+}
+
+interface Props {
+  tag: string;
+  tagPosts: Awaited<ReturnType<typeof getCollection<'posts'>>>;
+}
+
+const { tag, tagPosts } = Astro.props;
+
+const posts = tagPosts.map((p) => ({
+  href: `/posts/${p.data.slug}/`,
+  title: p.data.title,
+  summary: p.data.description ?? undefined,
+  featuredImage: p.data.featured_image ?? undefined,
+  date: p.data.date,
+  categories: p.data.categories ?? [],
+  tags: p.data.tags ?? [],
+  draft: p.data.draft,
+}));
+---
+
+<ListLayout
+  title={`标签：${tag}`}
+  description={`标签 "${tag}" 下的全部文章`}
+  posts={posts}
+/>

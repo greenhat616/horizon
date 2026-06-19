@@ -1,0 +1,14 @@
+{
+  "id": "migrate-blog-to-astro",
+  "title": "将博客从 Hugo(diary) 迁移到 Astro：静态、零-JS 默认、保留观感与对外契约",
+  "status": "in_progress",
+  "strategy": "full-collaborate",
+  "currentPhase": "5-optimization",
+  "nextAction": "Round 2 修复已验证（5 Critical 全修）→ Phase 6 验收 / 用户决定是否 Round 3 + 提交",
+  "gate": "user_finalize_decision",
+  "executionMode": "agent-teams",
+  "branch": "worktree-astro-migration",
+  "scope": "migrate-blog-to-astro",
+  "createdAt": "2026-06-20T01:37:05+08:00",
+  "notes": "Phase 1(研究)+Phase 2(多模型构思) 已在先前 /ccg:analyze 轮次完成（codex×2 + grok 核实 + Claude 前端补位）。gemini 本会话永久不可用(IneligibleTierError)，多模型降级为 codex+Claude。"
+}

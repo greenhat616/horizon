@@ -1,0 +1,60 @@
+---
+/**
+ * DarkModeToggle.astro — Dark/light mode button.
+ *
+ * Calls window.toggleDarkMode() (exposed by src/scripts/theme.ts).
+ * Renders two icon states:
+ *   - .dark-icon  shown when currently in light mode (clicking → go dark)
+ *   - .light-icon shown when currently in dark mode  (clicking → go light)
+ *
+ * The html.night / html.dark class (applied by theme.ts) drives icon visibility
+ * via the CSS rules already present in dark-mode.scss.
+ *
+ * Props:
+ *   class — forwarded to the <button> for positional styling
+ *   id    — optional element id (useful when multiple toggles exist on a page)
+ */
+
+interface Props {
+  class?: string;
+  id?: string;
+}
+
+const { class: className, id } = Astro.props;
+---
+
+<button
+  type="button"
+  class:list={['dark-mode-toggle', className]}
+  id={id}
+  onclick="toggleDarkMode()"
+  aria-label="切换深色模式"
+>
+  {/* dark_mode icon — shown in light mode (clicking enables dark) */}
+  <i class="material-icons dark-icon" aria-hidden="true">dark_mode</i>
+  {/* light_mode icon — shown in dark mode (clicking disables dark) */}
+  <i class="material-icons light-icon" aria-hidden="true">light_mode</i>
+</button>
+
+<style>
+  .dark-mode-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /*
+   * Default (light mode): show dark-icon, hide light-icon.
+   * When html.night is present (dark mode): swap.
+   * Relies on journal.scss / dark-mode.scss for color tokens.
+   */
+  .dark-icon  { display: inline; }
+  .light-icon { display: none;   }
+
+  :global(html.night) .dark-icon  { display: none;   }
+  :global(html.night) .light-icon { display: inline; }
+</style>

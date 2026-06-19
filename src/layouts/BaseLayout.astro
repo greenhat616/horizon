@@ -1,0 +1,169 @@
+---
+/**
+ * BaseLayout.astro — Root page shell for every page.
+ *
+ * Replicates themes/diary/layouts/_default/baseof.html's #app structure:
+ *   #app
+ *     MobileHeader  (nav + page hero, mobile only)
+ *     MobileDrawer  (slide-in nav, mobile only)
+ *     #content > #streamContainer   ← <slot /> lands here
+ *     SidebarNav    (desktop fixed sidebar)
+ *     ExtraBar      (desktop right panel; ToC slot forwarded via named slot)
+ *     Footer        (mobile footer + copyright)
+ *
+ * This component owns the sole <head> element in the document.
+ * HeadMeta.astro outputs only a content fragment (no <head> wrapper).
+ *
+ * Dark mode no-FOUC:
+ *   An inline is:inline script runs before any stylesheet to read the
+ *   `night` cookie (native document.cookie — no js-cookie dependency) and
+ *   toggle html.night / html.dark.  This mirrors head.html's getNightRawMode.
+ *
+ * Runtime init (after DOM ready):
+ *   initTheme()  — syncs dark-mode state from cookie / media-query
+ *   initNav()    — scroll transparency, mobile drawer, back-to-top
+ *
+ * Props:
+ *   title           — page <title> text (falls back to site title on home)
+ *   description     — meta description
+ *   canonicalUrl    — explicit canonical href
+ *   ogImage         — Open Graph image URL
+ *   enableLaTeX     — load KaTeX assets (default false)
+ *   disableViewerJS — reserved for post layout; not used in head (viewer.ts lazy-loads)
+ *   isHome          — true on the home page
+ *   prevUrl         — href for previous-page pagination (list pages)
+ *   nextUrl         — href for next-page pagination (list pages)
+ *   page            — current page number (list pages, for ExtraBar indicator)
+ *   totalPages      — total page count (list pages, for ExtraBar indicator)
+ */
+
+import '../styles/global.css';
+import '../styles/dark-mode.scss';
+
+import HeadMeta from '../components/HeadMeta.astro';
+import MobileHeader from '../components/MobileHeader.astro';
+import MobileDrawer from '../components/MobileDrawer.astro';
+import SidebarNav from '../components/SidebarNav.astro';
+import ExtraBar from '../components/ExtraBar.astro';
+import Footer from '../components/Footer.astro';
+
+import { SITE_DESCRIPTION } from '../site.config';
+
+interface Props {
+  title?: string;
+  description?: string;
+  canonicalUrl?: string;
+  ogImage?: string;
+  enableLaTeX?: boolean;
+  /** Reserved — viewer.ts handles lazy-loading; not forwarded to HeadMeta. */
+  disableViewerJS?: boolean;
+  isHome?: boolean;
+  /** Pagination props forwarded to ExtraBar and Footer (list pages). */
+  prevUrl?: string;
+  nextUrl?: string;
+  page?: number;
+  totalPages?: number;
+}
+
+const {
+  title,
+  description = SITE_DESCRIPTION,
+  canonicalUrl,
+  ogImage,
+  enableLaTeX = false,
+  isHome = false,
+  prevUrl,
+  nextUrl,
+  page,
+  totalPages,
+} = Astro.props;
+
+const pathname = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="zh-cn">
+  <head>
+    {/*
+      No-FOUC dark mode detection — MUST run before any stylesheet renders.
+      Reads the `night` cookie via native document.cookie (no js-cookie dep).
+      Mirrors head.html's getNightRawMode() logic exactly.
+    */}
+    <script is:inline>
+      (function () {
+        function getCookie(n) {
+          var m = document.cookie.match(new RegExp('(?:^|; )' + n + '=([^;]*)'));
+          return m ? decodeURIComponent(m[1]) : undefined;
+        }
+        var night = getCookie('night');
+        if (night === undefined) {
+          night = window.matchMedia('(prefers-color-scheme: dark)').matches ? '1' : '0';
+        }
+        if (night === '1') {
+          document.documentElement.classList.add('night', 'dark');
+        } else {
+          document.documentElement.classList.remove('night', 'dark');
+        }
+        // create theme-color meta (mirrors head.html)
+        var meta = document.createElement('meta');
+        meta.name = 'theme-color';
+        meta.content = getComputedStyle(document.documentElement)
+          .getPropertyValue('--nav-bar-background-color');
+        document.head.appendChild(meta);
+      })();
+    </script>
+
+    <HeadMeta
+      title={title}
+      description={description}
+      canonicalUrl={canonicalUrl}
+      ogImage={ogImage}
+      enableLaTeX={enableLaTeX}
+      isHome={isHome}
+    />
+  </head>
+
+  <body>
+    <div id="app">
+      {/* Mobile top nav + page hero — hidden on desktop via journal.scss */}
+      <MobileHeader />
+
+      {/* Mobile slide-in drawer */}
+      <MobileDrawer pathname={pathname} />
+
+      {/* Main content column */}
+      <div id="content">
+        <div id="streamContainer" class="stream-container">
+          <slot />
+        </div>
+      </div>
+
+      {/* Desktop fixed sidebar */}
+      <SidebarNav pathname={pathname} />
+
+      {/* Desktop right extra panel — ToC slot forwarded from child layouts */}
+      <ExtraBar
+        prevUrl={prevUrl}
+        nextUrl={nextUrl}
+        page={page}
+        total={totalPages}
+      >
+        <slot name="toc" slot="toc" />
+      </ExtraBar>
+
+      {/* Mobile footer (copyright + optional paginator) */}
+      <Footer prevUrl={prevUrl} nextUrl={nextUrl} />
+    </div>
+
+    {/* Runtime scripts — bundled by Astro, executed after DOM ready */}
+    <script>
+      import { initTheme } from '../scripts/theme';
+      import { initNav } from '../scripts/nav';
+
+      document.addEventListener('DOMContentLoaded', () => {
+        initTheme();
+        initNav();
+      });
+    </script>
+  </body>
+</html>

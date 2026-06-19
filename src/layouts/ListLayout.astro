@@ -1,0 +1,96 @@
+---
+/**
+ * ListLayout.astro — Post list page layout (home, taxonomy, archive).
+ *
+ * Wraps BaseLayout and renders the diary index.html structure:
+ *   .post-list-container.post-list-container-no-background
+ *     PostCard  × N
+ *   PostPager (list variant, mobile inline)
+ *
+ * Pagination state is forwarded to BaseLayout so ExtraBar (desktop)
+ * and Footer (mobile) render their respective paginator controls.
+ *
+ * Props:
+ *   title       — page <title> (optional; defaults to site title on home)
+ *   description — meta description
+ *   isHome      — true on the home page (title = siteTitle only)
+ *   posts       — array of post card data to render
+ *   page        — current page number (1-based)
+ *   totalPages  — total number of pages
+ *   prevUrl     — href for previous page (undefined on first page)
+ *   nextUrl     — href for next page (undefined on last page)
+ */
+
+import BaseLayout from './BaseLayout.astro';
+import PostCard from '../components/PostCard.astro';
+import PostPager from '../components/PostPager.astro';
+
+interface PostCardData {
+  href: string;
+  title: string;
+  summary?: string;
+  featuredImage?: string | null;
+  date: Date;
+  categories?: string[];
+  tags?: string[];
+  readingTime?: number;
+  draft?: boolean;
+}
+
+interface Props {
+  title?: string;
+  description?: string;
+  isHome?: boolean;
+  posts: PostCardData[];
+  page?: number;
+  totalPages?: number;
+  prevUrl?: string;
+  nextUrl?: string;
+}
+
+const {
+  title,
+  description,
+  isHome = false,
+  posts,
+  page = 1,
+  totalPages = 1,
+  prevUrl,
+  nextUrl,
+} = Astro.props;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  isHome={isHome}
+  page={page}
+  totalPages={totalPages}
+  prevUrl={prevUrl}
+  nextUrl={nextUrl}
+>
+  <div class="post-list-container post-list-container-no-background">
+    {posts.map((post) => (
+      <PostCard
+        href={post.href}
+        title={post.title}
+        summary={post.summary}
+        featuredImage={post.featuredImage}
+        date={post.date}
+        categories={post.categories}
+        tags={post.tags}
+        readingTime={post.readingTime}
+        draft={post.draft}
+      />
+    ))}
+  </div>
+
+  {/* Mobile inline pagination — mirrors mobile-paginator.html */}
+  <PostPager
+    variant="list"
+    page={page}
+    totalPages={totalPages}
+    prevHref={prevUrl}
+    nextHref={nextUrl}
+  />
+</BaseLayout>

@@ -1,0 +1,66 @@
+---
+/**
+ * posts/page/[page].astro — Paginated post archive.
+ *
+ * Generates:  /posts/page/2/, /posts/page/3/, … (page 1 is posts/index.astro)
+ * Page 1 is intentionally excluded from getStaticPaths to avoid a duplicate
+ * route — the canonical /posts/ page (posts/index.astro) already serves it.
+ */
+
+import { getCollection } from 'astro:content';
+import ListLayout from '../../../layouts/ListLayout.astro';
+
+export async function getStaticPaths() {
+  const PAGE_SIZE = 10;
+
+  const allPosts = (await getCollection('posts')).filter(
+    (p) => !p.data.draft && !p.data.hidden,
+  );
+
+  const sorted = allPosts.sort(
+    (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+  );
+
+  const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
+
+  // Start from page 2 — page 1 is rendered by posts/index.astro
+  return Array.from({ length: Math.max(0, totalPages - 1) }, (_, i) => {
+    const page = i + 2;
+    const start = (page - 1) * PAGE_SIZE;
+    const end = start + PAGE_SIZE;
+    const pagePosts = sorted.slice(start, end);
+
+    const posts = pagePosts.map((p) => ({
+      href: `/posts/${p.data.slug}/`,
+      title: p.data.title,
+      summary: p.data.description ?? undefined,
+      featuredImage: p.data.featured_image ?? undefined,
+      date: p.data.date,
+      categories: p.data.categories ?? [],
+      tags: p.data.tags ?? [],
+    }));
+
+    return {
+      params: { page: String(page) },
+      props: {
+        posts,
+        page,
+        totalPages,
+        prevUrl: page === 2 ? '/posts/' : `/posts/page/${page - 1}/`,
+        nextUrl: page < totalPages ? `/posts/page/${page + 1}/` : undefined,
+      },
+    };
+  });
+}
+
+const { posts, page, totalPages, prevUrl, nextUrl } = Astro.props;
+---
+
+<ListLayout
+  title={`文章 — 第 ${page} 页`}
+  posts={posts}
+  page={page}
+  totalPages={totalPages}
+  prevUrl={prevUrl}
+  nextUrl={nextUrl}
+/>

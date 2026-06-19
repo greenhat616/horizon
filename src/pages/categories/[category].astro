@@ -1,0 +1,71 @@
+---
+/**
+ * categories/[category].astro — Per-category post list page.
+ *
+ * Generates a static route for every unique urlized category found in published
+ * posts. The route param is the urlized (lowercase ASCII, CJK preserved) form
+ * produced by urlizeTerm(), matching Hugo's /categories/<slug>/ pattern.
+ *
+ * Multiple raw categories that collapse to the same slug are merged into one
+ * page; the page title shows the first canonical raw term encountered.
+ *
+ * Uses ListLayout to render the filtered post list.
+ */
+
+import { getCollection } from 'astro:content';
+import ListLayout from '../../layouts/ListLayout.astro';
+import { urlizeTerm } from '../../lib/taxonomy';
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection('posts');
+  const published = allPosts.filter((p) => !p.data.draft && !p.data.hidden);
+
+  // Map urlized slug → { canonical raw term, posts[] }
+  const catMap = new Map<string, { label: string; posts: typeof published }>();
+
+  for (const post of published) {
+    for (const rawCat of post.data.categories ?? []) {
+      const slug = urlizeTerm(rawCat);
+      if (!catMap.has(slug)) {
+        catMap.set(slug, { label: rawCat, posts: [] });
+      }
+      catMap.get(slug)!.posts.push(post);
+    }
+  }
+
+  return [...catMap.entries()].map(([slug, { label, posts: catPosts }]) => {
+    const sorted = catPosts
+      .slice()
+      .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+    return {
+      params: { category: slug },
+      props: { category: label, catPosts: sorted },
+    };
+  });
+}
+
+interface Props {
+  category: string;
+  catPosts: Awaited<ReturnType<typeof getCollection<'posts'>>>;
+}
+
+const { category, catPosts } = Astro.props;
+
+const posts = catPosts.map((p) => ({
+  href: `/posts/${p.data.slug}/`,
+  title: p.data.title,
+  summary: p.data.description ?? undefined,
+  featuredImage: p.data.featured_image ?? undefined,
+  date: p.data.date,
+  categories: p.data.categories ?? [],
+  tags: p.data.tags ?? [],
+  draft: p.data.draft,
+}));
+---
+
+<ListLayout
+  title={`分类：${category}`}
+  description={`分类 "${category}" 下的全部文章`}
+  posts={posts}
+/>

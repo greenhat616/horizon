@@ -1,0 +1,9 @@
+{"_example": "Fill with {\"file\": \"path\", \"reason\": \"why\"}. Seed rows are skipped."}
+{"file": ".ccg/tasks/migrate-blog-to-astro/requirements.md", "reason": "增强后的结构化迁移需求与验收标准"}
+{"file": ".ccg/tasks/migrate-blog-to-astro/analysis.md", "reason": "多模型迁移分析综合结论（codex + Claude）"}
+{"file": ".ccg/tasks/migrate-blog-to-astro/plan.md", "reason": "文件级分层实施计划"}
+{"file": "config.toml", "reason": "Hugo 站点配置：baseURL/taxonomies/markup/highlight，迁移参照"}
+{"file": "themes/diary/layouts/_default/baseof.html", "reason": "基础布局：全局 Vue 挂载点，组件化拆分参照"}
+{"file": "themes/diary/layouts/partials/head.html", "reason": "外链资源/SRI/CDN 兜底/暗色逻辑来源"}
+{"file": "themes/diary/static/js/journal-module.js", "reason": "现 Vue 行为逻辑（暗色/抽屉/滚动/OutdatedNotice），需改写为 vanilla"}
+{"file": "themes/diary/assets/scss/journal.scss", "reason": "diary 观感核心样式，保真打底"}

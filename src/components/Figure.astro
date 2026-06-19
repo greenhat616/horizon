@@ -1,0 +1,58 @@
+---
+/**
+ * Figure.astro — Image with caption.
+ * Mirrors diary's shortcodes/insertFigure.html.
+ *
+ * Local images (src starts with '/' or '.') → astro:assets Image (optimised).
+ * Remote images (http/https) → plain <img> (CDN already handles optimisation).
+ *
+ * Props
+ *   src     — image path or URL (required)
+ *   caption — figure caption text, supports Markdown (optional)
+ *   alt     — alt text (falls back to caption, then empty)
+ *   align   — 'left' | 'center' | 'right' (default 'center')
+ *   width   — intrinsic width in px for local images (default 800)
+ *   height  — intrinsic height in px for local images (default 450)
+ */
+import { Image } from 'astro:assets';
+
+interface Props {
+  src: string;
+  caption?: string;
+  alt?: string;
+  align?: string;
+  width?: number;
+  height?: number;
+}
+
+const {
+  src,
+  caption,
+  alt = caption ?? '',
+  align = 'center',
+  width = 800,
+  height = 450,
+} = Astro.props;
+
+const isRemote = /^https?:\/\//.test(src);
+const captionId = caption ? `caption-${caption.replace(/\s+/g, '-').substring(0, 32)}` : undefined;
+---
+
+<figure style={`text-align:${align}`} role="group" aria-describedby={captionId}>
+  <a href={src} class="img-link">
+    {isRemote ? (
+      <img src={src} alt={alt} loading="lazy" style="max-width:100%; border-radius:5px;" />
+    ) : (
+      <Image
+        src={src}
+        alt={alt}
+        width={width}
+        height={height}
+        style="max-width:100%; border-radius:5px;"
+      />
+    )}
+  </a>
+  {caption && (
+    <figcaption id={captionId} set:html={caption} />
+  )}
+</figure>

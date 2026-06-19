@@ -1,0 +1,20 @@
+---
+/**
+ * 404.astro — Custom 404 page.
+ *
+ * Astro serves this file automatically when a route is not found.
+ * Wrapped in BaseLayout for consistent chrome.
+ */
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="404 — 页面不存在" description="你访问的页面不存在">
+  <div class="post-list-container post-list-container-no-background">
+    <article class="post not-found-page">
+      <h1>404</h1>
+      <p>你访问的页面不存在。</p>
+      <p><a href="/">返回首页</a></p>
+    </article>
+  </div>
+</BaseLayout>

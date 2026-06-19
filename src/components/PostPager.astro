@@ -1,0 +1,88 @@
+---
+/**
+ * PostPager.astro — Article prev/next navigation.
+ * Mirrors diary's single.html .post-pagination block and
+ * mobile-paginator.html .pagination block.
+ *
+ * For desktop the `.post-pagination` layout is used (inline in the post body).
+ * For mobile the `.pagination` class is shown by journal.scss media queries.
+ *
+ * Props
+ *   prevHref   — URL of the older post (optional)
+ *   prevTitle  — title of the older post (optional)
+ *   nextHref   — URL of the newer post (optional)
+ *   nextTitle  — title of the newer post (optional)
+ *   variant    — 'post' (prev/next inside article, default) |
+ *                'list' (page X/Y paginator used on list pages)
+ *   page       — current page number (list variant)
+ *   totalPages — total page count (list variant)
+ */
+
+interface Props {
+  prevHref?: string;
+  prevTitle?: string;
+  nextHref?: string;
+  nextTitle?: string;
+  variant?: 'post' | 'list';
+  page?: number;
+  totalPages?: number;
+}
+
+const {
+  prevHref,
+  prevTitle,
+  nextHref,
+  nextTitle,
+  variant = 'post',
+  page = 1,
+  totalPages = 1,
+} = Astro.props;
+---
+
+{variant === 'post' && (
+  <nav class="post-pagination">
+    {nextHref ? (
+      <a class="newer-posts" href={nextHref}>
+        ← 较新的文章<br />{nextTitle}
+      </a>
+    ) : (
+      <a class="newer-posts">← 较新的文章<br />已是最新</a>
+    )}
+
+    {prevHref ? (
+      <a class="older-posts" href={prevHref}>
+        较旧的文章 →<br />{prevTitle}
+      </a>
+    ) : (
+      <a class="older-posts">较旧的文章 →<br />已是最旧</a>
+    )}
+  </nav>
+)}
+
+{variant === 'list' && totalPages > 1 && (
+  <div class="pagination">
+    {prevHref ? (
+      <a class="pagination-action" href={prevHref} style="opacity:1">
+        <i class="material-icons pagination-action-icon">chevron_left</i>
+      </a>
+    ) : (
+      <a class="pagination-action" style="opacity:0">
+        <i class="material-icons pagination-action-icon">chevron_left</i>
+      </a>
+    )}
+
+    <div class="pagination-indicator">
+      <span>{page}/{totalPages}</span>
+    </div>
+
+    {nextHref ? (
+      <a class="pagination-action" href={nextHref} style="opacity:1">
+        <i class="material-icons pagination-action-icon">chevron_right</i>
+      </a>
+    ) : (
+      <a class="pagination-action" style="opacity:0">
+        <i class="material-icons pagination-action-icon">chevron_right</i>
+      </a>
+    )}
+  </div>
+)}
