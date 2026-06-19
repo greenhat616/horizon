@@ -13,8 +13,6 @@
  *       and NAV_ITEMS with values from Astro.site / getCollection() etc.
  */
 
-import DarkModeToggle from './DarkModeToggle.astro';
-
 // TODO: 后续从 Astro config 注入
 const SITE_TITLE = '藤之青';
 const SITE_SUBTITLE = '亲眼所见，亦非真实';
@@ -73,12 +71,8 @@ function isActive(itemUrl: string): boolean {
     ))}
   </div>
 
-  {/* Dark mode toggle sits between nav links and footer */}
-  <DarkModeToggle
-    id="darkModeToggleButton"
-    class="pagination-action"
-  />
-
+  {/* No dark-mode toggle here: the original diary sidebar.html had none.
+      The desktop toggle lives in the right-side ExtraBar; mobile uses MobileHeader. */}
   <div class="nav-footer">
     {/* Mirrors copyright.html — preserve attribution per MIT licence requirement */}
     Hugo Theme <a href="https://github.com/amazingrise/hugo-theme-diary">Diary</a> by{' '}
