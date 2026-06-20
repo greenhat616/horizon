@@ -1405,6 +1405,17 @@ mjx-container {
     }
     .code-card__icon {
       display: block;
+      // The icons stroke with `currentColor` so they track the button color
+      // (incl. :hover / .is-copied). But the global `* { color }` reset clamps
+      // to #000 for this accent and paints the <svg> AND each child <rect>/
+      // <path>/<polyline> their own black color; since `stroke: currentColor`
+      // is inherited and re-resolved per element, every drawn line goes black
+      // → an icon that vanishes on the dark bar in night mode. Re-inherit color
+      // across the whole subtree (not just the <svg>) to restore currentColor.
+      color: inherit;
+      * {
+        color: inherit;
+      }
     }
     .code-card__icon--done {
       display: none;
