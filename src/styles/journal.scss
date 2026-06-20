@@ -1268,3 +1268,111 @@ img.vuser {
     margin: 10px;
   }
 }
+
+// ── Markdown prose rhythm (Astro / Tailwind v4) ────────────────────────────
+// Tailwind v4 preflight resets margin & padding to 0 on every element. The
+// diary theme only ever set margins on h1–h3 and relied on the browser's UA
+// defaults for paragraph spacing, list indentation and table cell padding —
+// all of which preflight strips. Restore them here, scoped to rendered
+// Markdown. Block components (.notice / .post-cc / figure) own their internal
+// spacing, so paragraphs/headings/lists are matched as *direct* children of
+// .post-body to avoid reaching into those subtrees.
+.post-body {
+  // Paragraph & heading vertical rhythm (UA default was ~1em / theme used 20px)
+  > p {
+    margin: 1em 0;
+  }
+  > h4,
+  > h5,
+  > h6 {
+    margin: 20px 0; // global rule used invalid `padding: …auto`; restore spacing
+  }
+
+  // List markers + indentation. Tailwind v4 preflight sets `list-style: none`
+  // and zeroes the padding on every ol/ul, so ordered lists lose their 1. 2. 3.
+  // ordinals and unordered lists lose their bullets. Restore both (the prod
+  // theme inherited them from the browser / Bootstrap reboot). Applied to all
+  // descendant lists so nested and footnote lists are marked too.
+  ul,
+  ol {
+    padding-left: 2.5em;
+  }
+  ul {
+    list-style: disc;
+  }
+  ol {
+    list-style: decimal;
+  }
+  > ul,
+  > ol {
+    margin: 1em 0;
+  }
+  li {
+    margin: 0.25em 0;
+    // nested lists shouldn't add an extra outer gap
+    > ul,
+    > ol {
+      margin: 0.25em 0;
+    }
+  }
+
+  // GFM tables — preflight removed cell padding and the theme never carried
+  // table borders (those came from Bootstrap reboot, now dropped). Give them
+  // a readable grid; `display:block` + overflow lets wide tables scroll on
+  // narrow viewports instead of overflowing the column.
+  table {
+    display: block;
+    width: max-content;
+    max-width: 100%;
+    overflow-x: auto;
+    margin: 1em 0;
+    border-collapse: collapse;
+  }
+  th,
+  td {
+    padding: 8px 12px;
+    border: 1px solid rgba($color-accent, 0.18);
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background: rgba($color-accent, 0.06);
+    font-weight: 600;
+  }
+  tbody tr:nth-child(even) {
+    background: rgba($color-accent, 0.025);
+  }
+
+  // Footnotes — remark-gfm emits <section class="footnotes"> ending the body.
+  // No divider: the notes flow directly after the content (the in-text
+  // superscripts already mark the reference points), just with a little top
+  // breathing room. The ordered list inherits `list-style: decimal` above, so
+  // its 1. 2. 3. ordinals line up with the in-text references [1] [2] [3].
+  .footnotes {
+    margin-top: 1.5em;
+    font-size: 0.9em;
+    color: $dark-accent;
+
+    // remark labels the section with a visually-hidden English <h2>
+    // ("Footnotes"). Tailwind v4 only emits `.sr-only` for classes it finds
+    // while scanning source files — this one lives in generated Markdown HTML,
+    // so the utility is never built and the heading shows. Hide it the
+    // accessible way (Goldmark printed no label); the article's own heading
+    // (e.g. 引用 & 注) stays the visible one.
+    > h2#footnote-label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    a.data-footnote-backref {
+      text-decoration: none;
+    }
+  }
+}
