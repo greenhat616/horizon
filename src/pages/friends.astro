@@ -10,6 +10,7 @@
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import FriendsGrid from '../components/FriendsGrid.astro';
+import Comments from '../components/Comments.astro';
 
 interface Friend {
   name: string;
@@ -60,6 +61,18 @@ const { Content } = friendsPage ? await render(friendsPage) : { Content: null };
           <FriendsGrid friends={friends} />
         </div>
       </div>
+
+      {/* Comment section — mirrors diary single.html (friends.md doesn't disable comments) */}
+      <Comments />
     </div>
   </div>
 </BaseLayout>
+
+{/* Lazy Waline mount on viewport enter / click */}
+<script>
+  import { initComments } from '../scripts/comments';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    initComments();
+  });
+</script>
