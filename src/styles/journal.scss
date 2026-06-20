@@ -1,4 +1,30 @@
 @use "tools/remify";
+
+// ─── Material Icons ligature fix ──────────────────────────────────────────────
+// The fonts.yecdn.com Material Icons CSS ships the @font-face + base
+// `.material-icons` rule but DROPS the `font-feature-settings: 'liga'`
+// declarations that Google's canonical CSS includes. Without them the
+// word→glyph ligature never fires, so `<i class="material-icons">menu</i>`
+// renders the literal text "menu" instead of the hamburger glyph. Restore
+// them here (covers every .material-icons on the site: nav, drawer, toggles).
+.material-icons {
+  font-feature-settings: "liga";
+  -webkit-font-feature-settings: "liga";
+  -moz-font-feature-settings: "liga";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+// Mobile-only: `.single-column-nav-container * { font-family: … }` (and the
+// drawer's universal rule) tie `.material-icons` on specificity (both 0,1,0)
+// and win by source order, swapping the icon font for a text font → glyphs
+// become literal words ("menu", "dark_mode"). Re-assert the icon font with a
+// higher-specificity selector so the hamburger / dark-mode glyphs render.
+.single-column-nav-container .material-icons,
+.single-column-drawer-container .material-icons {
+  font-family: "Material Icons" !important;
+}
+
 // $color-accent: #1976d2;
 // $color-accent: #330000;
 $color-accent: #01506f;
@@ -271,6 +297,12 @@ a {
       padding-left: 12px;
     }
     .nav-content {
+      // Bootstrap's .navbar used to supply the flex row; with Bootstrap
+      // dropped, declare it here so the hamburger / title / dark-mode toggle
+      // stay on one line (.navbar-brand has flex:1 to push the toggle right).
+      display: flex;
+      align-items: center;
+      flex-wrap: nowrap;
       padding: 12px 8px;
       justify-content: flex-start;
       max-width: unset !important;
