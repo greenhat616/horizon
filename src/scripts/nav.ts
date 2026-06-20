@@ -75,20 +75,45 @@ function initNavScroll(
 }
 
 // ─── mobile drawer ───────────────────────────────────────────────────────────
-function initDrawer(drawer: HTMLElement, toggleBtns: NodeListOf<HTMLElement>): void {
+// Mirrors the original Vue theme: the drawer slides in via the
+// `single-column-drawer-container-active` class, and the backdrop is made
+// visible by adding `single-column-drawer-mask` (the class itself supplies
+// the fixed full-screen dark overlay in journal.scss). Both classes are
+// present only while the drawer is open.
+const DRAWER_OPEN_CLASS = 'single-column-drawer-container-active';
+const MASK_VISIBLE_CLASS = 'single-column-drawer-mask';
+
+function initDrawer(
+  drawer: HTMLElement,
+  toggleBtns: NodeListOf<HTMLElement>,
+  mask: HTMLElement | null,
+): void {
+  function setOpen(opened: boolean): void {
+    drawer.classList.toggle(DRAWER_OPEN_CLASS, opened);
+    drawer.setAttribute('aria-hidden', String(!opened));
+    mask?.classList.toggle(MASK_VISIBLE_CLASS, opened);
+    mask?.setAttribute('aria-hidden', String(!opened));
+    toggleBtns.forEach((btn) => btn.setAttribute('aria-expanded', String(opened)));
+  }
+
   toggleBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
-      const opened = drawer.classList.toggle('is-open');
-      drawer.setAttribute('aria-hidden', String(!opened));
-      btn.setAttribute('aria-expanded', String(opened));
+      setOpen(!drawer.classList.contains(DRAWER_OPEN_CLASS));
     });
   });
 
   // close on backdrop click
-  drawer.addEventListener('click', (e) => {
-    if (e.target === drawer) {
-      drawer.classList.remove('is-open');
-      drawer.setAttribute('aria-hidden', 'true');
+  mask?.addEventListener('click', () => setOpen(false));
+
+  // close after navigating via a drawer link
+  drawer.querySelectorAll<HTMLAnchorElement>('a[href]').forEach((link) => {
+    link.addEventListener('click', () => setOpen(false));
+  });
+
+  // close on Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && drawer.classList.contains(DRAWER_OPEN_CLASS)) {
+      setOpen(false);
     }
   });
 }
@@ -122,11 +147,12 @@ export function initNav(): void {
   const nav = document.querySelector<HTMLElement>('[data-nav]');
   const pageHead = document.querySelector<HTMLElement>('[data-page-head]');
   const drawer = document.querySelector<HTMLElement>('[data-drawer]');
+  const drawerMask = document.querySelector<HTMLElement>('[data-drawer-mask]');
   const toggleBtns = document.querySelectorAll<HTMLElement>('[data-drawer-toggle]');
   const backToTop = document.querySelector<HTMLElement>('[data-back-to-top]');
 
   if (nav && pageHead) initNavScroll(nav, pageHead);
-  if (drawer && toggleBtns.length) initDrawer(drawer, toggleBtns);
+  if (drawer && toggleBtns.length) initDrawer(drawer, toggleBtns, drawerMask);
   if (backToTop) initBackToTop(backToTop);
   initTables();
 }

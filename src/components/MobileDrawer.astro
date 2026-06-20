@@ -9,9 +9,11 @@
  *   [data-drawer]  — the drawer element; nav.ts toggles .is-open on this
  *
  * The drawer backdrop click-to-close is handled by nav.ts's initDrawer().
- * Class names match journal.scss:
- *   .single-column-drawer-container  (+ .is-open when open)
- *   .single-column-drawer-mask       (backdrop)
+ * Class names match journal.scss (same contract as the original Vue theme):
+ *   .single-column-drawer-container  (+ .single-column-drawer-container-active when open)
+ *   .single-column-drawer-mask       — added to the backdrop ONLY while open
+ *                                       (the class itself makes the mask visible;
+ *                                        journal.scss forces display:block!important)
  *   .drawer-content → .drawer-menu → .drawer-menu-item (+ .active)
  *
  * TODO: 后续从 config 注入菜单项
@@ -68,10 +70,11 @@ function isActive(itemUrl: string): boolean {
   </div>
 </div>
 
-{/* Backdrop — clicking it closes the drawer (nav.ts initDrawer) */}
+{/* Backdrop — nav.ts adds .single-column-drawer-mask while the drawer is open
+    (the class makes it visible) and removes it on close / backdrop click.
+    Rendered class-less so it stays invisible by default. */}
 <div
   id="drawer-mask"
-  class="single-column-drawer-mask"
-  style="display:none"
+  data-drawer-mask
   aria-hidden="true"
 ></div>
