@@ -32,7 +32,7 @@
  *   lastmod          — last-modified date (optional)
  *   categories       — category array
  *   tags             — tag array
- *   readingTime      — minutes from remark-reading-time-cjk
+ *   readingSeconds   — reading time in seconds from remark-reading-time-cjk
  *   featuredImage    — URL for post hero background
  *   headings         — MarkdownHeading[] for ToC
  *   canonicalUrl     — explicit canonical href
@@ -75,7 +75,7 @@ interface Props {
   lastmod?: Date;
   categories?: string[];
   tags?: string[];
-  readingTime?: number;
+  readingSeconds?: number;
   featuredImage?: string | null;
   headings?: Heading[];
   canonicalUrl?: string;
@@ -104,7 +104,7 @@ const {
   lastmod,
   categories = [],
   tags = [],
-  readingTime,
+  readingSeconds,
   featuredImage,
   headings = [],
   canonicalUrl,
@@ -160,7 +160,7 @@ const postHeadClass = hasFeaturedImage ? 'post-head-wrapper' : 'post-head-wrappe
               date={date}
               categories={categories}
               tags={tags}
-              readingTime={readingTime}
+              readingSeconds={readingSeconds}
               draft={draft}
               variant="post"
             />

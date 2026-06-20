@@ -24,7 +24,7 @@
  */
 
 import BaseLayout from './BaseLayout.astro';
-import PostCard from '../components/PostCard.astro';
+import PostCard, { type MetaOptions } from '../components/PostCard.astro';
 
 interface PostCardData {
   href: string;
@@ -34,7 +34,7 @@ interface PostCardData {
   date: Date;
   categories?: string[];
   tags?: string[];
-  readingTime?: number;
+  readingSeconds?: number;
   draft?: boolean;
 }
 
@@ -47,6 +47,12 @@ interface Props {
   totalPages?: number;
   prevUrl?: string;
   nextUrl?: string;
+  /**
+   * Override the per-card meta row. Defaults (set in PostMeta) already give the
+   * list the desired "date · reading time" look with tags/categories hidden;
+   * pass overrides to, e.g., re-enable tags on a specific list page.
+   */
+  metaOptions?: MetaOptions;
 }
 
 const {
@@ -58,6 +64,7 @@ const {
   totalPages = 1,
   prevUrl,
   nextUrl,
+  metaOptions,
 } = Astro.props;
 ---
 
@@ -80,8 +87,9 @@ const {
         date={post.date}
         categories={post.categories}
         tags={post.tags}
-        readingTime={post.readingTime}
+        readingSeconds={post.readingSeconds}
         draft={post.draft}
+        metaOptions={metaOptions}
       />
     ))}
   </div>

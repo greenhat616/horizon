@@ -3,7 +3,7 @@ import sitemap from '@astrojs/sitemap';
 import mdx from '@astrojs/mdx';
 import tailwindcss from '@tailwindcss/vite';
 import rehypeCodeGroup from 'rehype-code-group';
-import remarkReadingTimeCjk from './src/plugins/remark-reading-time-cjk.mjs';
+import rehypeReadingTime from './src/plugins/rehype-reading-time.mjs';
 import remarkModifiedTime from './src/plugins/remark-modified-time.mjs';
 import remarkHugoShortcodes from './src/plugins/remark-hugo-shortcodes.mjs';
 import { transformerCodeCard } from './src/plugins/shiki-code-card.mjs';
@@ -30,12 +30,12 @@ export default defineConfig({
     // Hugo shortcode pre-processor must run first so remark sees clean Markdown
     remarkPlugins: [
       remarkHugoShortcodes,
-      remarkReadingTimeCjk,
       remarkModifiedTime,
     ],
     // VitePress-style ::: code-group tabs (wraps code blocks at the HAST level,
     // injects its own switch script/style into <head>; we override its classes).
-    rehypePlugins: [rehypeCodeGroup],
+    // rehypeReadingTime counts the rendered HTML text (Hugo's countwords .Content).
+    rehypePlugins: [rehypeCodeGroup, rehypeReadingTime],
     shikiConfig: {
       theme: 'monokai',
       // Map non-lowercase fence languages used in legacy content to Shiki ids

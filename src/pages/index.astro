@@ -12,6 +12,7 @@
 
 import { getCollection } from 'astro:content';
 import ListLayout from '../layouts/ListLayout.astro';
+import { toCardData } from '../lib/post-card';
 
 const PAGE_SIZE = 10;
 
@@ -26,15 +27,7 @@ const sorted = allPosts.sort(
 const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
 const pagePosts = sorted.slice(0, PAGE_SIZE);
 
-const posts = pagePosts.map((p) => ({
-  href: `/posts/${p.data.slug}/`,
-  title: p.data.title,
-  summary: p.data.description ?? undefined,
-  featuredImage: p.data.featured_image ?? undefined,
-  date: p.data.date,
-  categories: p.data.categories ?? [],
-  tags: p.data.tags ?? [],
-}));
+const posts = await Promise.all(pagePosts.map(toCardData));
 ---
 
 <ListLayout
