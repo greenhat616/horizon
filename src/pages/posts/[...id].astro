@@ -44,7 +44,12 @@ export async function getStaticPaths() {
 const { post, prevHref, prevTitle, nextHref, nextTitle } = Astro.props;
 const { data } = post;
 
-const { Content, headings, remarkPluginFrontmatter } = await render(post);
+const { Content, headings: rawHeadings, remarkPluginFrontmatter } = await render(post);
+
+// remark-gfm appends a visually-hidden <h2 id="footnote-label">Footnotes</h2>
+// to articles that use footnotes. It is not authored content, so drop it from
+// the ToC (Goldmark never emitted it, so production never listed it).
+const headings = rawHeadings.filter((h) => h.slug !== 'footnote-label');
 
 // remark-reading-time-cjk writes a string like "5 分钟"; extract the integer.
 const rawReadingTime = remarkPluginFrontmatter?.readingTime as string | undefined;
