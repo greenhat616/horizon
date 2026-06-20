@@ -360,4 +360,62 @@ html.night {
       color: darken(#fff, 20%) !important;
     }
   }
+
+  // ── Code cards & code groups (dark) ──────────────────────────────────────
+  // Mirrors the light rules in journal.scss. The line-number colour needs
+  // !important to win over `pre { color: … !important }` above, which would
+  // otherwise force the gutter to the body text colour via inheritance.
+  .post-body {
+    .code-card,
+    .rehype-code-group {
+      background: rgba(#fff, 0.03);
+      border-color: rgba(#fff, 0.09);
+    }
+
+    .code-card__bar,
+    .rcg-tab-container {
+      background: rgba(#fff, 0.03);
+      border-color: rgba(#fff, 0.09);
+    }
+    // The in-group copy bar is overlaid on the tab row, not a real header —
+    // keep it transparent (overrides the .code-card__bar rule above).
+    .rcg-block .code-card__bar {
+      background: transparent;
+    }
+
+    .code-card__lang {
+      color: $deep-light-accent;
+    }
+    .code-card__title {
+      color: $dark-mode-text;
+    }
+
+    .code-card__copy {
+      color: rgba(#fff, 0.5);
+      &:hover {
+        background: rgba(#fff, 0.08);
+        color: $light-accent;
+      }
+    }
+
+    // Same light gutter as light mode (code surface is dark in both); the
+    // !important is required to beat `html.night pre { color: … !important }`,
+    // which would otherwise force the gutter to the body text colour.
+    pre.line-numbers .line::before {
+      color: rgba(#fff, 0.32) !important;
+      border-color: rgba(#fff, 0.13);
+    }
+
+    .rcg-tab {
+      color: rgba(#fff, 0.5);
+      &:hover {
+        color: $light-accent;
+      }
+      &.active {
+        // Match the dark-mode language-label colour (.code-card__lang).
+        color: $deep-light-accent;
+        border-bottom-color: $deep-light-accent;
+      }
+    }
+  }
 }

@@ -18,19 +18,20 @@ Astro 5.18（Content Layer）+ Tailwind v4（`@tailwindcss/vite`）+ pnpm。
 - `layouts/`：BaseLayout(唯一 `<head>` + 暗色 no-FOUC 内联脚本) / PostLayout / ListLayout。
 - `components/`：19 个；含 **OutdatedNotice**(编译期 + 运行时双算，弃 dayjs 用 `Intl.RelativeTimeFormat`)、**ExternalAsset**(SRI + `__cdnfb` 兜底)、Notice/Figure/BilibiliEmbed/FriendsGrid 等。
 - `lib/`：`cdn`(外链注册表 + SRI + `__cdnfb` + 禁用 CDN 校验) · `dates` · `outdated` · `taxonomy`。
-- `plugins/`：`remark-hugo-shortcodes`(unwrap `row` / 去 `friends` / `bilibili`→iframe；导出 `stripShortcodes`) · `remark-reading-time-cjk` · `remark-modified-time`(`execFileSync` git lastmod)。
-- `scripts/`：theme / nav / outdated-runtime / comments(懒加载 Waline) / viewer(懒加载 ViewerJS)，全 vanilla 零依赖。
+- `plugins/`：`remark-hugo-shortcodes`(unwrap `row` / 去 `friends` / `bilibili`→iframe；导出 `stripShortcodes`) · `remark-reading-time-cjk` · `remark-modified-time`(`execFileSync` git lastmod) · **`shiki-code-card`**(Shiki transformer：`<pre>`→`figure.code-card` 头部栏[语言 label+复制按钮]、默认加 `line-numbers` 类、读 `meta.__raw` 支持 `title="…"`/`no-line-numbers`)。
+- `scripts/`：theme / nav / outdated-runtime / comments(懒加载 Waline) / viewer(懒加载 ViewerJS) / **code-card**(委托式复制按钮，BaseLayout 引导)，全 vanilla 零依赖。
 - **零客户端框架**：旧 Vue/Bootstrap/dayjs/js-cookie 全弃；页面纯静态 HTML + 内联微脚本 + 按需懒加载。
 
 ## 关键策略（务必保持）
 - **CDN 策略**：主 zstatic → 备 cdnjs，全 SRI，`__cdnfb` onerror 兜底；**禁用** staticfile/bytecdntp/BootCDN（已投毒）。`lib/cdn.ts` 实现。
 - **URL 等价**：文章路由用 frontmatter `slug`（已全小写、与生产一致）；taxonomy 用 `urlizeTerm`（ASCII 小写、CJK 保留）。切换前跑完整 sitemap diff。
+- **代码块增强（Shiki）**：行号（CSS counter，默认全开，`no-line-numbers` 关）+ 语言 label + 复制按钮（`shiki-code-card` transformer + `code-card.ts`）；代码组用 `rehype-code-group`（`::: code-group labels=[a,b]` … `:::`，其向 `<head>` 注入切换 script/style，我方用 `.post-body` 高特异性覆盖类名）。**注意**：transformer 把 `<pre>` 包进 `figure` 后 Astro 的 `astro-code` 类被丢弃，故 CSS 选择器只依赖自有 `.code-card`/`.line-numbers`，**勿**改回 `.astro-code`。monokai 为暗色主题，代码体在明/暗两态恒暗 → 行号 gutter 用浅色（含 `!important` 压过 `html.night pre{color:…!important}`）。授权语法见样式注释。
 
 ## 待办 / 生产切换步骤
 1. **视觉保真核对（人工）**：`pnpm dev` 对照 https://i.a632079.me 逐页核对（首页/文章/friends/taxonomy × 桌面+移动、暗色无闪）。
-2. **Shiki 高亮大小写**：部分文章代码块用 `HTML`/`PHP`/`JavaScript`/`conf` 非小写语言名 → 回退纯文本无高亮。修法：`astro.config.mjs` 加 `markdown.shikiConfig.langAlias`（`HTML→html, PHP→php, JavaScript→js, conf→ini`），不动内容。
+2. ~~**Shiki 高亮大小写**~~：✅ 已修。`astro.config.mjs` 已加 `markdown.shikiConfig.langAlias`（`HTML→html, PHP→php, JavaScript→js, conf→ini`）；如再遇其他非小写语言名按需补映射。
 3. **SCSS 弃用警告（Info）**：`styles/journal.scss` 的 `darken()/lighten()/@import` → 迁 `@use "sass:color"`。
-3b. **Astro 弃用提示（Info，非阻塞）**：`astro check` 提示 `z` from `astro:content` 已弃用（改直接 `import { z } from 'zod'`）、`markdown.remarkPlugins` 配置已弃用（改用 `@astrojs/markdown-remark` 的 `unified({...})`）。仅前向兼容，不影响当前构建。
+3b. **Astro 弃用提示（Info，非阻塞）**：`astro check` 提示 `z` from `astro:content` 已弃用（改直接 `import { z } from 'zod'`）、`markdown.remarkPlugins`/`rehypePlugins`/`remarkRehype` 配置已弃用（改用 `@astrojs/markdown-remark` 的 `unified({...})`）。仅前向兼容，不影响当前构建。
 4. **/workers/**：生产 sitemap 不含，按需保留或移除。
 5. **生产切换**：合并 `worktree-astro-migration` → `master` 触发 CI（`.github/workflows/deploy.yml` 已改 Node+Astro、部署 `dist/`）；parity 接受后删 diary submodule（`.gitmodules` + `themes/`）+ 旧 Hugo 文件（`config.toml`、`content/`、`static/`、`archetypes/`、`config/`）。
 

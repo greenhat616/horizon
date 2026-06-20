@@ -2,9 +2,11 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import mdx from '@astrojs/mdx';
 import tailwindcss from '@tailwindcss/vite';
+import rehypeCodeGroup from 'rehype-code-group';
 import remarkReadingTimeCjk from './src/plugins/remark-reading-time-cjk.mjs';
 import remarkModifiedTime from './src/plugins/remark-modified-time.mjs';
 import remarkHugoShortcodes from './src/plugins/remark-hugo-shortcodes.mjs';
+import { transformerCodeCard } from './src/plugins/shiki-code-card.mjs';
 
 export default defineConfig({
   output: 'static',
@@ -31,8 +33,21 @@ export default defineConfig({
       remarkReadingTimeCjk,
       remarkModifiedTime,
     ],
+    // VitePress-style ::: code-group tabs (wraps code blocks at the HAST level,
+    // injects its own switch script/style into <head>; we override its classes).
+    rehypePlugins: [rehypeCodeGroup],
     shikiConfig: {
       theme: 'monokai',
+      // Map non-lowercase fence languages used in legacy content to Shiki ids
+      // so they highlight instead of falling back to plain text.
+      langAlias: {
+        HTML: 'html',
+        PHP: 'php',
+        JavaScript: 'js',
+        conf: 'ini',
+      },
+      // Wrap each <pre> in a .code-card frame (lang label + copy + line numbers).
+      transformers: [transformerCodeCard()],
     },
   },
 });
