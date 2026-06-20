@@ -25,6 +25,8 @@ Astro 5.18（Content Layer）+ Tailwind v4（`@tailwindcss/vite`）+ pnpm。
 ## 关键策略（务必保持）
 - **CDN 策略**：主 zstatic → 备 cdnjs，全 SRI，`__cdnfb` onerror 兜底；**禁用** staticfile/bytecdntp/BootCDN（已投毒）。`lib/cdn.ts` 实现。
 - **URL 等价**：文章路由用 frontmatter `slug`（已全小写、与生产一致）；taxonomy 用 `urlizeTerm`（ASCII 小写、CJK 保留）。切换前跑完整 sitemap diff。
+- **暗色与 Tailwind**：站点暗色用 `html.night`（非 `prefers-color-scheme`）。`global.css` 已加 `@custom-variant dark (&:where(.night, .night *))`，故组件内可直接用 `dark:` 工具类（如 `FriendsGrid.astro`）。`.night` 全局规则仍在 `dark-mode.scss`。**注意**：`.post-body img{border-radius:5px}`（特异性 0,1,1）会压过单类 Tailwind 工具，post-body 内的图片若要改圆角须用 `rounded-full!` 等 important 变体（友链头像即如此）。
+- **友链卡片（friends）**：`/friends/` 用 `single.html` 结构（text-only 标题头 +`.post-body-wrapper/.post-body` 白卡阴影）；卡片网格 `FriendsGrid.astro` 已弃 Bootstrap（`.card/.row/.col-lg-6`），改 Tailwind grid（`lg:grid-cols-2`）。旧 `.friendship` SCSS 已删（journal/dark-mode）。
 - **代码块增强（Shiki）**：行号（CSS counter，默认全开，`no-line-numbers` 关）+ 语言 label + 复制按钮（`shiki-code-card` transformer + `code-card.ts`）；代码组用 `rehype-code-group`（`::: code-group labels=[a,b]` … `:::`，其向 `<head>` 注入切换 script/style，我方用 `.post-body` 高特异性覆盖类名）。**注意**：transformer 把 `<pre>` 包进 `figure` 后 Astro 的 `astro-code` 类被丢弃，故 CSS 选择器只依赖自有 `.code-card`/`.line-numbers`，**勿**改回 `.astro-code`。monokai 为暗色主题，代码体在明/暗两态恒暗 → 行号 gutter 用浅色（含 `!important` 压过 `html.night pre{color:…!important}`）。授权语法见样式注释。
 
 ## 待办 / 生产切换步骤

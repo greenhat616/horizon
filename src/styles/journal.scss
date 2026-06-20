@@ -1184,70 +1184,9 @@ mjx-container {
 
 
 // Friendship
-.friendship {
-  .card {
-    margin-bottom: 1.5rem;
-    border-radius: 5px;
-  }
-  .card:hover {
-    background: rgba($color-accent, 0.05);
-    color: darken($color-accent, 30%);
-    cursor: pointer;
-  }
-  .card img {
-    transition: all 0.5s;
-  }
-  .card:hover img {
-    transform: rotate(360deg);
-  }
-  > div > div > div > div {
-    // Card Body
-    .friend-sheet {
-      display: flex;
-      flex: 1;
-    }
-    .friend-information {
-      padding-left: 1em;
-      display: flex;
-      flex: 1;
-      justify-items: center;
-      justify-content: center;
-      flex-direction: column;
-      width: 70%;
-      font-family: $sans-preferred-font-list;
-
-      > h1 {
-        // Name
-        margin: 0 0 0 0;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        line-height: 1.5em;
-      }
-      > p {
-        // Description
-        margin: 0 0 0 0;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        line-height: 1.2em;
-      }
-    }
-    .friend-avatar {
-      width: 80px;
-      height: 80px;
-      > img {
-        // Logo Pictrue
-        border: 1px solid #dddddd;
-        border-radius: 50% !important;
-        width: 80px;
-        height: 80px;
-        max-width: 80px;
-        min-width: 80px;
-      }
-    }
-  }
-}
+// NOTE: the friends-page card grid (.friendship) is now built with Tailwind
+// utilities in components/FriendsGrid.astro — see that file. The old Bootstrap
+// .card / .row / .col-lg-6 chrome was dropped in the Astro migration.
 
 // waline
 img.vuser {

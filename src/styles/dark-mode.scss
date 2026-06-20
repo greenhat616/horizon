@@ -294,17 +294,7 @@ html.night {
     }
   }
 
-  // friendship
-  .friendship {
-    .card {
-      background: lighten($dark-mode-front-container-background, 5%);
-    }
-    .card:hover {
-      background: lighten($dark-mode-front-container-background, 10%);
-      color: lighten($color-accent, 30%);
-    }
-  }
-
+  // friendship — dark styling now lives in FriendsGrid.astro (Tailwind dark:)
 
   .extra-container {
     .pagination {
