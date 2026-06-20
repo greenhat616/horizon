@@ -40,7 +40,7 @@ export async function getStaticPaths() {
           posts,
           page,
           totalPages,
-          prevUrl: page === 2 ? '/posts/' : `/posts/page/${page - 1}/`,
+          prevUrl: page === 2 ? '/' : `/posts/page/${page - 1}/`,
           nextUrl: page < totalPages ? `/posts/page/${page + 1}/` : undefined,
         },
       };

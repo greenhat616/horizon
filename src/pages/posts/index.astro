@@ -1,19 +1,27 @@
 ---
 /**
- * posts/index.astro — /posts/ listing page (page 1 of the post archive).
+ * posts/index.astro — /posts/ post archive (年份分组).
  *
- * Redirects concern: /posts/ is the canonical first page; the paginated
- * variant lives at /posts/page/N/. We render page 1 directly here so
- * /posts/ always resolves without a redirect.
+ * Unlike the home feed (paginated PostCards with summary/image/meta), /posts/
+ * is a compact chronological archive: posts grouped under a year heading, each
+ * shown as a single "MM-DD · title" row. Mirrors the production archive layout
+ * at https://risehere.net/posts/ while using diary's exact palette
+ * (accent #01506f links, near-black #000e14 headings) so it matches
+ * i.a632079.me. The browsable card feed still lives at / → /posts/page/N/.
  *
- * Posts are filtered (no draft/hidden), sorted descending by date,
- * then sliced to PAGE_SIZE. Maps to PostCardData for ListLayout.
+ * Grouping uses formatDateDash() so the year/month/day are derived from the
+ * Asia/Shanghai calendar date — a bare midnight date never slips to the
+ * previous year on a UTC build machine.
+ *
+ * Styling is Tailwind-only; dark: is wired to html.night via global.css.
+ * Note: dark-mode.scss colours `.post-body h2/li` with high enough specificity
+ * (html.night h2) to beat the :where()-based dark: utilities, which is why we
+ * deliberately let links inherit diary's dark `a` colour rather than fight it.
  */
 
 import { getCollection } from 'astro:content';
-import ListLayout from '../../layouts/ListLayout.astro';
-
-const PAGE_SIZE = 10;
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatDateDash } from '../../lib/dates';
 
 const allPosts = (await getCollection('posts')).filter(
   (p) => !p.data.draft && !p.data.hidden,
@@ -23,24 +31,90 @@ const sorted = allPosts.sort(
   (a, b) => b.data.date.getTime() - a.data.date.getTime(),
 );
 
-const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
-const pagePosts = sorted.slice(0, PAGE_SIZE);
+interface ArchiveItem {
+  href: string;
+  title: string;
+  monthDay: string; // "MM-DD"
+}
 
-const posts = pagePosts.map((p) => ({
-  href: `/posts/${p.data.slug}/`,
-  title: p.data.title,
-  summary: p.data.description ?? undefined,
-  featuredImage: p.data.featured_image ?? undefined,
-  date: p.data.date,
-  categories: p.data.categories ?? [],
-  tags: p.data.tags ?? [],
-}));
+// Group the already-descending posts by year, preserving order.
+const groups: { year: string; items: ArchiveItem[] }[] = [];
+for (const p of sorted) {
+  const [year, month, day] = formatDateDash(p.data.date).split('-');
+  let group = groups.find((g) => g.year === year);
+  if (!group) {
+    group = { year, items: [] };
+    groups.push(group);
+  }
+  group.items.push({
+    href: `/posts/${p.data.slug}/`,
+    title: p.data.title,
+    monthDay: `${month}-${day}`,
+  });
+}
 ---
 
-<ListLayout
-  title="文章"
-  posts={posts}
-  page={1}
-  totalPages={totalPages}
-  nextUrl={totalPages > 1 ? '/posts/page/2/' : undefined}
-/>
+<BaseLayout title="文章" description="文章归档">
+  {/* Mirror diary single.html: text-only title head + shadowed body card. */}
+  <div class="post-list-container post-list-container-shadow">
+    <div class="post archive-page">
+      <div class="post-head-wrapper-text-only">
+        <div class="post-title">文章</div>
+      </div>
+      <div class="post-body-wrapper">
+        <div class="post-body">
+          {groups.map((group) => (
+            <section class="mt-9 first:mt-0">
+              <h2 class="mb-3 border-b border-black/10 pb-1.5 text-4xl font-bold leading-snug text-black dark:border-white/10 dark:text-[#e6e6e6]">
+                {group.year}
+              </h2>
+              <ul class="m-0 list-none p-0">
+                {group.items.map((item) => (
+                  <li class="flex items-baseline gap-4 py-2">
+                    <time class="w-[3.6em] shrink-0 text-sm tabular-nums text-black/55 dark:text-white/45">
+                      {item.monthDay}
+                    </time>
+                    {/* Colour comes from the scoped .archive-link rule below —
+                        NOT Tailwind. Tailwind colour utilities live in
+                        @layer utilities and lose to journal.scss's unlayered
+                        `a { color }`, so a `text-black` here renders link-teal.
+                        Size/weight/layout stay Tailwind. */}
+                    <a
+                      href={item.href}
+                      class="archive-link min-w-0 flex-1 text-2xl font-medium leading-snug no-underline hover:underline max-[1020px]:text-xl"
+                    >
+                      {item.title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  /* Archive entry titles replicate the homepage post title (.post-item-title):
+       rest  #000      (light)  / #e6e6e6 (dark)
+       hover #012c3c   (= $dark-accent, what the homepage title shows on hover)
+     These are intentionally UNLAYERED scoped styles: Tailwind colour utilities
+     sit in @layer utilities and lose the cascade to journal.scss's unlayered
+     `a { color: #01506f }` regardless of specificity, which is why a Tailwind
+     `text-black` rendered the title link-teal. */
+  .archive-link {
+    color: #000;
+  }
+  .archive-link:hover {
+    color: #012c3c;
+  }
+  :global(html.night) .archive-link {
+    color: #e6e6e6;
+  }
+  /* `!important` beats the global `html.night a:hover { …!important }` rule. */
+  :global(html.night) .archive-link:hover {
+    color: #e6e6e6 !important;
+  }
+</style>
