@@ -37,7 +37,15 @@ export default defineConfig({
     // rehypeReadingTime counts the rendered HTML text (Hugo's countwords .Content).
     rehypePlugins: [rehypeCodeGroup, rehypeReadingTime],
     shikiConfig: {
-      theme: 'monokai',
+      // Dual theme: light site mode → a light palette (github-light); dark site
+      // mode (html.night) → monokai. Shiki inlines the light colors as the
+      // default and emits `--shiki-dark`/`--shiki-dark-bg` CSS vars on every
+      // token; dark-mode.scss flips the code surface to those vars under .night.
+      themes: {
+        light: 'github-light',
+        dark: 'monokai',
+      },
+      defaultColor: 'light',
       // Map non-lowercase fence languages used in legacy content to Shiki ids
       // so they highlight instead of falling back to plain text.
       langAlias: {

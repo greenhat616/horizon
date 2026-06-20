@@ -1457,11 +1457,11 @@ img.vuser {
         margin-right: 1.1em;
         padding-right: 0.5em;
         text-align: right;
-        // The Shiki theme (monokai) paints the <pre> a dark background in BOTH
-        // site themes, so the gutter is light-on-dark regardless of light/dark
-        // mode — tuned for the dark code surface, not the page.
-        color: rgba(#fff, 0.32);
-        border-right: 1px solid rgba(#fff, 0.13);
+        // Dual Shiki theme: light mode paints a LIGHT code surface
+        // (github-light), so the gutter is dark-on-light here; dark-mode.scss
+        // flips it to light-on-dark for the monokai surface under .night.
+        color: rgba(#000, 0.3);
+        border-right: 1px solid rgba(#000, 0.1);
         user-select: none;
         -webkit-user-select: none;
       }
