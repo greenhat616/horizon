@@ -35,17 +35,32 @@ const tags = [...tagMap.entries()].sort(
 ---
 
 <BaseLayout title="标签" description="所有标签">
-  <div class="post-list-container post-list-container-no-background">
-    <div class="taxonomy-header">
-      <h1>标签</h1>
-    </div>
-    <div class="taxonomy-list">
-      {tags.map(([slug, { label, count }]) => (
-        <a href={`/tags/${slug}/`} class="taxonomy-item">
-          <span class="taxonomy-name">{label}</span>
-          <span class="taxonomy-count">{count}</span>
-        </a>
-      ))}
+  {/* Mirror diary single.html: text-only title head + shadowed body card. */}
+  <div class="post-list-container post-list-container-shadow">
+    <div class="post archive-page">
+      <div class="post-head-wrapper-text-only">
+        <div class="post-title">标签</div>
+      </div>
+      <div class="post-body-wrapper">
+        <div class="post-body">
+          <p class="mt-0! mb-6! text-[0.95em] text-[#000e14]/55 dark:text-white/45">
+            共 {tags.length} 个标签
+          </p>
+          <div class="flex flex-wrap gap-2.5">
+            {tags.map(([slug, { label, count }]) => (
+              <a
+                href={`/tags/${slug}/`}
+                class="group inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[0.95rem] leading-none no-underline transition-colors border-[#01506f]/15 bg-[#01506f]/[0.05] text-[#01506f] hover:border-[#01506f]/45 hover:bg-[#01506f]/12 dark:border-white/15 dark:bg-white/8 dark:text-[#a9d6ea]! dark:hover:border-[#a9d6ea]/40 dark:hover:bg-white/12"
+              >
+                <span class="text-[#01506f] dark:text-[#a9d6ea]!">{label}</span>
+                <span class="inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-xs font-semibold tabular-nums transition-colors bg-[#01506f]/12 text-[#01506f]! group-hover:bg-[#01506f]/20 dark:bg-white/12 dark:text-[#a9d6ea]! dark:group-hover:bg-white/18">
+                  {count}
+                </span>
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </BaseLayout>
