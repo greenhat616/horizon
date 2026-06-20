@@ -11,3 +11,7 @@ tmp/
 
 # Astro cache
 .astro/
+
+# Local tooling artefacts (not part of the source tree)
+.serena/
+.ccg/**/.turns.json
