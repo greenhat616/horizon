@@ -69,45 +69,44 @@ function validateHref(href: string): string | undefined {
 const shuffled = [...friends].sort(() => Math.random() - 0.5);
 ---
 
-<div class="friendship">
-  <div class="row">
-    {shuffled.map((friend) => {
-      const href = validateHref(friend.href);
-      if (!href) return null; // skip cards with invalid/missing href
+{/* Two-up on large screens (mirrors Bootstrap col-lg-6); single column below.
+    Tailwind utilities replace the dropped Bootstrap card/grid chrome. */}
+<div class="friendship mt-6 grid grid-cols-1 gap-x-5 gap-y-3 lg:grid-cols-2">
+  {shuffled.map((friend) => {
+    const href = validateHref(friend.href);
+    if (!href) return null; // skip cards with invalid/missing href
 
-      const avatar = resolveAvatar(friend);
-      return (
-        <div class="col-lg-6">
-          <a
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="card friend-card-link"
-          >
-            <div class="card-body">
-              <div class="friend-sheet">
-                <div class="friend-avatar">
-                  <img
-                    loading="lazy"
-                    src={DEFAULT_AVATAR}
-                    data-src={avatar}
-                    data-placeholder={DEFAULT_AVATAR}
-                    alt={friend.name}
-                    onerror={`this.src=this.dataset.placeholder`}
-                    class="lazyload"
-                  />
-                </div>
-                <div class="friend-information">
-                  <h1 title={friend.name}>{friend.name}</h1>
-                  {friend.desc && <p title={friend.desc}>{friend.desc}</p>}
-                </div>
-              </div>
-            </div>
-          </a>
+    const avatar = resolveAvatar(friend);
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        title={friend.name}
+        class="group flex items-center gap-3 rounded-xl border border-black/6 bg-white p-3 text-[#01313f] no-underline transition-all duration-300 hover:-translate-y-0.5 hover:bg-[rgba(1,80,111,0.05)] hover:text-[#012e3f] hover:shadow-md dark:border-white/6 dark:bg-[#2d2d2d] dark:text-neutral-100 dark:hover:bg-[#333333] dark:hover:text-[#7ec0db]"
+      >
+        <img
+          loading="lazy"
+          src={DEFAULT_AVATAR}
+          data-src={avatar}
+          data-placeholder={DEFAULT_AVATAR}
+          alt={friend.name}
+          onerror={`this.src=this.dataset.placeholder`}
+          class="lazyload h-16 w-16 shrink-0 rounded-full! border border-gray-200 object-cover transition-transform duration-500 group-hover:rotate-360 dark:border-white/10"
+        />
+        <div class="flex min-w-0 flex-col justify-center">
+          <span class="truncate text-[0.95rem] font-semibold leading-snug">
+            {friend.name}
+          </span>
+          {friend.desc && (
+            <span class="truncate text-xs leading-snug text-black/55 dark:text-white/50">
+              {friend.desc}
+            </span>
+          )}
         </div>
-      );
-    })}
-  </div>
+      </a>
+    );
+  })}
 </div>
 
 <script>

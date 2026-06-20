@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Wire Tailwind's `dark:` variant to the site's manual toggle (html.night),
+   not prefers-color-scheme — the theme script sets/removes `.night` on <html>. */
+@custom-variant dark (&:where(.night, .night *));
+
 @theme {
   /* Tokens derived from diary theme — expand in later layers */
   --color-background: #fcfcfc;

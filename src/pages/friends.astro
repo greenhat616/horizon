@@ -47,10 +47,19 @@ const { Content } = friendsPage ? await render(friendsPage) : { Content: null };
 ---
 
 <BaseLayout title="朋友们" description="博主的朋友们">
-  <div class="post-list-container post-list-container-no-background">
-    <article class="post friends-page">
-      {Content && <Content />}
-      <FriendsGrid friends={friends} />
-    </article>
+  {/* Mirror diary single.html: text-only title head + shadowed body card.
+      friends.md sets disableMetaInfo, so the head shows only the title. */}
+  <div class="post-list-container post-list-container-shadow">
+    <div class="post friends-page">
+      <div class="post-head-wrapper-text-only">
+        <div class="post-title">朋友们</div>
+      </div>
+      <div class="post-body-wrapper">
+        <div class="post-body">
+          {Content && <Content />}
+          <FriendsGrid friends={friends} />
+        </div>
+      </div>
+    </div>
   </div>
 </BaseLayout>
