@@ -1380,3 +1380,199 @@ img.vuser {
     }
   }
 }
+
+// ── Code cards & code groups (Shiki) ───────────────────────────────────────
+// The `shiki-code-card` transformer wraps each <pre> in a .code-card frame
+// (header bar = language label + optional title + copy button) and tags the
+// <pre> with `.line-numbers`. `rehype-code-group` wraps consecutive cards into
+// VitePress-style tabs and injects its own minimal <style>/<script> into <head>;
+// these rules are scoped under .post-body so their specificity (≥0,2,0) always
+// beats the plugin's unscoped defaults regardless of stylesheet order.
+.post-body {
+  // ---- Card frame ----
+  .code-card {
+    margin: 1.2em 0;
+    border: 1px solid rgba($color-accent, 0.12);
+    border-radius: 6px;
+    overflow: hidden;
+    background: rgba($color-accent, 0.07);
+  }
+
+  .code-card__bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    font-family: $mono-font-list;
+    font-size: 12px;
+    line-height: 1;
+    background: rgba($color-accent, 0.06);
+    border-bottom: 1px solid rgba($color-accent, 0.12);
+  }
+
+  .code-card__lang {
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    color: rgba($color-accent, 0.85);
+  }
+
+  .code-card__title {
+    color: rgba($color-accent, 0.55);
+    &::before {
+      content: "·";
+      margin-right: 8px;
+    }
+  }
+
+  .code-card__copy {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 22px;
+    padding: 0;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: rgba($color-accent, 0.65);
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+    &:hover {
+      background: rgba($color-accent, 0.12);
+      color: $color-accent;
+    }
+    .code-card__icon {
+      display: block;
+    }
+    .code-card__icon--done {
+      display: none;
+      color: #2e9e5b;
+    }
+    &.is-copied {
+      color: #2e9e5b;
+      .code-card__icon--copy {
+        display: none;
+      }
+      .code-card__icon--done {
+        display: block;
+      }
+    }
+  }
+
+  // <pre> inside a card: the card owns the frame, so flatten the pre's own
+  // background/radius/margin (set by the global `pre` rule) and let it scroll.
+  // Note: selectors don't rely on Astro's `.astro-code` class — wrapping the
+  // <pre> in a <figure> drops it, and the `.line-numbers`/`.code-card` classes
+  // we emit are sufficient (and don't couple us to an internal Astro name).
+  .code-card > pre {
+    margin: 0;
+    border-radius: 0;
+    background: transparent;
+    overflow-x: auto;
+  }
+
+  // ---- Line numbers (pure CSS counters on Shiki's .line spans) ----
+  pre.line-numbers {
+    code {
+      counter-reset: ln;
+    }
+    .line {
+      counter-increment: ln;
+      &::before {
+        content: counter(ln);
+        display: inline-block;
+        width: 2.2em;
+        margin-right: 1.1em;
+        padding-right: 0.5em;
+        text-align: right;
+        // The Shiki theme (monokai) paints the <pre> a dark background in BOTH
+        // site themes, so the gutter is light-on-dark regardless of light/dark
+        // mode — tuned for the dark code surface, not the page.
+        color: rgba(#fff, 0.32);
+        border-right: 1px solid rgba(#fff, 0.13);
+        user-select: none;
+        -webkit-user-select: none;
+      }
+    }
+  }
+
+  // ---- Code group tabs (rehype-code-group) ----
+  .rehype-code-group {
+    position: relative; // anchor the copy button to the tab row
+    // Override the plugin's injected `display:grid; gap:0.6rem`, which leaves a
+    // gap between the tab row and the code block.
+    display: block;
+    margin: 1.2em 0;
+    border: 1px solid rgba($color-accent, 0.12);
+    border-radius: 6px;
+    overflow: hidden;
+    background: rgba($color-accent, 0.07);
+  }
+
+  .rcg-tab-container {
+    display: flex;
+    flex-wrap: wrap;
+    // Reserve room on the right for the copy button overlaid on this row.
+    padding-right: 40px;
+    background: rgba($color-accent, 0.06);
+    border-bottom: 1px solid rgba($color-accent, 0.12);
+  }
+
+  .rcg-tab {
+    padding: 8px 15px;
+    font-family: $mono-font-list;
+    font-size: 13px;
+    color: rgba($color-accent, 0.55);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: color 0.15s ease, border-color 0.15s ease;
+    &:hover {
+      color: $color-accent;
+    }
+    &.active {
+      // Match the default block's language-label colour (.code-card__lang).
+      color: rgba($color-accent, 0.85);
+      border-bottom-color: $color-accent;
+      font-weight: 600;
+    }
+  }
+
+  .rcg-block {
+    display: none;
+    &.active {
+      display: block;
+    }
+    // Inside a group the card is already framed by the group and the tab names
+    // the block, so flatten the card and drop its in-flow header bar.
+    .code-card {
+      margin: 0;
+      border: none;
+      border-radius: 0;
+      background: transparent;
+    }
+    .code-card__lang,
+    .code-card__title {
+      display: none;
+    }
+    // Lift the (copy-only) bar up onto the right end of the tab row so the
+    // group header mirrors the default block: label(s) left, copy right.
+    // Only the active block is displayed, so just one button is ever visible.
+    .code-card__bar {
+      position: absolute;
+      top: 0;
+      right: 0;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      height: 36px; // matches the tab row height (tab padding 8px + ~20px line)
+      padding: 0 8px;
+      background: transparent;
+      border-bottom: none;
+    }
+    // Copy button now sits on the (light) tab row, not on dark code — let the
+    // shared accent/dark-mode rules style it (consistent with default blocks).
+  }
+}
