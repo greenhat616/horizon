@@ -1,9 +1,9 @@
 ---
 /**
- * Comments.astro — Waline comment widget mount point.
- * Mirrors diary's partials/comment.html (Waline branch).
+ * Comments.astro — Artalk comment widget mount point.
+ * Mirrors diary's partials/comment.html (comment branch).
  *
- * The actual Waline CSS + JS are loaded lazily by src/scripts/comments.ts
+ * The actual Artalk CSS + JS are loaded lazily by src/scripts/comments.ts
  * (IntersectionObserver + click fallback). This component only provides
  * the mount point that comments.ts looks for via [data-comments].
  *
@@ -26,6 +26,6 @@ const { disabled = false } = Astro.props;
       <small>评论已关闭</small>
     </p>
   ) : (
-    <div id="waline" data-comments />
+    <div id="artalk" data-comments />
   )}
 </div>

@@ -273,14 +273,6 @@ html.night {
     color: $dark-mode-text;
   }
 
-  .vwrap * {
-    color: $dark-mode-text !important;
-  }
-
-  .vcontent p {
-    color: $dark-mode-text !important;
-  }
-
   .gsc-control-searchbox-only table * {
     color: black !important;
   }
@@ -323,33 +315,11 @@ html.night {
       filter: brightness(1);
     }
   }
-  // waline
-  /* 常规颜色 */
-  --waline-white: #000;
-  --waline-light-grey: #666;
-  --waline-dark-grey: #999;
 
-  /* 布局颜色 */
-  --waline-text-color: #888;
-  --waline-bgcolor: #353535 !important;
-  --waline-bgcolor-light: #424242 !important;
-  --waline-border-color: #333;
-  --waline-border: 1px solid var(--waline-border-color);
-  --waline-disable-bgcolor: #444;
-  --waline-disable-color: #424242 !important;
-
-  /* 特殊颜色 */
-  --waline-bq-color: #424242 !important;
-
-  /* 其他颜色 */
-  --waline-info-bgcolor: #424242 !important;
-  --waline-info-color: #666;
-  .vmeta {
-    span {
-      background: #424242 !important;
-      color: darken(#fff, 20%) !important;
-    }
-  }
+  // Comments (Artalk): dark theming is driven by Artalk's own `darkMode` API
+  // (comments.ts toggles it from html.night), so no CSS-variable overrides are
+  // needed here. If a future visual pass finds drift, scope overrides under
+  // `.artalk { --at-color-*: … }`.
 
   // ── Code cards & code groups (dark) ──────────────────────────────────────
   // Mirrors the light rules in journal.scss. The line-number colour needs

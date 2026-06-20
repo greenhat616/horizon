@@ -3,7 +3,12 @@
  *
  * Values are derived from config.toml + config/_default/{params,menu}.toml.
  * All layout and component hardcodes should reference these exports instead.
+ *
+ * Deployment-varying values (canonical origin, comment server) are read from
+ * astro:env/client (PUBLIC_*); see .env.example. Brand copy stays hardcoded.
  */
+
+import { PUBLIC_SITE_URL, PUBLIC_ARTALK_SERVER } from 'astro:env/client';
 
 // ─── Site identity ────────────────────────────────────────────────────────────
 
@@ -16,8 +21,8 @@ export const SITE_SUBTITLE = '亲眼所见，亦非真实';
 /** Copyright line (config.toml `copyright`). */
 export const SITE_COPYRIGHT = '2026 a632079';
 
-/** Canonical origin (astro.config.mjs `site`). */
-export const SITE_URL = 'https://i.a632079.me';
+/** Canonical origin (astro:env PUBLIC_SITE_URL; mirrors astro.config `site`). */
+export const SITE_URL = PUBLIC_SITE_URL;
 
 /** Default OG/meta description (params.toml `description`). */
 export const SITE_DESCRIPTION = '亲眼所见，亦非真实';
@@ -27,10 +32,16 @@ export const SITE_DESCRIPTION = '亲眼所见，亦非真实';
 /** Favicon URL (params.toml `favicon`). */
 export const FAVICON_URL = 'https://cdn.a632079.me/favicon.ico';
 
-// ─── Feature flags ───────────────────────────────────────────────────────────
+// ─── Comments (Artalk) ───────────────────────────────────────────────────────
 
-/** Waline comment server (params.toml `walineServer`). */
-export const WALINE_SERVER = 'https://comments.a632079.me';
+/** Artalk comment-server origin (astro:env PUBLIC_ARTALK_SERVER). */
+export const ARTALK_SERVER = PUBLIC_ARTALK_SERVER;
+
+/**
+ * Artalk site identifier. Must match the backend site name and the `site` field
+ * of imported comment data. Fixed brand label, not an env var; '' for single-site.
+ */
+export const ARTALK_SITE = '藤之青';
 
 // ─── Navigation ──────────────────────────────────────────────────────────────
 

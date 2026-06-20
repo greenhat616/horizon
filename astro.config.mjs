@@ -1,4 +1,4 @@
-import { defineConfig } from 'astro/config';
+import { defineConfig, envField } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import mdx from '@astrojs/mdx';
 import tailwindcss from '@tailwindcss/vite';
@@ -8,10 +8,29 @@ import remarkModifiedTime from './src/plugins/remark-modified-time.mjs';
 import remarkHugoShortcodes from './src/plugins/remark-hugo-shortcodes.mjs';
 import { transformerCodeCard } from './src/plugins/shiki-code-card.mjs';
 
+// The canonical origin must be known here (it feeds `site:` → sitemap / RSS /
+// canonical URLs), but astro:env/client isn't available during config bootstrap.
+// Load the gitignored .env natively (zero deps); CI injects the var instead, in
+// which case there is no file and the value comes straight from the environment.
+try {
+  process.loadEnvFile();
+} catch (error) {
+  // A missing .env (e.g. CI, where the var is injected) is expected; any other
+  // failure (malformed/unreadable file) is real and must not be swallowed.
+  if (error?.code !== 'ENOENT') throw error;
+}
+const SITE_URL = process.env.PUBLIC_SITE_URL;
+
 export default defineConfig({
   output: 'static',
-  site: 'https://i.a632079.me',
+  site: SITE_URL,
   trailingSlash: 'always',
+  env: {
+    schema: {
+      PUBLIC_SITE_URL: envField.string({ context: 'client', access: 'public', url: true }),
+      PUBLIC_ARTALK_SERVER: envField.string({ context: 'client', access: 'public', url: true }),
+    },
+  },
   integrations: [
     sitemap({
       // Exclude draft-related paths and hidden special pages from the sitemap.

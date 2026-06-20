@@ -42,29 +42,31 @@ export function isBannedCdn(url: string): boolean {
  *
  * Removed entries (no longer used in this Astro build):
  *   js-cookie   — replaced by native document.cookie in theme.ts
- *   vue-disqus  — Vue dependency dropped; Waline is the sole comment system
+ *   vue-disqus  — Vue dependency dropped; Artalk is the sole comment system
+ *   waline-css/js — replaced by Artalk
  *   twikoo-js   — comment system not in use
  *   gitalk-css/js — comment system not in use
  */
 export const CDN: Record<string, CdnResource> = {
-  // ── Waline ────────────────────────────────────────────────────────────
-  'waline-css': {
+  // ── Artalk (comments) ─────────────────────────────────────────────────
+  // SRI re-verified against zstatic + cdnjs (byte-identical) on 2026-06-21.
+  'artalk-css': {
     primary:
-      'https://s4.zstatic.net/ajax/libs/waline/2.15.5/waline.min.css',
+      'https://s4.zstatic.net/ajax/libs/artalk/2.9.1/Artalk.css',
     fallback:
-      'https://cdnjs.cloudflare.com/ajax/libs/waline/2.15.5/waline.min.css',
+      'https://cdnjs.cloudflare.com/ajax/libs/artalk/2.9.1/Artalk.css',
     integrity:
-      'sha384-7PVcrQdw1KOS/MXsBfQevVf5AJs2mD055XoGTdex2w/v5tTsGPfiYzsxlW+y4vUd',
+      'sha384-gI2jJYJLvjRisO+PzIvuJimdjyC5JhjopwQcbA/9u3lBuCOtQRksXgX1XIVXXr2c',
     crossorigin: 'anonymous',
     type: 'style',
   },
-  'waline-js': {
+  'artalk-js': {
     primary:
-      'https://s4.zstatic.net/ajax/libs/waline/2.15.5/waline.min.js',
+      'https://s4.zstatic.net/ajax/libs/artalk/2.9.1/Artalk.js',
     fallback:
-      'https://cdnjs.cloudflare.com/ajax/libs/waline/2.15.5/waline.min.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/artalk/2.9.1/Artalk.js',
     integrity:
-      'sha384-40RaVgL7x9vyFxIDbsZireNQWZ+W6Fky5QGZ+BLyHgaRn1q2NeH30iPTq410dG1c',
+      'sha384-/E3idIiuUk+xDah7acnuTLnphKkIYqPsL/1IomWWBAugRCuLiOYKu9sLW83R9QFT',
     crossorigin: 'anonymous',
     type: 'script',
   },
@@ -135,6 +137,23 @@ export const CDN: Record<string, CdnResource> = {
     type: 'style',
   },
 };
+
+// Enforce the CDN policy across the WHOLE registry, not just the entries rendered
+// through ExternalAsset. comments.ts and viewer.ts pull their assets straight
+// from CDN[...] and inject them at runtime, bypassing ExternalAsset's per-asset
+// assertNoBannedCdn() — so without this a future banned/SRI-less comment or
+// viewer URL would ship silently. Guarded to the build/SSR pass: the URLs are
+// build-time constants, so the check is dead weight in the client bundle and is
+// tree-shaken out there (import.meta.env.SSR → false on the client).
+if (import.meta.env.SSR) {
+  for (const [key, resource] of Object.entries(CDN)) {
+    assertNoBannedCdn(resource.primary);
+    assertNoBannedCdn(resource.fallback);
+    if (!resource.integrity.startsWith('sha384-')) {
+      throw new Error(`CDN registry entry "${key}" is missing a sha384 SRI hash`);
+    }
+  }
+}
 
 /**
  * Inline script string for the CDN fallback loader (__cdnfb).

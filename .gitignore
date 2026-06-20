@@ -12,6 +12,11 @@ tmp/
 # Astro cache
 .astro/
 
+# Environment variables — local only; .env.example is the committed template
+.env
+.env.*
+!.env.example
+
 # Local tooling artefacts (not part of the source tree)
 .serena/
 .ccg/**/.turns.json
