@@ -362,6 +362,19 @@ html.night {
       border-color: rgba(#fff, 0.09);
     }
 
+    // Dual Shiki theme: the light palette is inlined as the default; under
+    // .night flip the code surface (<pre>) and every token (<span>) to the
+    // monokai theme via Shiki's `--shiki-dark*` vars. `!important` is required
+    // because the light colors live in inline `style=""` attributes, which a
+    // non-important stylesheet rule cannot override.
+    .code-card > pre {
+      background-color: var(--shiki-dark-bg) !important;
+      color: var(--shiki-dark) !important;
+    }
+    .code-card pre span {
+      color: var(--shiki-dark) !important;
+    }
+
     .code-card__bar,
     .rcg-tab-container {
       background: rgba(#fff, 0.03);
