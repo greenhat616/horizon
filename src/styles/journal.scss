@@ -1220,19 +1220,9 @@ mjx-container {
 // utilities in components/FriendsGrid.astro — see that file. The old Bootstrap
 // .card / .row / .col-lg-6 chrome was dropped in the Astro migration.
 
-// waline
-img.vuser {
-  transition: all 0.5s;
-}
-.vitem:hover {
-  img.vuser {
-    transform: rotate(360deg);
-  }
-}
-
-.veditor {
-  border-radius: 0 !important;
-}
+// Comments (Artalk): the widget ships its own avatar/editor styling. The legacy
+// Waline avatar hover-spin (.vuser) was dropped; restore an equivalent under
+// `.atk-avatar img` only if a visual pass calls for it.
 .tags {
   display: flex;
   align-items: center;

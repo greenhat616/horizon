@@ -27,6 +27,13 @@ jobs:
 
       - name: Build
         run: pnpm build
+        env:
+          # Public (non-secret) build-time config, validated by astro:env.
+          # Define these as repository Variables:
+          #   Settings → Secrets and variables → Actions → Variables.
+          # A missing required value fails the build fast (astro:env).
+          PUBLIC_SITE_URL: ${{ vars.PUBLIC_SITE_URL }}
+          PUBLIC_ARTALK_SERVER: ${{ vars.PUBLIC_ARTALK_SERVER }}
 
       - name: Deploy to server
         uses: easingthemes/ssh-deploy@main
