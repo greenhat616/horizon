@@ -76,3 +76,19 @@ export function formatDate(d: Date, locale = 'zh-CN'): string {
     day: 'numeric',
   });
 }
+
+/**
+ * Format a Date as a dash-separated ISO calendar date, e.g. "2026-06-20".
+ *
+ * Uses the `en-CA` locale (which renders YYYY-MM-DD) and pins the calendar to
+ * Asia/Shanghai so a bare midnight date does not slip to the previous day on
+ * UTC build machines. This is the format used by the post-list meta row.
+ */
+export function formatDateDash(d: Date, timeZone = 'Asia/Shanghai'): string {
+  return d.toLocaleDateString('en-CA', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
+}

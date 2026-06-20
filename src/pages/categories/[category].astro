@@ -15,6 +15,7 @@
 import { getCollection } from 'astro:content';
 import ListLayout from '../../layouts/ListLayout.astro';
 import { urlizeTerm } from '../../lib/taxonomy';
+import { toCardData } from '../../lib/post-card';
 
 export async function getStaticPaths() {
   const allPosts = await getCollection('posts');
@@ -52,16 +53,7 @@ interface Props {
 
 const { category, catPosts } = Astro.props;
 
-const posts = catPosts.map((p) => ({
-  href: `/posts/${p.data.slug}/`,
-  title: p.data.title,
-  summary: p.data.description ?? undefined,
-  featuredImage: p.data.featured_image ?? undefined,
-  date: p.data.date,
-  categories: p.data.categories ?? [],
-  tags: p.data.tags ?? [],
-  draft: p.data.draft,
-}));
+const posts = await Promise.all(catPosts.map(toCardData));
 ---
 
 <ListLayout

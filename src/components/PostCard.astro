@@ -11,10 +11,18 @@
  *   date         — publish date
  *   categories   — array of category strings
  *   tags         — array of tag strings
- *   readingTime  — minutes (optional)
+ *   readingSeconds — reading time in seconds (optional)
  *   draft        — show draft badge (optional)
  */
 import PostMeta from './PostMeta.astro';
+
+/** Optional overrides for the meta row; see PostMeta for defaults. */
+export interface MetaOptions {
+  showCategories?: boolean;
+  showTags?: boolean;
+  showReadingTime?: boolean;
+  dateStyle?: 'cn' | 'dash';
+}
 
 interface Props {
   href: string;
@@ -24,8 +32,9 @@ interface Props {
   date: Date;
   categories?: string[];
   tags?: string[];
-  readingTime?: number;
+  readingSeconds?: number;
   draft?: boolean;
+  metaOptions?: MetaOptions;
 }
 
 const {
@@ -36,8 +45,9 @@ const {
   date,
   categories = [],
   tags = [],
-  readingTime,
+  readingSeconds,
   draft = false,
+  metaOptions = {},
 } = Astro.props;
 ---
 
@@ -53,9 +63,10 @@ const {
           date={date}
           categories={categories}
           tags={tags}
-          readingTime={readingTime}
+          readingSeconds={readingSeconds}
           draft={draft}
           variant="item"
+          {...metaOptions}
         />
       </div>
 

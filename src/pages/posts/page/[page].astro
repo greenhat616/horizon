@@ -9,6 +9,7 @@
 
 import { getCollection } from 'astro:content';
 import ListLayout from '../../../layouts/ListLayout.astro';
+import { toCardData } from '../../../lib/post-card';
 
 export async function getStaticPaths() {
   const PAGE_SIZE = 10;
@@ -24,33 +25,27 @@ export async function getStaticPaths() {
   const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
 
   // Start from page 2 — page 1 is rendered by posts/index.astro
-  return Array.from({ length: Math.max(0, totalPages - 1) }, (_, i) => {
-    const page = i + 2;
-    const start = (page - 1) * PAGE_SIZE;
-    const end = start + PAGE_SIZE;
-    const pagePosts = sorted.slice(start, end);
+  return Promise.all(
+    Array.from({ length: Math.max(0, totalPages - 1) }, async (_, i) => {
+      const page = i + 2;
+      const start = (page - 1) * PAGE_SIZE;
+      const end = start + PAGE_SIZE;
+      const pagePosts = sorted.slice(start, end);
 
-    const posts = pagePosts.map((p) => ({
-      href: `/posts/${p.data.slug}/`,
-      title: p.data.title,
-      summary: p.data.description ?? undefined,
-      featuredImage: p.data.featured_image ?? undefined,
-      date: p.data.date,
-      categories: p.data.categories ?? [],
-      tags: p.data.tags ?? [],
-    }));
+      const posts = await Promise.all(pagePosts.map(toCardData));
 
-    return {
-      params: { page: String(page) },
-      props: {
-        posts,
-        page,
-        totalPages,
-        prevUrl: page === 2 ? '/posts/' : `/posts/page/${page - 1}/`,
-        nextUrl: page < totalPages ? `/posts/page/${page + 1}/` : undefined,
-      },
-    };
-  });
+      return {
+        params: { page: String(page) },
+        props: {
+          posts,
+          page,
+          totalPages,
+          prevUrl: page === 2 ? '/posts/' : `/posts/page/${page - 1}/`,
+          nextUrl: page < totalPages ? `/posts/page/${page + 1}/` : undefined,
+        },
+      };
+    }),
+  );
 }
 
 const { posts, page, totalPages, prevUrl, nextUrl } = Astro.props;

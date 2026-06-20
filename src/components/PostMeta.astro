@@ -4,37 +4,61 @@
  * Mirrors diary's partials/post-item-meta.html and the .post-meta block
  * inside single.html.
  *
+ * Every part except the date is optional and toggleable, so the list card can
+ * show only "date · reading time" (matching i.a632079.me) while the article
+ * header keeps the full row. The date is always rendered.
+ *
  * Props
- *   date        — publish date (required)
- *   categories  — array of category strings (optional)
- *   tags        — array of tag strings (optional)
- *   readingTime — minutes, from remark-reading-time-cjk (optional)
- *   draft       — show draft badge when true (optional)
- *   variant     — 'item' (list card) | 'post' (article header, default)
+ *   date            — publish date (required, always shown)
+ *   categories      — array of category strings
+ *   tags            — array of tag strings
+ *   readingSeconds  — reading time in seconds (from remark-reading-time-cjk),
+ *                     rendered as Hugo's "min s" string
+ *   draft           — show draft badge when true
+ *   variant         — 'item' (list card) | 'post' (article header, default)
+ *   showCategories  — render categories (default: post only)
+ *   showTags        — render tags (default: post only)
+ *   showReadingTime — render reading time (default: true)
+ *   dateStyle       — 'cn' (2026年6月20日) | 'dash' (2026-06-20)
+ *                     (default: 'dash' for item, 'cn' for post)
  */
-import { formatDate } from '../lib/dates';
+import { formatDate, formatDateDash } from '../lib/dates';
+import { formatReadingTime } from '../lib/reading-time';
 import { urlizeTerm } from '../lib/taxonomy';
 
 interface Props {
   date: Date;
   categories?: string[];
   tags?: string[];
-  readingTime?: number;
+  readingSeconds?: number;
   draft?: boolean;
   variant?: 'item' | 'post';
+  showCategories?: boolean;
+  showTags?: boolean;
+  showReadingTime?: boolean;
+  dateStyle?: 'cn' | 'dash';
 }
 
 const {
   date,
   categories = [],
   tags = [],
-  readingTime,
+  readingSeconds,
   draft = false,
   variant = 'post',
+  showCategories = variant === 'post',
+  showTags = variant === 'post',
+  showReadingTime = true,
+  dateStyle = variant === 'item' ? 'dash' : 'cn',
 } = Astro.props;
 
-const formattedDate = formatDate(date);
+const formattedDate =
+  dateStyle === 'dash' ? formatDateDash(date) : formatDate(date);
 const cssClass = variant === 'item' ? 'post-item-meta' : 'post-meta';
+
+// Reading time rendered exactly as the Hugo diary theme: "24 min 30 s".
+const readingTimeText =
+  readingSeconds != null ? formatReadingTime(readingSeconds) : '';
 ---
 
 <div class={cssClass}>
@@ -42,7 +66,7 @@ const cssClass = variant === 'item' ? 'post-item-meta' : 'post-meta';
     {formattedDate}
   </time>
 
-  {categories.length > 0 && (
+  {showCategories && categories.length > 0 && (
     <>
       &emsp;
       <i class="material-icons" style="font-size:14px; vertical-align:middle">folder</i>
@@ -52,7 +76,7 @@ const cssClass = variant === 'item' ? 'post-item-meta' : 'post-meta';
     </>
   )}
 
-  {tags.length > 0 && (
+  {showTags && tags.length > 0 && (
     <>
       &emsp;
       <i class="material-icons" style="font-size:14px; vertical-align:middle">label</i>
@@ -65,11 +89,11 @@ const cssClass = variant === 'item' ? 'post-item-meta' : 'post-meta';
     </>
   )}
 
-  {readingTime != null && readingTime > 0 && (
+  {showReadingTime && readingSeconds != null && (
     <>
       &emsp;
       <i class="material-icons" style="font-size:10px; vertical-align:middle">schedule</i>
-      {readingTime} min
+      {readingTimeText}
     </>
   )}
 

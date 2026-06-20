@@ -51,11 +51,10 @@ const { Content, headings: rawHeadings, remarkPluginFrontmatter } = await render
 // the ToC (Goldmark never emitted it, so production never listed it).
 const headings = rawHeadings.filter((h) => h.slug !== 'footnote-label');
 
-// remark-reading-time-cjk writes a string like "5 分钟"; extract the integer.
-const rawReadingTime = remarkPluginFrontmatter?.readingTime as string | undefined;
-const readingTimeMinutes = rawReadingTime
-  ? parseInt(rawReadingTime, 10) || undefined
-  : undefined;
+// remark-reading-time-cjk writes the reading time in seconds (Hugo's formula).
+const rawReadingSeconds = remarkPluginFrontmatter?.readingSeconds as number | undefined;
+const readingSeconds =
+  typeof rawReadingSeconds === 'number' ? rawReadingSeconds : undefined;
 
 // Effective lastmod: explicit frontmatter wins, then git-derived lastModified
 // from the remark plugin (exposed via remarkPluginFrontmatter after render()).
@@ -73,7 +72,7 @@ const effectiveLastmod: Date | undefined =
   lastmod={effectiveLastmod}
   categories={data.categories ?? []}
   tags={data.tags ?? []}
-  readingTime={readingTimeMinutes}
+  readingSeconds={readingSeconds}
   featuredImage={data.featured_image ?? undefined}
   headings={headings}
   enableLaTeX={data.enableLaTeX}

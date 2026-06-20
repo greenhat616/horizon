@@ -18,7 +18,7 @@ Astro 5.18（Content Layer）+ Tailwind v4（`@tailwindcss/vite`）+ pnpm。
 - `layouts/`：BaseLayout(唯一 `<head>` + 暗色 no-FOUC 内联脚本) / PostLayout / ListLayout。
 - `components/`：19 个；含 **OutdatedNotice**(编译期 + 运行时双算，弃 dayjs 用 `Intl.RelativeTimeFormat`)、**ExternalAsset**(SRI + `__cdnfb` 兜底)、Notice/Figure/BilibiliEmbed/FriendsGrid 等。
 - `lib/`：`cdn`(外链注册表 + SRI + `__cdnfb` + 禁用 CDN 校验) · `dates` · `outdated` · `taxonomy`。
-- `plugins/`：`remark-hugo-shortcodes`(unwrap `row` / 去 `friends` / `bilibili`→iframe；导出 `stripShortcodes`) · `remark-reading-time-cjk` · `remark-modified-time`(`execFileSync` git lastmod) · **`shiki-code-card`**(Shiki transformer：`<pre>`→`figure.code-card` 头部栏[语言 label+复制按钮]、默认加 `line-numbers` 类、读 `meta.__raw` 支持 `title="…"`/`no-line-numbers`)。
+- `plugins/`：`remark-hugo-shortcodes`(unwrap `row` / 去 `friends` / `bilibili`→iframe；导出 `stripShortcodes`) · **`rehype-reading-time`**(复刻 Hugo diary `countwords .Content / 220 * 60`：HAST 阶段数渲染后纯文本[≈`StripHTML`，故含 raw-HTML 内文、排除标签/URL]，CJK 按 rune、ASCII token 按词；写 `readingSeconds`/`wordCount` frontmatter；`lib/reading-time.ts#formatReadingTime` 出 `min s`，单数 `minute`/`second` 与 Hugo 模板一致) · `remark-modified-time`(`execFileSync` git lastmod) · **`shiki-code-card`**(Shiki transformer：`<pre>`→`figure.code-card` 头部栏[语言 label+复制按钮]、默认加 `line-numbers` 类、读 `meta.__raw` 支持 `title="…"`/`no-line-numbers`)。
 - `scripts/`：theme / nav / outdated-runtime / comments(懒加载 Waline) / viewer(懒加载 ViewerJS) / **code-card**(委托式复制按钮，BaseLayout 引导)，全 vanilla 零依赖。
 - **零客户端框架**：旧 Vue/Bootstrap/dayjs/js-cookie 全弃；页面纯静态 HTML + 内联微脚本 + 按需懒加载。
 
