@@ -9,12 +9,12 @@
  * prev/next:  adjacent posts by date (prev = older, next = newer).
  */
 
-import { getCollection, render } from 'astro:content';
-import PostLayout from '../../layouts/PostLayout.astro';
-import { isListable, postSlug } from '../../lib/posts';
+import { getCollection, render } from "astro:content";
+import PostLayout from "../../layouts/PostLayout.astro";
+import { isListable, postSlug } from "../../lib/posts";
 
 export async function getStaticPaths() {
-  const allPosts = (await getCollection('posts')).filter(isListable);
+  const allPosts = (await getCollection("posts")).filter(isListable);
 
   // Sort descending by date (newest first = index 0)
   const sorted = allPosts.sort(
@@ -43,21 +43,29 @@ export async function getStaticPaths() {
 const { post, prevHref, prevTitle, nextHref, nextTitle } = Astro.props;
 const { data } = post;
 
-const { Content, headings: rawHeadings, remarkPluginFrontmatter } = await render(post);
+const {
+  Content,
+  headings: rawHeadings,
+  remarkPluginFrontmatter,
+} = await render(post);
 
 // remark-gfm appends a visually-hidden <h2 id="footnote-label">Footnotes</h2>
 // to articles that use footnotes. It is not authored content, so drop it from
 // the ToC (Goldmark never emitted it, so production never listed it).
-const headings = rawHeadings.filter((h) => h.slug !== 'footnote-label');
+const headings = rawHeadings.filter((h) => h.slug !== "footnote-label");
 
 // remark-reading-time-cjk writes the reading time in seconds (Hugo's formula).
-const rawReadingSeconds = remarkPluginFrontmatter?.readingSeconds as number | undefined;
+const rawReadingSeconds = remarkPluginFrontmatter?.readingSeconds as
+  | number
+  | undefined;
 const readingSeconds =
-  typeof rawReadingSeconds === 'number' ? rawReadingSeconds : undefined;
+  typeof rawReadingSeconds === "number" ? rawReadingSeconds : undefined;
 
 // Effective lastmod: explicit frontmatter wins, then git-derived lastModified
 // from the remark plugin (exposed via remarkPluginFrontmatter after render()).
-const gitLastModified = remarkPluginFrontmatter?.lastModified as string | undefined;
+const gitLastModified = remarkPluginFrontmatter?.lastModified as
+  | string
+  | undefined;
 const effectiveLastmod: Date | undefined =
   data.lastmod ??
   data.updated ??
@@ -79,7 +87,8 @@ const effectiveLastmod: Date | undefined =
   disableMetaInfo={data.disableMetaInfo ?? false}
   disablePagination={data.disablePagination ?? false}
   disableCC={data.disableCC ?? false}
-  disableOutdatedNotice={(data as { disableOutdatedNotice?: boolean }).disableOutdatedNotice ?? false}
+  disableOutdatedNotice={(data as { disableOutdatedNotice?: boolean })
+    .disableOutdatedNotice ?? false}
   comment={data.comment}
   draft={data.draft}
   prevHref={prevHref}

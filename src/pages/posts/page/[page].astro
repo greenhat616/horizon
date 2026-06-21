@@ -7,15 +7,15 @@
  * route — the canonical /posts/ page (posts/index.astro) already serves it.
  */
 
-import { getCollection } from 'astro:content';
-import ListLayout from '../../../layouts/ListLayout.astro';
-import { toCardData } from '../../../lib/post-card';
-import { isListable } from '../../../lib/posts';
+import { getCollection } from "astro:content";
+import ListLayout from "../../../layouts/ListLayout.astro";
+import { toCardData } from "../../../lib/post-card";
+import { isListable } from "../../../lib/posts";
 
 export async function getStaticPaths() {
   const PAGE_SIZE = 10;
 
-  const allPosts = (await getCollection('posts')).filter(isListable);
+  const allPosts = (await getCollection("posts")).filter(isListable);
 
   const sorted = allPosts.sort(
     (a, b) => b.data.date.getTime() - a.data.date.getTime(),
@@ -39,7 +39,7 @@ export async function getStaticPaths() {
           posts,
           page,
           totalPages,
-          prevUrl: page === 2 ? '/' : `/posts/page/${page - 1}/`,
+          prevUrl: page === 2 ? "/" : `/posts/page/${page - 1}/`,
           nextUrl: page < totalPages ? `/posts/page/${page + 1}/` : undefined,
         },
       };

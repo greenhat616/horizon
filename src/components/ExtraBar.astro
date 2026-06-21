@@ -21,7 +21,7 @@
  *   total    — total page count
  */
 
-import DarkModeToggle from './DarkModeToggle.astro';
+import DarkModeToggle from "./DarkModeToggle.astro";
 
 interface Props {
   prevUrl?: string;
@@ -50,43 +50,53 @@ const showPagination = total !== undefined && total > 1;
       aria-label="回到顶部"
       aria-hidden="true"
     >
-      <i class="material-icons pagination-action-icon" aria-hidden="true">keyboard_arrow_up</i>
+      <i class="material-icons pagination-action-icon" aria-hidden="true"
+        >keyboard_arrow_up</i
+      >
     </a>
 
     {/* Dark mode toggle */}
     <DarkModeToggle class="pagination-action" />
 
     {/* List pagination (prev / indicator / next) */}
-    {showPagination && (
-      <>
-        <a
-          class="pagination-action"
-          href={prevUrl}
-          style={!prevUrl ? 'display:none' : undefined}
-          aria-label="上一页"
-        >
-          <i class="material-icons pagination-action-icon" aria-hidden="true">chevron_left</i>
-        </a>
+    {
+      showPagination && (
+        <>
+          <a
+            class="pagination-action"
+            href={prevUrl}
+            style={!prevUrl ? "display:none" : undefined}
+            aria-label="上一页"
+          >
+            <i class="material-icons pagination-action-icon" aria-hidden="true">
+              chevron_left
+            </i>
+          </a>
 
-        <div class="pagination-indicator">
-          <span style="text-align:center">
-            {page}
-            <br />
-            <span style="display:inline-block;transform:rotate(-28deg)">-</span>
-            <br />
-            {total}
-          </span>
-        </div>
+          <div class="pagination-indicator">
+            <span style="text-align:center">
+              {page}
+              <br />
+              <span style="display:inline-block;transform:rotate(-28deg)">
+                -
+              </span>
+              <br />
+              {total}
+            </span>
+          </div>
 
-        <a
-          class="pagination-action"
-          href={nextUrl}
-          style={!nextUrl ? 'display:none' : undefined}
-          aria-label="下一页"
-        >
-          <i class="material-icons pagination-action-icon" aria-hidden="true">chevron_right</i>
-        </a>
-      </>
-    )}
+          <a
+            class="pagination-action"
+            href={nextUrl}
+            style={!nextUrl ? "display:none" : undefined}
+            aria-label="下一页"
+          >
+            <i class="material-icons pagination-action-icon" aria-hidden="true">
+              chevron_right
+            </i>
+          </a>
+        </>
+      )
+    }
   </div>
 </div>

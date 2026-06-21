@@ -22,9 +22,9 @@
  *   dateStyle       — 'cn' (2026年6月20日) | 'dash' (2026-06-20)
  *                     (default: 'dash' for item, 'cn' for post)
  */
-import { formatDate, formatDateDash } from '../lib/dates';
-import { formatReadingTime } from '../lib/reading-time';
-import { urlizeTerm } from '../lib/taxonomy';
+import { formatDate, formatDateDash } from "../lib/dates";
+import { formatReadingTime } from "../lib/reading-time";
+import { urlizeTerm } from "../lib/taxonomy";
 
 interface Props {
   date: Date;
@@ -32,11 +32,11 @@ interface Props {
   tags?: string[];
   readingSeconds?: number;
   draft?: boolean;
-  variant?: 'item' | 'post';
+  variant?: "item" | "post";
   showCategories?: boolean;
   showTags?: boolean;
   showReadingTime?: boolean;
-  dateStyle?: 'cn' | 'dash';
+  dateStyle?: "cn" | "dash";
 }
 
 const {
@@ -45,20 +45,20 @@ const {
   tags = [],
   readingSeconds,
   draft = false,
-  variant = 'post',
-  showCategories = variant === 'post',
-  showTags = variant === 'post',
+  variant = "post",
+  showCategories = variant === "post",
+  showTags = variant === "post",
   showReadingTime = true,
-  dateStyle = variant === 'item' ? 'dash' : 'cn',
+  dateStyle = variant === "item" ? "dash" : "cn",
 } = Astro.props;
 
 const formattedDate =
-  dateStyle === 'dash' ? formatDateDash(date) : formatDate(date);
-const cssClass = variant === 'item' ? 'post-item-meta' : 'post-meta';
+  dateStyle === "dash" ? formatDateDash(date) : formatDate(date);
+const cssClass = variant === "item" ? "post-item-meta" : "post-meta";
 
 // Reading time rendered exactly as the Hugo diary theme: "24 min 30 s".
 const readingTimeText =
-  readingSeconds != null ? formatReadingTime(readingSeconds) : '';
+  readingSeconds != null ? formatReadingTime(readingSeconds) : "";
 ---
 
 <div class={cssClass}>
@@ -66,43 +66,51 @@ const readingTimeText =
     {formattedDate}
   </time>
 
-  {showCategories && categories.length > 0 && (
-    <>
-      &emsp;
-      <i class="material-icons">folder</i>
-      {categories.map((cat) => (
-        <a href={`/categories/${urlizeTerm(cat)}/`}>{cat}</a>
-      ))}
-    </>
-  )}
+  {
+    showCategories && categories.length > 0 && (
+      <>
+        &emsp;
+        <i class="material-icons">folder</i>
+        {categories.map((cat) => (
+          <a href={`/categories/${urlizeTerm(cat)}/`}>{cat}</a>
+        ))}
+      </>
+    )
+  }
 
-  {showTags && tags.length > 0 && (
-    <>
-      &emsp;
-      <i class="material-icons">label</i>
-      {tags.map((tag, i) => (
-        <>
-          <a href={`/tags/${urlizeTerm(tag)}/`}>{tag}</a>
-          {i < tags.length - 1 && <> </>}
-        </>
-      ))}
-    </>
-  )}
+  {
+    showTags && tags.length > 0 && (
+      <>
+        &emsp;
+        <i class="material-icons">label</i>
+        {tags.map((tag, i) => (
+          <>
+            <a href={`/tags/${urlizeTerm(tag)}/`}>{tag}</a>
+            {i < tags.length - 1 && <> </>}
+          </>
+        ))}
+      </>
+    )
+  }
 
-  {showReadingTime && readingSeconds != null && (
-    <>
-      &emsp;
-      <i class="material-icons">schedule</i>
-      {readingTimeText}
-    </>
-  )}
+  {
+    showReadingTime && readingSeconds != null && (
+      <>
+        &emsp;
+        <i class="material-icons">schedule</i>
+        {readingTimeText}
+      </>
+    )
+  }
 
-  {draft && (
-    <>
-      &emsp;
-      <span class="draft-label">草稿</span>
-    </>
-  )}
+  {
+    draft && (
+      <>
+        &emsp;
+        <span class="draft-label">草稿</span>
+      </>
+    )
+  }
 </div>
 
 <style>

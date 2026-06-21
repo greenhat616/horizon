@@ -10,7 +10,7 @@
  *   - git is not available (CI without full history, etc.).
  */
 
-import { execFileSync } from 'node:child_process';
+import { execFileSync } from "node:child_process";
 
 /** remark plugin factory — no options required. */
 export default function remarkModifiedTime() {
@@ -24,9 +24,12 @@ export default function remarkModifiedTime() {
       try {
         // %cI  →  ISO 8601 committer date with timezone offset
         const result = execFileSync(
-          'git',
-          ['log', '-1', '--pretty=format:%cI', '--', filepath],
-          { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] },
+          "git",
+          ["log", "-1", "--pretty=format:%cI", "--", filepath],
+          {
+            encoding: "utf8",
+            stdio: ["pipe", "pipe", "pipe"],
+          },
         ).trim();
 
         // Empty string means the file is not tracked by git yet

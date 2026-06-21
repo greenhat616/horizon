@@ -23,7 +23,7 @@ interface Props {
   prevTitle?: string;
   nextHref?: string;
   nextTitle?: string;
-  variant?: 'post' | 'list';
+  variant?: "post" | "list";
   page?: number;
   totalPages?: number;
 }
@@ -33,56 +33,72 @@ const {
   prevTitle,
   nextHref,
   nextTitle,
-  variant = 'post',
+  variant = "post",
   page = 1,
   totalPages = 1,
 } = Astro.props;
 ---
 
-{variant === 'post' && (
-  <nav class="post-pagination">
-    {nextHref ? (
-      <a class="newer-posts" href={nextHref}>
-        ← 较新的文章<br />{nextTitle}
-      </a>
-    ) : (
-      <a class="newer-posts">← 较新的文章<br />已是最新</a>
-    )}
+{
+  variant === "post" && (
+    <nav class="post-pagination">
+      {nextHref ? (
+        <a class="newer-posts" href={nextHref}>
+          ← 较新的文章
+          <br />
+          {nextTitle}
+        </a>
+      ) : (
+        <a class="newer-posts">
+          ← 较新的文章
+          <br />
+          已是最新
+        </a>
+      )}
 
-    {prevHref ? (
-      <a class="older-posts" href={prevHref}>
-        较旧的文章 →<br />{prevTitle}
-      </a>
-    ) : (
-      <a class="older-posts">较旧的文章 →<br />已是最旧</a>
-    )}
-  </nav>
-)}
+      {prevHref ? (
+        <a class="older-posts" href={prevHref}>
+          较旧的文章 →<br />
+          {prevTitle}
+        </a>
+      ) : (
+        <a class="older-posts">
+          较旧的文章 →<br />
+          已是最旧
+        </a>
+      )}
+    </nav>
+  )
+}
 
-{variant === 'list' && totalPages > 1 && (
-  <div class="pagination">
-    {prevHref ? (
-      <a class="pagination-action" href={prevHref} style="opacity:1">
-        <i class="material-icons pagination-action-icon">chevron_left</i>
-      </a>
-    ) : (
-      <a class="pagination-action" style="opacity:0">
-        <i class="material-icons pagination-action-icon">chevron_left</i>
-      </a>
-    )}
+{
+  variant === "list" && totalPages > 1 && (
+    <div class="pagination">
+      {prevHref ? (
+        <a class="pagination-action" href={prevHref} style="opacity:1">
+          <i class="material-icons pagination-action-icon">chevron_left</i>
+        </a>
+      ) : (
+        <a class="pagination-action" style="opacity:0">
+          <i class="material-icons pagination-action-icon">chevron_left</i>
+        </a>
+      )}
 
-    <div class="pagination-indicator">
-      <span>{page}/{totalPages}</span>
+      <div class="pagination-indicator">
+        <span>
+          {page}/{totalPages}
+        </span>
+      </div>
+
+      {nextHref ? (
+        <a class="pagination-action" href={nextHref} style="opacity:1">
+          <i class="material-icons pagination-action-icon">chevron_right</i>
+        </a>
+      ) : (
+        <a class="pagination-action" style="opacity:0">
+          <i class="material-icons pagination-action-icon">chevron_right</i>
+        </a>
+      )}
     </div>
-
-    {nextHref ? (
-      <a class="pagination-action" href={nextHref} style="opacity:1">
-        <i class="material-icons pagination-action-icon">chevron_right</i>
-      </a>
-    ) : (
-      <a class="pagination-action" style="opacity:0">
-        <i class="material-icons pagination-action-icon">chevron_right</i>
-      </a>
-    )}
-  </div>
-)}
+  )
+}

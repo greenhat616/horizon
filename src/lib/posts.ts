@@ -12,7 +12,7 @@
  * `hidden` posts (friends/workers) are excluded unconditionally.
  */
 
-import type { CollectionEntry } from 'astro:content';
+import type { CollectionEntry } from "astro:content";
 
 /** Drafts are visible only under `astro dev`; PROD builds always exclude them. */
 export const SHOW_DRAFTS = import.meta.env.DEV;
@@ -22,11 +22,11 @@ export const SHOW_DRAFTS = import.meta.env.DEV;
  * glob id (filename) when absent. The fallback keeps slug-less draft files
  * (e.g. Unraid.md) from generating `/posts/undefined/` in dev.
  */
-export function postSlug(p: CollectionEntry<'posts'>): string {
+export function postSlug(p: CollectionEntry<"posts">): string {
   return p.data.slug ?? p.id;
 }
 
 /** Listable/routable: never `hidden`; drafts only under dev. */
-export function isListable(p: CollectionEntry<'posts'>): boolean {
+export function isListable(p: CollectionEntry<"posts">): boolean {
   return !p.data.hidden && (SHOW_DRAFTS || !p.data.draft);
 }

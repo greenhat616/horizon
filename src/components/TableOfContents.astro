@@ -10,7 +10,7 @@
  */
 
 interface Heading {
-  depth: number;  // 1–6
+  depth: number; // 1–6
   slug: string;
   text: string;
 }
@@ -36,19 +36,23 @@ const items = filtered.map((h) => ({
 }));
 ---
 
-{items.length >= 1 && (
-  <div class="toc">
-    <div class="toc-content">
-      <p style="text-align:center">- 目录 -</p>
-      <ul>
-        {items.map((item) => (
-          <li style={item.level > 0 ? `margin-left: ${item.level * 16}px` : ''}>
-            <a href={`#${item.slug}`} class={`nav-${item.slug}`}>
-              {item.text}
-            </a>
-          </li>
-        ))}
-      </ul>
+{
+  items.length >= 1 && (
+    <div class="toc">
+      <div class="toc-content">
+        <p style="text-align:center">- 目录 -</p>
+        <ul>
+          {items.map((item) => (
+            <li
+              style={item.level > 0 ? `margin-left: ${item.level * 16}px` : ""}
+            >
+              <a href={`#${item.slug}`} class={`nav-${item.slug}`}>
+                {item.text}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
-  </div>
-)}
+  )
+}

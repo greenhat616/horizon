@@ -13,8 +13,8 @@
  * so calling it here (even across multiple taxonomy pages) is cheap.
  */
 
-import { render, type CollectionEntry } from 'astro:content';
-import { postSlug } from './posts';
+import { render, type CollectionEntry } from "astro:content";
+import { postSlug } from "./posts";
 
 export interface PostCardData {
   href: string;
@@ -29,7 +29,9 @@ export interface PostCardData {
 }
 
 /** Project a posts collection entry into list-card data. */
-export async function toCardData(p: CollectionEntry<'posts'>): Promise<PostCardData> {
+export async function toCardData(
+  p: CollectionEntry<"posts">,
+): Promise<PostCardData> {
   const { remarkPluginFrontmatter } = await render(p);
   const rs = remarkPluginFrontmatter?.readingSeconds;
 
@@ -41,7 +43,7 @@ export async function toCardData(p: CollectionEntry<'posts'>): Promise<PostCardD
     date: p.data.date,
     categories: p.data.categories ?? [],
     tags: p.data.tags ?? [],
-    readingSeconds: typeof rs === 'number' ? rs : undefined,
+    readingSeconds: typeof rs === "number" ? rs : undefined,
     draft: p.data.draft,
   };
 }

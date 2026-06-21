@@ -19,12 +19,12 @@
  * deliberately let links inherit diary's dark `a` colour rather than fight it.
  */
 
-import { getCollection } from 'astro:content';
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import { formatDateDash } from '../../lib/dates';
-import { isListable, postSlug } from '../../lib/posts';
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { formatDateDash } from "../../lib/dates";
+import { isListable, postSlug } from "../../lib/posts";
 
-const allPosts = (await getCollection('posts')).filter(isListable);
+const allPosts = (await getCollection("posts")).filter(isListable);
 
 const sorted = allPosts.sort(
   (a, b) => b.data.date.getTime() - a.data.date.getTime(),
@@ -39,7 +39,7 @@ interface ArchiveItem {
 // Group the already-descending posts by year, preserving order.
 const groups: { year: string; items: ArchiveItem[] }[] = [];
 for (const p of sorted) {
-  const [year, month, day] = formatDateDash(p.data.date).split('-');
+  const [year, month, day] = formatDateDash(p.data.date).split("-");
   let group = groups.find((g) => g.year === year);
   if (!group) {
     group = { year, items: [] };
@@ -62,33 +62,35 @@ for (const p of sorted) {
       </div>
       <div class="post-body-wrapper">
         <div class="post-body">
-          {groups.map((group) => (
-            <section class="mt-9 first:mt-0">
-              <h2 class="mb-3 border-b border-black/10 pb-1.5 text-4xl font-bold leading-snug text-black dark:border-white/10 dark:text-[#e6e6e6]">
-                {group.year}
-              </h2>
-              <ul class="m-0 list-none p-0">
-                {group.items.map((item) => (
-                  <li class="flex items-baseline gap-4 py-2">
-                    <time class="w-[3.6em] shrink-0 text-sm tabular-nums text-black/55 dark:text-white/45">
-                      {item.monthDay}
-                    </time>
-                    {/* Colour comes from the scoped .archive-link rule below —
+          {
+            groups.map((group) => (
+              <section class="mt-9 first:mt-0">
+                <h2 class="mb-3 border-b border-black/10 pb-1.5 text-4xl leading-snug font-bold text-black dark:border-white/10 dark:text-[#e6e6e6]">
+                  {group.year}
+                </h2>
+                <ul class="m-0 list-none p-0">
+                  {group.items.map((item) => (
+                    <li class="flex items-baseline gap-4 py-2">
+                      <time class="w-[3.6em] shrink-0 text-sm text-black/55 tabular-nums dark:text-white/45">
+                        {item.monthDay}
+                      </time>
+                      {/* Colour comes from the scoped .archive-link rule below —
                         NOT Tailwind. Tailwind colour utilities live in
                         @layer utilities and lose to journal.scss's unlayered
                         `a { color }`, so a `text-black` here renders link-teal.
                         Size/weight/layout stay Tailwind. */}
-                    <a
-                      href={item.href}
-                      class="archive-link min-w-0 flex-1 text-2xl font-medium leading-snug no-underline hover:underline max-[1020px]:text-xl"
-                    >
-                      {item.title}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ))}
+                      <a
+                        href={item.href}
+                        class="archive-link min-w-0 flex-1 text-2xl leading-snug font-medium no-underline hover:underline max-[1020px]:text-xl"
+                      >
+                        {item.title}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ))
+          }
         </div>
       </div>
     </div>

@@ -15,16 +15,16 @@
  *   initComments()  — call once on DOMContentLoaded
  */
 
-import { CDN } from '../lib/cdn';
-import { ARTALK_SERVER, ARTALK_SITE } from '../site.config';
+import { CDN } from "../lib/cdn";
+import { ARTALK_SERVER, ARTALK_SITE } from "../site.config";
 
 // Resolve CDN entries at module load time (build-time constants via cdn.ts).
-const ARTALK_CSS = CDN['artalk-css'];
-const ARTALK_JS  = CDN['artalk-js'];
+const ARTALK_CSS = CDN["artalk-css"];
+const ARTALK_JS = CDN["artalk-js"];
 
 // Minimal Artalk type surface — avoids importing the artalk package into the bundle.
 interface ArtalkInstance {
-  setDarkMode(value: boolean | 'auto'): void;
+  setDarkMode(value: boolean | "auto"): void;
   destroy(): void;
 }
 interface ArtalkStatic {
@@ -38,21 +38,24 @@ declare global {
 }
 
 const isNight = (): boolean =>
-  document.documentElement.classList.contains('night');
+  document.documentElement.classList.contains("night");
 
 // ─── asset injection helpers ─────────────────────────────────────────────────
 
 function injectCSS(res: typeof ARTALK_CSS): Promise<void> {
   return new Promise((resolve) => {
-    if (document.querySelector(`link[href="${res.primary}"]`)) { resolve(); return; }
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
+    if (document.querySelector(`link[href="${res.primary}"]`)) {
+      resolve();
+      return;
+    }
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
     link.href = res.primary;
     link.integrity = res.integrity;
     link.crossOrigin = res.crossorigin;
     link.onerror = () => {
-      const fb = document.createElement('link');
-      fb.rel = 'stylesheet';
+      const fb = document.createElement("link");
+      fb.rel = "stylesheet";
       fb.href = res.fallback;
       fb.integrity = res.integrity;
       fb.crossOrigin = res.crossorigin;
@@ -67,19 +70,23 @@ function injectCSS(res: typeof ARTALK_CSS): Promise<void> {
 
 function injectJS(res: typeof ARTALK_JS): Promise<void> {
   return new Promise((resolve, reject) => {
-    if (window.Artalk) { resolve(); return; }
-    const script = document.createElement('script');
+    if (window.Artalk) {
+      resolve();
+      return;
+    }
+    const script = document.createElement("script");
     script.src = res.primary;
     script.integrity = res.integrity;
     script.crossOrigin = res.crossorigin;
     script.async = false;
     script.onerror = () => {
-      const fb = document.createElement('script');
+      const fb = document.createElement("script");
       fb.src = res.fallback;
       fb.integrity = res.integrity;
       fb.crossOrigin = res.crossorigin;
       fb.onload = () => resolve();
-      fb.onerror = () => reject(new Error('Artalk JS failed to load from both CDNs'));
+      fb.onerror = () =>
+        reject(new Error("Artalk JS failed to load from both CDNs"));
       document.head.appendChild(fb);
     };
     script.onload = () => resolve();
@@ -117,7 +124,10 @@ async function loadArtalk(container: HTMLElement): Promise<void> {
   // html.night). Zero coupling — we only observe the class attribute.
   new MutationObserver(() => artalk.setDarkMode(isNight())).observe(
     document.documentElement,
-    { attributes: true, attributeFilter: ['class'] },
+    {
+      attributes: true,
+      attributeFilter: ["class"],
+    },
   );
 }
 
@@ -129,7 +139,7 @@ async function loadArtalk(container: HTMLElement): Promise<void> {
  * Call once on DOMContentLoaded.
  */
 export function initComments(): void {
-  const container = document.querySelector<HTMLElement>('[data-comments]');
+  const container = document.querySelector<HTMLElement>("[data-comments]");
   if (!container) return;
 
   let loaded = false;
@@ -141,10 +151,10 @@ export function initComments(): void {
   };
 
   // click fallback
-  container.addEventListener('click', load, { once: true });
+  container.addEventListener("click", load, { once: true });
 
   // IntersectionObserver — trigger 200 px before viewport edge
-  if ('IntersectionObserver' in window) {
+  if ("IntersectionObserver" in window) {
     const io = new IntersectionObserver(
       (entries) => {
         if (entries[0]?.isIntersecting) {
@@ -152,7 +162,7 @@ export function initComments(): void {
           load();
         }
       },
-      { rootMargin: '200px' }
+      { rootMargin: "200px" },
     );
     io.observe(container);
   } else {

@@ -29,13 +29,13 @@ const encoder = new TextEncoder();
 
 /** Concatenate the text content of a hast tree (ignoring tags, comments, raw). */
 function hastText(node) {
-  if (node.type === 'text') return node.value;
+  if (node.type === "text") return node.value;
   if (node.children) {
-    let out = '';
+    let out = "";
     for (const child of node.children) out += hastText(child);
     return out;
   }
-  return '';
+  return "";
 }
 
 /**

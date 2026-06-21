@@ -25,18 +25,24 @@ const { class: className, id } = Astro.props;
 
 <button
   type="button"
-  class:list={['dark-mode-toggle', className]}
+  class:list={["dark-mode-toggle", className]}
   id={id}
   onclick="toggleDarkMode()"
   aria-label="切换深色模式"
 >
   {/* dark_mode icon — shown in light mode (clicking enables dark) */}
-  {/* pagination-action-icon: exempts the glyph from the `.pagination-action
+  {
+    /* pagination-action-icon: exempts the glyph from the `.pagination-action
       :not(.pagination-action-icon)` monospace override inside .extra-container,
-      which would otherwise kill the Material Icons ligature → plain text. */}
-  <i class="material-icons pagination-action-icon dark-icon" aria-hidden="true">dark_mode</i>
+      which would otherwise kill the Material Icons ligature → plain text. */
+  }
+  <i class="material-icons pagination-action-icon dark-icon" aria-hidden="true"
+    >dark_mode</i
+  >
   {/* light_mode icon — shown in dark mode (clicking disables dark) */}
-  <i class="material-icons pagination-action-icon light-icon" aria-hidden="true">light_mode</i>
+  <i class="material-icons pagination-action-icon light-icon" aria-hidden="true"
+    >light_mode</i
+  >
 </button>
 
 <style>
@@ -55,9 +61,17 @@ const { class: className, id } = Astro.props;
    * When html.night is present (dark mode): swap.
    * Relies on journal.scss / dark-mode.scss for color tokens.
    */
-  .dark-icon  { display: inline; }
-  .light-icon { display: none;   }
+  .dark-icon {
+    display: inline;
+  }
+  .light-icon {
+    display: none;
+  }
 
-  :global(html.night) .dark-icon  { display: none;   }
-  :global(html.night) .light-icon { display: inline; }
+  :global(html.night) .dark-icon {
+    display: none;
+  }
+  :global(html.night) .light-icon {
+    display: inline;
+  }
 </style>

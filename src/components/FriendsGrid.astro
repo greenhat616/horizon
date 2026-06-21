@@ -16,7 +16,7 @@
  *   friends — array of Friend objects from page frontmatter
  */
 
-import { createHash } from 'node:crypto';
+import { createHash } from "node:crypto";
 
 interface Friend {
   name: string;
@@ -35,11 +35,11 @@ interface Props {
 const { friends } = Astro.props;
 
 const DEFAULT_AVATAR =
-  'https://static.a632079.me/assets/images/default_icon.png';
+  "https://static.a632079.me/assets/images/default_icon.png";
 
 /** MD5 hex digest — matches Go template md5 and Gravatar/Cravatar convention. */
 function md5(str: string): string {
-  return createHash('md5').update(str.trim().toLowerCase()).digest('hex');
+  return createHash("md5").update(str.trim().toLowerCase()).digest("hex");
 }
 
 function resolveAvatar(f: Friend): string {
@@ -61,7 +61,7 @@ function resolveAvatar(f: Friend): string {
  * Returns href if valid, undefined otherwise (card is skipped).
  */
 function validateHref(href: string): string | undefined {
-  if (href.startsWith('https://') || href.startsWith('http://')) return href;
+  if (href.startsWith("https://") || href.startsWith("http://")) return href;
   return undefined;
 }
 
@@ -69,64 +69,73 @@ function validateHref(href: string): string | undefined {
 const shuffled = [...friends].sort(() => Math.random() - 0.5);
 ---
 
-{/* Two-up on large screens (mirrors Bootstrap col-lg-6); single column below.
-    Tailwind utilities replace the dropped Bootstrap card/grid chrome. */}
+{
+  /* Two-up on large screens (mirrors Bootstrap col-lg-6); single column below.
+    Tailwind utilities replace the dropped Bootstrap card/grid chrome. */
+}
 <div class="friendship mt-6 grid grid-cols-1 gap-x-5 gap-y-3 lg:grid-cols-2">
-  {shuffled.map((friend) => {
-    const href = validateHref(friend.href);
-    if (!href) return null; // skip cards with invalid/missing href
+  {
+    shuffled.map((friend) => {
+      const href = validateHref(friend.href);
+      if (!href) return null; // skip cards with invalid/missing href
 
-    const avatar = resolveAvatar(friend);
-    return (
-      <a
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        title={friend.name}
-        class="group flex items-center gap-3 rounded-xl border border-black/6 bg-white p-3 text-[#01313f] no-underline transition-all duration-300 hover:-translate-y-0.5 hover:bg-[rgba(1,80,111,0.05)] hover:text-[#012e3f] hover:shadow-md dark:border-white/6 dark:bg-[#2d2d2d] dark:text-neutral-100 dark:hover:bg-[#333333] dark:hover:text-[#7ec0db]"
-      >
-        <img
-          loading="lazy"
-          src={DEFAULT_AVATAR}
-          data-src={avatar}
-          data-placeholder={DEFAULT_AVATAR}
-          alt={friend.name}
-          onerror={`this.src=this.dataset.placeholder`}
-          class="lazyload h-16 w-16 shrink-0 rounded-full! border border-gray-200 object-cover transition-transform duration-500 group-hover:rotate-360 dark:border-white/10"
-        />
-        <div class="flex min-w-0 flex-col justify-center">
-          <span class="truncate text-[0.95rem] font-semibold leading-snug">
-            {friend.name}
-          </span>
-          {friend.desc && (
-            <span class="truncate text-xs leading-snug text-black/55 dark:text-white/50">
-              {friend.desc}
+      const avatar = resolveAvatar(friend);
+      return (
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          title={friend.name}
+          class="group flex items-center gap-3 rounded-xl border border-black/6 bg-white p-3 text-[#01313f] no-underline transition-all duration-300 hover:-translate-y-0.5 hover:bg-[rgba(1,80,111,0.05)] hover:text-[#012e3f] hover:shadow-md dark:border-white/6 dark:bg-[#2d2d2d] dark:text-neutral-100 dark:hover:bg-[#333333] dark:hover:text-[#7ec0db]"
+        >
+          <img
+            loading="lazy"
+            src={DEFAULT_AVATAR}
+            data-src={avatar}
+            data-placeholder={DEFAULT_AVATAR}
+            alt={friend.name}
+            onerror={`this.src=this.dataset.placeholder`}
+            class="lazyload h-16 w-16 shrink-0 rounded-full! border border-gray-200 object-cover transition-transform duration-500 group-hover:rotate-360 dark:border-white/10"
+          />
+          <div class="flex min-w-0 flex-col justify-center">
+            <span class="truncate text-[0.95rem] leading-snug font-semibold">
+              {friend.name}
             </span>
-          )}
-        </div>
-      </a>
-    );
-  })}
+            {friend.desc && (
+              <span class="truncate text-xs leading-snug text-black/55 dark:text-white/50">
+                {friend.desc}
+              </span>
+            )}
+          </div>
+        </a>
+      );
+    })
+  }
 </div>
 
 <script>
   // Native lazy-load for [data-src] images (replaces lazyload lib dependency)
-  document.addEventListener('DOMContentLoaded', () => {
-    const imgs = document.querySelectorAll<HTMLImageElement>('img.lazyload[data-src]');
-    if ('IntersectionObserver' in window) {
-      const io = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const img = entry.target as HTMLImageElement;
-            img.src = img.dataset['src'] ?? img.src;
-            io.unobserve(img);
-          }
-        });
-      }, { rootMargin: '200px' });
+  document.addEventListener("DOMContentLoaded", () => {
+    const imgs = document.querySelectorAll<HTMLImageElement>(
+      "img.lazyload[data-src]",
+    );
+    if ("IntersectionObserver" in window) {
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const img = entry.target as HTMLImageElement;
+              img.src = img.dataset["src"] ?? img.src;
+              io.unobserve(img);
+            }
+          });
+        },
+        { rootMargin: "200px" },
+      );
       imgs.forEach((img) => io.observe(img));
     } else {
       imgs.forEach((img) => {
-        img.src = img.dataset['src'] ?? img.src;
+        img.src = img.dataset["src"] ?? img.src;
       });
     }
   });

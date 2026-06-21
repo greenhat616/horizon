@@ -1,13 +1,13 @@
-import { defineCollection, z } from 'astro:content';
-import { glob } from 'astro/loaders';
-import { toDate } from './lib/dates';
+import { defineCollection, z } from "astro:content";
+import { glob } from "astro/loaders";
+import { toDate } from "./lib/dates";
 
 // Preprocessor that handles bare "YYYY-MM-DD HH:mm:ss" strings without a
 // timezone by forwarding them through toDate(), which applies Asia/Shanghai.
 // Values that are already Date objects are passed through unchanged, which
 // covers YAML timestamps that Astro's loader already converted.
 const optionalDateField = z.preprocess(
-  (v) => (typeof v === 'string' ? toDate(v) : v),
+  (v) => (typeof v === "string" ? toDate(v) : v),
   z.date().optional(),
 );
 
@@ -24,9 +24,9 @@ const arrayOrString = z.preprocess((val) => {
 const postSchema = z.object({
   // title and date are required for published posts but bare-draft files may
   // omit them; default to empty/epoch so the schema doesn't reject them.
-  title: z.string().default(''),
+  title: z.string().default(""),
   date: z.preprocess(
-    (v) => (typeof v === 'string' ? toDate(v) : v),
+    (v) => (typeof v === "string" ? toDate(v) : v),
     z.date().default(new Date(0)),
   ),
   lastmod: optionalDateField,
@@ -50,12 +50,12 @@ const postSchema = z.object({
 });
 
 const posts = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/posts' }),
+  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/posts" }),
   schema: postSchema,
 });
 
 const pages = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/pages' }),
+  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/pages" }),
   schema: postSchema,
 });
 

@@ -8,7 +8,7 @@ $dark-mode-back-container-background: #212121;
 $dark-mode-front-container-background: #282828;
 
 html.night {
-  --nav-bar-background-color: rgba(40,40,40,.7);
+  --nav-bar-background-color: rgba(40, 40, 40, 0.7);
 
   body {
     background: $dark-mode-back-container-background;
@@ -131,7 +131,7 @@ html.night {
         background: $dark-mode-back-container-background;
       }
       .post-head-wrapper {
-        filter: brightness(0.8)
+        filter: brightness(0.8);
       }
       .post-pagination a:not([href]) {
         color: $dark-mode-text;
@@ -300,15 +300,18 @@ html.night {
     }
   }
 
-  .post-cc{
-    &::after{
-      background-color: lighten($color: rgba($color-accent, 0.05), $amount: 25%);
+  .post-cc {
+    &::after {
+      background-color: lighten(
+        $color: rgba($color-accent, 0.05),
+        $amount: 25%
+      );
     }
-    *, p {
+    *,
+    p {
       color: $deep-light-accent;
     }
   }
-
 
   .viewer-canvas {
     img {

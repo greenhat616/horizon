@@ -9,8 +9,7 @@
  */
 
 /** Regex that matches a bare "YYYY-MM-DD HH:mm:ss" (no Z, no offset). */
-const BARE_DATETIME_RE =
-  /^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d+)?$/;
+const BARE_DATETIME_RE = /^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d+)?$/;
 
 /** Regex that matches a bare "YYYY-MM-DD" date only. */
 const BARE_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -31,26 +30,26 @@ export function toDate(raw: unknown): Date | null {
     return isNaN(raw.getTime()) ? null : raw;
   }
 
-  if (typeof raw === 'number') {
+  if (typeof raw === "number") {
     const d = new Date(raw);
     return isNaN(d.getTime()) ? null : d;
   }
 
-  if (typeof raw === 'string') {
+  if (typeof raw === "string") {
     const s = raw.trim();
     if (!s) return null;
 
     // Bare datetime — no timezone info, treat as Asia/Shanghai
     if (BARE_DATETIME_RE.test(s)) {
       // Normalise the separator to 'T' and append the offset
-      const iso = s.replace(' ', 'T') + '+08:00';
+      const iso = s.replace(" ", "T") + "+08:00";
       const d = new Date(iso);
       return isNaN(d.getTime()) ? null : d;
     }
 
     // Bare date only — treat as midnight Asia/Shanghai
     if (BARE_DATE_RE.test(s)) {
-      const d = new Date(s + 'T00:00:00+08:00');
+      const d = new Date(s + "T00:00:00+08:00");
       return isNaN(d.getTime()) ? null : d;
     }
 
@@ -69,11 +68,11 @@ export function toDate(raw: unknown): Date | null {
  * @param locale - BCP 47 locale tag. Defaults to "zh-CN".
  * @returns      A human-readable string, e.g. "2023年4月15日".
  */
-export function formatDate(d: Date, locale = 'zh-CN'): string {
+export function formatDate(d: Date, locale = "zh-CN"): string {
   return d.toLocaleDateString(locale, {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 }
 
@@ -84,11 +83,11 @@ export function formatDate(d: Date, locale = 'zh-CN'): string {
  * Asia/Shanghai so a bare midnight date does not slip to the previous day on
  * UTC build machines. This is the format used by the post-list meta row.
  */
-export function formatDateDash(d: Date, timeZone = 'Asia/Shanghai'): string {
-  return d.toLocaleDateString('en-CA', {
+export function formatDateDash(d: Date, timeZone = "Asia/Shanghai"): string {
+  return d.toLocaleDateString("en-CA", {
     timeZone,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
   });
 }

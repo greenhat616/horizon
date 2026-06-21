@@ -7,10 +7,10 @@
  * Mirrors Hugo's /friends/ page served by diary's friends-list shortcode.
  */
 
-import { getCollection, render } from 'astro:content';
-import BaseLayout from '../layouts/BaseLayout.astro';
-import FriendsGrid from '../components/FriendsGrid.astro';
-import Comments from '../components/Comments.astro';
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import FriendsGrid from "../components/FriendsGrid.astro";
+import Comments from "../components/Comments.astro";
 
 interface Friend {
   name: string;
@@ -22,8 +22,10 @@ interface Friend {
   icon?: string;
 }
 
-const pages = await getCollection('pages');
-const friendsPage = pages.find((p) => p.id === 'friends.md' || p.data.slug === 'friends');
+const pages = await getCollection("pages");
+const friendsPage = pages.find(
+  (p) => p.id === "friends.md" || p.data.slug === "friends",
+);
 
 // friends[] lives in frontmatter; the Zod schema doesn't define it, so
 // it is stripped from p.data. We access it via the raw entry body isn't
@@ -37,10 +39,12 @@ const friendsPage = pages.find((p) => p.id === 'friends.md' || p.data.slug === '
 // Practical workaround: extend the Zod schema or read raw via import.meta.glob.
 // Here we use import.meta.glob to get the raw frontmatter without Zod stripping.
 const rawPages = import.meta.glob<{ frontmatter: Record<string, unknown> }>(
-  '/src/content/pages/friends.md',
-  { eager: true }
+  "/src/content/pages/friends.md",
+  { eager: true },
 );
-const rawFriends = Object.values(rawPages)[0]?.frontmatter?.friends as Friend[] | undefined;
+const rawFriends = Object.values(rawPages)[0]?.frontmatter?.friends as
+  | Friend[]
+  | undefined;
 const friends: Friend[] = rawFriends ?? [];
 
 // Body prose from the friends.md content (intro paragraph above the list)
@@ -48,8 +52,10 @@ const { Content } = friendsPage ? await render(friendsPage) : { Content: null };
 ---
 
 <BaseLayout title="朋友们" description="博主的朋友们">
-  {/* Mirror diary single.html: text-only title head + shadowed body card.
-      friends.md sets disableMetaInfo, so the head shows only the title. */}
+  {
+    /* Mirror diary single.html: text-only title head + shadowed body card.
+      friends.md sets disableMetaInfo, so the head shows only the title. */
+  }
   <div class="post-list-container post-list-container-shadow">
     <div class="post friends-page">
       <div class="post-head-wrapper-text-only">
@@ -62,7 +68,9 @@ const { Content } = friendsPage ? await render(friendsPage) : { Content: null };
         </div>
       </div>
 
-      {/* Comment section — mirrors diary single.html (friends.md doesn't disable comments) */}
+      {
+        /* Comment section — mirrors diary single.html (friends.md doesn't disable comments) */
+      }
       <Comments />
     </div>
   </div>
@@ -70,9 +78,9 @@ const { Content } = friendsPage ? await render(friendsPage) : { Content: null };
 
 {/* Lazy Artalk mount on viewport enter / click */}
 <script>
-  import { initComments } from '../scripts/comments';
+  import { initComments } from "../scripts/comments";
 
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener("DOMContentLoaded", () => {
     initComments();
   });
 </script>

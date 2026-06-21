@@ -23,8 +23,8 @@ export function formatReadingTime(readSeconds: number): string {
 
   const parts: string[] = [];
   if (minutes > 0) {
-    parts.push(`${minutes} ${minutes === 1 ? 'minute' : 'min'}`);
+    parts.push(`${minutes} ${minutes === 1 ? "minute" : "min"}`);
   }
-  parts.push(`${seconds} ${seconds === 1 ? 'second' : 's'}`);
-  return parts.join(' ');
+  parts.push(`${seconds} ${seconds === 1 ? "second" : "s"}`);
+  return parts.join(" ");
 }

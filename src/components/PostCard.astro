@@ -14,15 +14,15 @@
  *   readingSeconds — reading time in seconds (optional)
  *   draft        — show draft badge (optional)
  */
-import PostMeta from './PostMeta.astro';
-import DraftBadge from './DraftBadge.astro';
+import PostMeta from "./PostMeta.astro";
+import DraftBadge from "./DraftBadge.astro";
 
 /** Optional overrides for the meta row; see PostMeta for defaults. */
 export interface MetaOptions {
   showCategories?: boolean;
   showTags?: boolean;
   showReadingTime?: boolean;
-  dateStyle?: 'cn' | 'dash';
+  dateStyle?: "cn" | "dash";
 }
 
 interface Props {
@@ -57,9 +57,7 @@ const {
     <div class="post-item post-item-no-divider">
       <div class="post-item-info-wrapper">
         <div class="post-item-title">{title}</div>
-        {summary && (
-          <div class="post-item-summary">{summary}</div>
-        )}
+        {summary && <div class="post-item-summary">{summary}</div>}
         <PostMeta
           date={date}
           categories={categories}
@@ -71,17 +69,19 @@ const {
         />
       </div>
 
-      {featuredImage && (
-        <div class="post-item-image-wrapper">
-          <div class="post-item-image">
-            <div
-              class="post-item-image-inner"
-              style={`background-image: url('${featuredImage}')`}
-            />
-            {draft && <DraftBadge />}
+      {
+        featuredImage && (
+          <div class="post-item-image-wrapper">
+            <div class="post-item-image">
+              <div
+                class="post-item-image-inner"
+                style={`background-image: url('${featuredImage}')`}
+              />
+              {draft && <DraftBadge />}
+            </div>
           </div>
-        </div>
-      )}
+        )
+      }
     </div>
   </div>
 </a>
