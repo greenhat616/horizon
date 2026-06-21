@@ -1,0 +1,39 @@
+name: Lint
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Enable corepack and setup pnpm
+        run: corepack enable pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check formatting (Prettier)
+        run: pnpm fmt:check
+
+      - name: Lint (ESLint)
+        run: pnpm lint
+
+      - name: Type check (astro check)
+        run: pnpm typecheck
+        env:
+          # astro:env validates required PUBLIC_* values during `astro check`.
+          # Define these as repository Variables (Settings → Secrets and
+          # variables → Actions → Variables) — same as the build job.
+          PUBLIC_SITE_URL: ${{ vars.PUBLIC_SITE_URL }}
+          PUBLIC_ARTALK_SERVER: ${{ vars.PUBLIC_ARTALK_SERVER }}
