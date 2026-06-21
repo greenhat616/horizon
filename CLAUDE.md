@@ -11,6 +11,10 @@ Hugo（diary 主题）→ Astro 静态站迁移 **已实施、评审、修复并
 ## 技术栈与命令
 Astro 5.18（Content Layer）+ Tailwind v4（`@tailwindcss/vite`）+ pnpm。
 - `pnpm dev` → http://localhost:4321 · `pnpm build` → `dist/` · `pnpm preview` · `pnpm astro check`
+- **质量门禁**（Astro 官方栈）：`pnpm lint`(ESLint flat config `eslint.config.js`：`@eslint/js`+typescript-eslint+`eslint-plugin-astro` recommended，`.astro` frontmatter/`<script>` 用 TS parser，模板亦覆盖) · `pnpm fmt`/`fmt:check`(Prettier + `prettier-plugin-astro`，`.prettierignore` 排除 `src/content` 与全部 md/mdx；scss/css/astro/ts/js/json 均格式化) · `pnpm typecheck`(=`astro check`)。
+- **Git 钩子**(husky v9)：pre-commit → lint-staged（`.lintstagedrc.json`：`*.{js,mjs,cjs,ts,astro}` 跑 `eslint --fix`+`prettier --write`，`*.{json,css,scss}` 跑 `prettier --write`）；commit-msg → commitlint（`@commitlint/config-conventional`，须 Conventional Commits）。`prepare:husky` 在 `pnpm install` 时自动装钩子。
+- **CI**：`.github/workflows/lint.yml`（push master + 所有 PR）跑 fmt:check → lint → typecheck。
+- 备注：Tailwind class 排序插件 `prettier-plugin-tailwindcss` **未启用**（会重排所有模板 class，diff 巨大）；如需启用，加入 `.prettierrc.mjs` 的 `plugins`（须置于 `prettier-plugin-astro` **之后**）并设 `tailwindStylesheet: './src/styles/global.css'`。
 
 ## 架构（`src/`）
 - `content.config.ts`：posts/pages 集合，Zod schema，`z.preprocess(toDate)`（裸日期按 Asia/Shanghai）。
