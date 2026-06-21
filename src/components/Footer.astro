@@ -23,7 +23,7 @@
  *   totalPages — total page count (list pages; paginator hidden when ≤ 1)
  */
 
-import PostPager from './PostPager.astro';
+import PostPager from "./PostPager.astro";
 
 interface Props {
   prevUrl?: string;
@@ -35,7 +35,7 @@ interface Props {
 const { prevUrl, nextUrl, page = 1, totalPages = 1 } = Astro.props;
 
 // TODO: 后续从 config 注入
-const SITE_COPYRIGHT = '2026 a632079';
+const SITE_COPYRIGHT = "2026 a632079";
 ---
 
 {/* Mobile paginator (page X/Y) — mirrors mobile-paginator.html */}
@@ -49,12 +49,22 @@ const SITE_COPYRIGHT = '2026 a632079';
 
 {/* Copyright — mirrors copyright.html; preserve attribution per MIT licence */}
 <div id="single-column-footer">
-  Hugo Theme <a href="https://github.com/amazingrise/hugo-theme-diary">Diary</a> by{' '}
-  <a href="https://risehere.net">Rise</a> &amp; <a href="https://i.a632079.me">a632079</a>
+  Hugo Theme <a href="https://github.com/amazingrise/hugo-theme-diary">Diary</a> by{
+    " "
+  }
+  <a href="https://risehere.net">Rise</a> &amp; <a href="https://i.a632079.me"
+    >a632079</a
+  >
   <br />
-  Ported from <a href="https://mak1t0.cc/" target="_blank" rel="noreferrer noopener">Makito</a>
+  Ported from <a
+    href="https://mak1t0.cc/"
+    target="_blank"
+    rel="noreferrer noopener">Makito</a
+  >
   <br />
   &copy; {SITE_COPYRIGHT}
   <br />
-  <a href="https://beian.miit.gov.cn/" target="_blank" rel="noreferrer noopener">苏ICP备17002503号</a>
+  <a href="https://beian.miit.gov.cn/" target="_blank" rel="noreferrer noopener"
+    >苏ICP备17002503号</a
+  >
 </div>

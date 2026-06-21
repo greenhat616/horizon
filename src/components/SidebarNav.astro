@@ -14,9 +14,9 @@
  */
 
 // TODO: 后续从 Astro config 注入
-const SITE_TITLE = '藤之青';
-const SITE_SUBTITLE = '亲眼所见，亦非真实';
-const SITE_COPYRIGHT = '2026 a632079';
+const SITE_TITLE = "藤之青";
+const SITE_SUBTITLE = "亲眼所见，亦非真实";
+const SITE_COPYRIGHT = "2026 a632079";
 
 interface NavItem {
   url: string;
@@ -26,10 +26,10 @@ interface NavItem {
 
 // Mirrors config/_default/menu.toml [main] entries, sorted by weight.
 const NAV_ITEMS: NavItem[] = [
-  { url: 'https://github.com/greenhat616', name: 'Github',  weight: 1 },
-  { url: '/friends/',                      name: '朋友们',   weight: 2 },
-  { url: '/posts/',                        name: '文章',     weight: 4 },
-  { url: '/index.xml',                     name: 'RSS',      weight: 5 },
+  { url: "https://github.com/greenhat616", name: "Github", weight: 1 },
+  { url: "/friends/", name: "朋友们", weight: 2 },
+  { url: "/posts/", name: "文章", weight: 4 },
+  { url: "/index.xml", name: "RSS", weight: 5 },
 ].sort((a, b) => a.weight - b.weight);
 
 interface Props {
@@ -37,11 +37,11 @@ interface Props {
   pathname?: string;
 }
 
-const { pathname = '/' } = Astro.props;
+const { pathname = "/" } = Astro.props;
 
 /** True when the current path starts with the nav item's URL prefix. */
 function isActive(itemUrl: string): boolean {
-  if (!itemUrl.startsWith('/')) return false; // external links never active
+  if (!itemUrl.startsWith("/")) return false; // external links never active
   return pathname === itemUrl || pathname.startsWith(itemUrl);
 }
 ---
@@ -49,39 +49,63 @@ function isActive(itemUrl: string): boolean {
 <div id="sideContainer" class="side-container">
   {/* Site title / home link — mirrors sidebar.html nav-head */}
   <a
-    class:list={['a-block', 'nav-head', isActive('/') && pathname === '/' ? 'active' : 'false']}
+    class:list={[
+      "a-block",
+      "nav-head",
+      isActive("/") && pathname === "/" ? "active" : "false",
+    ]}
     href="/"
   >
     <div class="nav-title">{SITE_TITLE}</div>
-    {SITE_SUBTITLE && (
-      <div class="nav-subtitle">{SITE_SUBTITLE}</div>
-    )}
+    {SITE_SUBTITLE && <div class="nav-subtitle">{SITE_SUBTITLE}</div>}
   </a>
 
   <div class="nav-link-list">
-    {NAV_ITEMS.map((item) => (
-      <a
-        class:list={['a-block', 'nav-link-item', isActive(item.url) ? 'active' : 'false']}
-        href={item.url}
-        target={item.url.startsWith('http') ? '_blank' : undefined}
-        rel={item.url.startsWith('http') ? 'noopener noreferrer' : undefined}
-      >
-        {item.name}
-      </a>
-    ))}
+    {
+      NAV_ITEMS.map((item) => (
+        <a
+          class:list={[
+            "a-block",
+            "nav-link-item",
+            isActive(item.url) ? "active" : "false",
+          ]}
+          href={item.url}
+          target={item.url.startsWith("http") ? "_blank" : undefined}
+          rel={item.url.startsWith("http") ? "noopener noreferrer" : undefined}
+        >
+          {item.name}
+        </a>
+      ))
+    }
   </div>
 
-  {/* No dark-mode toggle here: the original diary sidebar.html had none.
-      The desktop toggle lives in the right-side ExtraBar; mobile uses MobileHeader. */}
+  {
+    /* No dark-mode toggle here: the original diary sidebar.html had none.
+      The desktop toggle lives in the right-side ExtraBar; mobile uses MobileHeader. */
+  }
   <div class="nav-footer">
-    {/* Mirrors copyright.html — preserve attribution per MIT licence requirement */}
-    Hugo Theme <a href="https://github.com/amazingrise/hugo-theme-diary">Diary</a> by{' '}
-    <a href="https://risehere.net">Rise</a> &amp; <a href="https://i.a632079.me">a632079</a>
+    {
+      /* Mirrors copyright.html — preserve attribution per MIT licence requirement */
+    }
+    Hugo Theme <a href="https://github.com/amazingrise/hugo-theme-diary"
+      >Diary</a
+    > by{" "}
+    <a href="https://risehere.net">Rise</a> &amp; <a href="https://i.a632079.me"
+      >a632079</a
+    >
     <br />
-    Ported from <a href="https://mak1t0.cc/" target="_blank" rel="noreferrer noopener">Makito</a>
+    Ported from <a
+      href="https://mak1t0.cc/"
+      target="_blank"
+      rel="noreferrer noopener">Makito</a
+    >
     <br />
     &copy; {SITE_COPYRIGHT}
     <br />
-    <a href="https://beian.miit.gov.cn/" target="_blank" rel="noreferrer noopener">苏ICP备17002503号</a>
+    <a
+      href="https://beian.miit.gov.cn/"
+      target="_blank"
+      rel="noreferrer noopener">苏ICP备17002503号</a
+    >
   </div>
 </div>

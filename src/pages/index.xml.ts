@@ -17,11 +17,11 @@
  * which emits it inside a <content:encoded> CDATA block.
  */
 
-import rss from '@astrojs/rss';
-import { getCollection } from 'astro:content';
-import type { APIContext } from 'astro';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../site.config';
-import { stripShortcodes } from '../plugins/remark-hugo-shortcodes.mjs';
+import rss from "@astrojs/rss";
+import { getCollection } from "astro:content";
+import type { APIContext } from "astro";
+import { SITE_TITLE, SITE_DESCRIPTION } from "../site.config";
+import { stripShortcodes } from "../plugins/remark-hugo-shortcodes.mjs";
 
 // Build-time markdown→HTML processor.
 // We initialise lazily to avoid top-level await and keep imports tree-shakeable.
@@ -40,11 +40,11 @@ async function getProcessor() {
     { default: remarkRehype },
     { default: rehypeStringify },
   ] = await Promise.all([
-    import('unified'),
-    import('remark-parse'),
-    import('remark-gfm'),
-    import('remark-rehype'),
-    import('rehype-stringify'),
+    import("unified"),
+    import("remark-parse"),
+    import("remark-gfm"),
+    import("remark-rehype"),
+    import("rehype-stringify"),
   ]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -67,29 +67,29 @@ async function bodyToHtml(body: string): Promise<string> {
 }
 
 export async function GET(context: APIContext) {
-  const allPosts = await getCollection('posts');
+  const allPosts = await getCollection("posts");
   const published = allPosts
     .filter((p) => !p.data.draft && !p.data.hidden)
     .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 
   const siteOrigin =
-    context.site?.toString().replace(/\/$/, '') ?? 'https://i.a632079.me';
+    context.site?.toString().replace(/\/$/, "") ?? "https://i.a632079.me";
 
   const items = await Promise.all(
     published.map(async (post) => {
-      const rawSlug = post.data.slug ?? post.id.replace(/\.mdx?$/, '');
+      const rawSlug = post.data.slug ?? post.id.replace(/\.mdx?$/, "");
       // Encode CJK and other non-ASCII characters in the slug so the link and
       // guid match the percent-encoded URLs that Astro's sitemap emits.
       const encodedSlug = rawSlug
-        .split('/')
+        .split("/")
         .map((seg) => encodeURIComponent(seg))
-        .join('/');
+        .join("/");
       const link = `${siteOrigin}/posts/${encodedSlug}/`;
 
       // Render markdown body to HTML for full-content feed.
       let content: string | undefined;
       try {
-        content = await bodyToHtml(post.body ?? '');
+        content = await bodyToHtml(post.body ?? "");
       } catch {
         // Render failure falls back to description-only.
         content = undefined;
@@ -120,7 +120,7 @@ export async function GET(context: APIContext) {
     items,
     customData: `<language>zh-cn</language>`,
     xmlns: {
-      content: 'http://purl.org/rss/1.0/modules/content/',
+      content: "http://purl.org/rss/1.0/modules/content/",
     },
   });
 }

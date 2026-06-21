@@ -16,11 +16,11 @@
  * TODO: 后续从 config 注入站点标题/副标题
  */
 
-import DarkModeToggle from './DarkModeToggle.astro';
+import DarkModeToggle from "./DarkModeToggle.astro";
 
 // TODO: 后续从 Astro config 注入
-const SITE_TITLE = '藤之青';
-const SITE_SUBTITLE = '亲眼所见，亦非真实';
+const SITE_TITLE = "藤之青";
+const SITE_SUBTITLE = "亲眼所见，亦非真实";
 ---
 
 {/* Sticky top nav — shown only on mobile */}
@@ -30,7 +30,7 @@ const SITE_SUBTITLE = '亲眼所见，亦非真实';
   class="navbar sticky-top navbar-light single-column-nav-container"
 >
   <div id="navBackground" class="nav-background"></div>
-  <div class="container container-narrow nav-content">
+  <div class="container-narrow nav-content container">
     {/* Hamburger — triggers MobileDrawer */}
     <button
       id="nav_dropdown_btn"
@@ -49,23 +49,18 @@ const SITE_SUBTITLE = '亲眼所见，亦非真实';
     </a>
 
     {/* Dark mode toggle on mobile nav */}
-    <DarkModeToggle
-      id="darkModeToggleButton2"
-      class="nav-darkmode-toggle"
-    />
+    <DarkModeToggle id="darkModeToggleButton2" class="nav-darkmode-toggle" />
   </div>
 </nav>
 
 {/* Page hero — its height drives the nav transparency fade in nav.ts */}
-<div
-  data-page-head
-  class="single-column-header-container"
-  id="pageHead"
->
+<div data-page-head class="single-column-header-container" id="pageHead">
   <a href="/">
     <div class="single-column-header-title">{SITE_TITLE}</div>
-    {SITE_SUBTITLE && (
-      <div class="single-column-header-subtitle">{SITE_SUBTITLE}</div>
-    )}
+    {
+      SITE_SUBTITLE && (
+        <div class="single-column-header-subtitle">{SITE_SUBTITLE}</div>
+      )
+    }
   </a>
 </div>

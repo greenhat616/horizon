@@ -14,15 +14,18 @@
  *   initViewer()  — call once on DOMContentLoaded
  */
 
-import { CDN } from '../lib/cdn';
+import { CDN } from "../lib/cdn";
 
 // Resolve CDN entries at module load time (build-time constants via cdn.ts).
-const VIEWER_CSS = CDN['viewerjs-css'];
-const VIEWER_JS  = CDN['viewerjs-js'];
+const VIEWER_CSS = CDN["viewerjs-css"];
+const VIEWER_JS = CDN["viewerjs-js"];
 
 // Minimal Viewer type — avoids importing viewerjs into the bundle.
 interface ViewerConstructor {
-  new (element: HTMLElement, options?: Record<string, unknown>): { destroy(): void };
+  new (
+    element: HTMLElement,
+    options?: Record<string, unknown>,
+  ): { destroy(): void };
 }
 
 declare global {
@@ -35,14 +38,14 @@ declare global {
 
 function injectCSS(res: typeof VIEWER_CSS): void {
   if (document.querySelector(`link[href="${res.primary}"]`)) return;
-  const link = document.createElement('link');
-  link.rel = 'stylesheet';
+  const link = document.createElement("link");
+  link.rel = "stylesheet";
   link.href = res.primary;
   link.integrity = res.integrity;
   link.crossOrigin = res.crossorigin;
   link.onerror = () => {
-    const fb = document.createElement('link');
-    fb.rel = 'stylesheet';
+    const fb = document.createElement("link");
+    fb.rel = "stylesheet";
     fb.href = res.fallback;
     fb.integrity = res.integrity;
     fb.crossOrigin = res.crossorigin;
@@ -53,19 +56,23 @@ function injectCSS(res: typeof VIEWER_CSS): void {
 
 function injectJS(res: typeof VIEWER_JS): Promise<void> {
   return new Promise((resolve, reject) => {
-    if (window.Viewer) { resolve(); return; }
-    const script = document.createElement('script');
+    if (window.Viewer) {
+      resolve();
+      return;
+    }
+    const script = document.createElement("script");
     script.src = res.primary;
     script.integrity = res.integrity;
     script.crossOrigin = res.crossorigin;
     script.async = false;
     script.onerror = () => {
-      const fb = document.createElement('script');
+      const fb = document.createElement("script");
       fb.src = res.fallback;
       fb.integrity = res.integrity;
       fb.crossOrigin = res.crossorigin;
       fb.onload = () => resolve();
-      fb.onerror = () => reject(new Error('ViewerJS failed to load from both CDNs'));
+      fb.onerror = () =>
+        reject(new Error("ViewerJS failed to load from both CDNs"));
       document.head.appendChild(fb);
     };
     script.onload = () => resolve();
@@ -92,10 +99,12 @@ async function loadViewer(scope: HTMLElement): Promise<void> {
  * and the lightbox opens. Call once on DOMContentLoaded.
  */
 export function initViewer(): void {
-  const scope = document.querySelector<HTMLElement>('[data-viewer-scope], .post-body');
+  const scope = document.querySelector<HTMLElement>(
+    "[data-viewer-scope], .post-body",
+  );
   if (!scope) return;
 
-  const imgs = scope.querySelectorAll<HTMLImageElement>('img');
+  const imgs = scope.querySelectorAll<HTMLImageElement>("img");
   if (!imgs.length) return;
 
   let loaded = false;
@@ -107,7 +116,7 @@ export function initViewer(): void {
   };
 
   imgs.forEach((img) => {
-    img.style.cursor = 'zoom-in';
-    img.addEventListener('click', load, { once: true });
+    img.style.cursor = "zoom-in";
+    img.addEventListener("click", load, { once: true });
   });
 }

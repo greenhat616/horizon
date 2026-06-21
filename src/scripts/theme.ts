@@ -19,7 +19,9 @@
 
 function getCookie(name: string): string | undefined {
   const match = document.cookie.match(
-    new RegExp('(?:^|; )' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '=([^;]*)')
+    new RegExp(
+      "(?:^|; )" + name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "=([^;]*)",
+    ),
   );
   return match ? decodeURIComponent(match[1]) : undefined;
 }
@@ -31,22 +33,26 @@ function setCookie(name: string, value: string, days = 365): void {
 
 // ─── night-mode detection (mirrors Hugo head.html getNightRawMode) ────────────
 
-function getNightRaw(): '1' | '0' {
-  const cookie = getCookie('night');
-  if (cookie !== undefined) return cookie === '1' ? '1' : '0';
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? '1' : '0';
+function getNightRaw(): "1" | "0" {
+  const cookie = getCookie("night");
+  if (cookie !== undefined) return cookie === "1" ? "1" : "0";
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "1" : "0";
 }
 
 // ─── DOM helpers ─────────────────────────────────────────────────────────────
 
 function applyDark(dark: boolean): void {
   const root = document.documentElement;
-  root.classList.toggle('night', dark);
-  root.classList.toggle('dark', dark);
+  root.classList.toggle("night", dark);
+  root.classList.toggle("dark", dark);
 
-  const meta = document.head.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+  const meta = document.head.querySelector<HTMLMetaElement>(
+    'meta[name="theme-color"]',
+  );
   if (meta) {
-    meta.content = getComputedStyle(root).getPropertyValue('--nav-bar-background-color').trim();
+    meta.content = getComputedStyle(root)
+      .getPropertyValue("--nav-bar-background-color")
+      .trim();
   }
 }
 
@@ -54,15 +60,15 @@ function applyDark(dark: boolean): void {
 
 /** Sync dark-mode state from cookie / media-query on page load. */
 export function initTheme(): void {
-  const isDark = getNightRaw() === '1';
-  setCookie('night', isDark ? '1' : '0');
+  const isDark = getNightRaw() === "1";
+  setCookie("night", isDark ? "1" : "0");
   applyDark(isDark);
 }
 
 /** Toggle dark mode. Safe to call from onclick attributes via window.toggleDarkMode(). */
 export function toggleDarkMode(): void {
-  const willBeDark = !document.documentElement.classList.contains('night');
-  setCookie('night', willBeDark ? '1' : '0');
+  const willBeDark = !document.documentElement.classList.contains("night");
+  setCookie("night", willBeDark ? "1" : "0");
   applyDark(willBeDark);
 }
 

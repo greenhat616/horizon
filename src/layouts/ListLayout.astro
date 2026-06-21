@@ -23,8 +23,8 @@
  *   nextUrl     — href for next page (undefined on last page)
  */
 
-import BaseLayout from './BaseLayout.astro';
-import PostCard, { type MetaOptions } from '../components/PostCard.astro';
+import BaseLayout from "./BaseLayout.astro";
+import PostCard, { type MetaOptions } from "../components/PostCard.astro";
 
 interface PostCardData {
   href: string;
@@ -78,19 +78,21 @@ const {
   nextUrl={nextUrl}
 >
   <div class="post-list-container post-list-container-no-background">
-    {posts.map((post) => (
-      <PostCard
-        href={post.href}
-        title={post.title}
-        summary={post.summary}
-        featuredImage={post.featuredImage}
-        date={post.date}
-        categories={post.categories}
-        tags={post.tags}
-        readingSeconds={post.readingSeconds}
-        draft={post.draft}
-        metaOptions={metaOptions}
-      />
-    ))}
+    {
+      posts.map((post) => (
+        <PostCard
+          href={post.href}
+          title={post.title}
+          summary={post.summary}
+          featuredImage={post.featuredImage}
+          date={post.date}
+          categories={post.categories}
+          tags={post.tags}
+          readingSeconds={post.readingSeconds}
+          draft={post.draft}
+          metaOptions={metaOptions}
+        />
+      ))
+    }
   </div>
 </BaseLayout>

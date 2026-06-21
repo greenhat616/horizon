@@ -22,7 +22,7 @@
  * is found.
  */
 
-import { CDN, assertNoBannedCdn, type CdnResource } from '../lib/cdn';
+import { CDN, assertNoBannedCdn, type CdnResource } from "../lib/cdn";
 
 interface Props {
   /** Look up a pre-registered resource by key. Takes priority over direct props. */
@@ -34,7 +34,7 @@ interface Props {
   /** SRI integrity hash. Required when cdnKey is omitted. */
   integrity?: string;
   /** 'script' | 'style'. Required when cdnKey is omitted. */
-  type?: 'script' | 'style';
+  type?: "script" | "style";
   /** Adds the defer attribute to script elements. */
   defer?: boolean;
 }
@@ -47,14 +47,21 @@ if (cdnKey) {
   if (!entry) throw new Error(`ExternalAsset: unknown cdnKey "${cdnKey}"`);
   resource = entry;
 } else {
-  if (!directProps.primary || !directProps.fallback || !directProps.integrity || !directProps.type) {
-    throw new Error('ExternalAsset: provide either cdnKey or all of primary/fallback/integrity/type');
+  if (
+    !directProps.primary ||
+    !directProps.fallback ||
+    !directProps.integrity ||
+    !directProps.type
+  ) {
+    throw new Error(
+      "ExternalAsset: provide either cdnKey or all of primary/fallback/integrity/type",
+    );
   }
   resource = {
     primary: directProps.primary,
     fallback: directProps.fallback,
     integrity: directProps.integrity,
-    crossorigin: 'anonymous',
+    crossorigin: "anonymous",
     type: directProps.type,
   };
 }
@@ -64,23 +71,25 @@ assertNoBannedCdn(resource.primary);
 assertNoBannedCdn(resource.fallback);
 ---
 
-{resource.type === 'script' ? (
-  <script
-    is:inline
-    src={resource.primary}
-    integrity={resource.integrity}
-    crossorigin="anonymous"
-    data-fb={resource.fallback}
-    onerror="__cdnfb(this)"
-    defer={defer || undefined}
-  ></script>
-) : (
-  <link
-    rel="stylesheet"
-    href={resource.primary}
-    integrity={resource.integrity}
-    crossorigin="anonymous"
-    data-fb={resource.fallback}
-    onerror="__cdnfb(this)"
-  />
-)}
+{
+  resource.type === "script" ? (
+    <script
+      is:inline
+      src={resource.primary}
+      integrity={resource.integrity}
+      crossorigin="anonymous"
+      data-fb={resource.fallback}
+      onerror="__cdnfb(this)"
+      defer={defer || undefined}
+    />
+  ) : (
+    <link
+      rel="stylesheet"
+      href={resource.primary}
+      integrity={resource.integrity}
+      crossorigin="anonymous"
+      data-fb={resource.fallback}
+      onerror="__cdnfb(this)"
+    />
+  )
+}

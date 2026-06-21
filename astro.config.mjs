@@ -1,12 +1,12 @@
-import { defineConfig, envField } from 'astro/config';
-import sitemap from '@astrojs/sitemap';
-import mdx from '@astrojs/mdx';
-import tailwindcss from '@tailwindcss/vite';
-import rehypeCodeGroup from 'rehype-code-group';
-import rehypeReadingTime from './src/plugins/rehype-reading-time.mjs';
-import remarkModifiedTime from './src/plugins/remark-modified-time.mjs';
-import remarkHugoShortcodes from './src/plugins/remark-hugo-shortcodes.mjs';
-import { transformerCodeCard } from './src/plugins/shiki-code-card.mjs';
+import { defineConfig, envField } from "astro/config";
+import sitemap from "@astrojs/sitemap";
+import mdx from "@astrojs/mdx";
+import tailwindcss from "@tailwindcss/vite";
+import rehypeCodeGroup from "rehype-code-group";
+import rehypeReadingTime from "./src/plugins/rehype-reading-time.mjs";
+import remarkModifiedTime from "./src/plugins/remark-modified-time.mjs";
+import remarkHugoShortcodes from "./src/plugins/remark-hugo-shortcodes.mjs";
+import { transformerCodeCard } from "./src/plugins/shiki-code-card.mjs";
 
 // The canonical origin must be known here (it feeds `site:` → sitemap / RSS /
 // canonical URLs), but astro:env/client isn't available during config bootstrap.
@@ -17,18 +17,26 @@ try {
 } catch (error) {
   // A missing .env (e.g. CI, where the var is injected) is expected; any other
   // failure (malformed/unreadable file) is real and must not be swallowed.
-  if (error?.code !== 'ENOENT') throw error;
+  if (error?.code !== "ENOENT") throw error;
 }
 const SITE_URL = process.env.PUBLIC_SITE_URL;
 
 export default defineConfig({
-  output: 'static',
+  output: "static",
   site: SITE_URL,
-  trailingSlash: 'always',
+  trailingSlash: "always",
   env: {
     schema: {
-      PUBLIC_SITE_URL: envField.string({ context: 'client', access: 'public', url: true }),
-      PUBLIC_ARTALK_SERVER: envField.string({ context: 'client', access: 'public', url: true }),
+      PUBLIC_SITE_URL: envField.string({
+        context: "client",
+        access: "public",
+        url: true,
+      }),
+      PUBLIC_ARTALK_SERVER: envField.string({
+        context: "client",
+        access: "public",
+        url: true,
+      }),
     },
   },
   integrations: [
@@ -36,9 +44,9 @@ export default defineConfig({
       // Exclude draft-related paths and hidden special pages from the sitemap.
       // /friends/ and /workers/ are hidden:true pages not meant for crawlers.
       filter: (page) =>
-        !page.includes('/friends/') &&
-        !page.includes('/workers/') &&
-        !page.includes('/404'),
+        !page.includes("/friends/") &&
+        !page.includes("/workers/") &&
+        !page.includes("/404"),
     }),
     mdx(),
   ],
@@ -47,10 +55,7 @@ export default defineConfig({
   },
   markdown: {
     // Hugo shortcode pre-processor must run first so remark sees clean Markdown
-    remarkPlugins: [
-      remarkHugoShortcodes,
-      remarkModifiedTime,
-    ],
+    remarkPlugins: [remarkHugoShortcodes, remarkModifiedTime],
     // VitePress-style ::: code-group tabs (wraps code blocks at the HAST level,
     // injects its own switch script/style into <head>; we override its classes).
     // rehypeReadingTime counts the rendered HTML text (Hugo's countwords .Content).
@@ -61,17 +66,17 @@ export default defineConfig({
       // default and emits `--shiki-dark`/`--shiki-dark-bg` CSS vars on every
       // token; dark-mode.scss flips the code surface to those vars under .night.
       themes: {
-        light: 'github-light',
-        dark: 'monokai',
+        light: "github-light",
+        dark: "monokai",
       },
-      defaultColor: 'light',
+      defaultColor: "light",
       // Map non-lowercase fence languages used in legacy content to Shiki ids
       // so they highlight instead of falling back to plain text.
       langAlias: {
-        HTML: 'html',
-        PHP: 'php',
-        JavaScript: 'js',
-        conf: 'ini',
+        HTML: "html",
+        PHP: "php",
+        JavaScript: "js",
+        conf: "ini",
       },
       // Wrap each <pre> in a .code-card frame (lang label + copy + line numbers).
       transformers: [transformerCodeCard()],

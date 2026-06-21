@@ -25,7 +25,7 @@
  * ASCII punctuation is stripped; CJK and other non-ASCII codepoints are kept.
  */
 export function urlizeTerm(term: string): string {
-  let result = '';
+  let result = "";
 
   for (const ch of term) {
     const code = ch.codePointAt(0) ?? 0;
@@ -33,25 +33,25 @@ export function urlizeTerm(term: string): string {
     if (code > 127) {
       // Non-ASCII (CJK, accented Latin, emoji, etc.) — keep as-is
       result += ch;
-    } else if (ch >= 'A' && ch <= 'Z') {
+    } else if (ch >= "A" && ch <= "Z") {
       // ASCII uppercase → lowercase
       result += ch.toLowerCase();
-    } else if (ch >= 'a' && ch <= 'z') {
+    } else if (ch >= "a" && ch <= "z") {
       // ASCII lowercase — keep
       result += ch;
-    } else if (ch >= '0' && ch <= '9') {
+    } else if (ch >= "0" && ch <= "9") {
       // ASCII digit — keep
       result += ch;
-    } else if (ch === ' ' || ch === '_') {
+    } else if (ch === " " || ch === "_") {
       // Space/underscore → hyphen
-      result += '-';
-    } else if (ch === '-') {
+      result += "-";
+    } else if (ch === "-") {
       // Hyphen — keep (collapse handled below)
-      result += '-';
+      result += "-";
     }
     // All other ASCII (punctuation, symbols) → strip
   }
 
   // Collapse consecutive hyphens and trim leading/trailing hyphens
-  return result.replace(/-{2,}/g, '-').replace(/^-+|-+$/g, '');
+  return result.replace(/-{2,}/g, "-").replace(/^-+|-+$/g, "");
 }

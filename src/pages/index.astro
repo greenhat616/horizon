@@ -10,14 +10,14 @@
  * bare site title.
  */
 
-import { getCollection } from 'astro:content';
-import ListLayout from '../layouts/ListLayout.astro';
-import { toCardData } from '../lib/post-card';
-import { isListable } from '../lib/posts';
+import { getCollection } from "astro:content";
+import ListLayout from "../layouts/ListLayout.astro";
+import { toCardData } from "../lib/post-card";
+import { isListable } from "../lib/posts";
 
 const PAGE_SIZE = 10;
 
-const allPosts = (await getCollection('posts')).filter(isListable);
+const allPosts = (await getCollection("posts")).filter(isListable);
 
 const sorted = allPosts.sort(
   (a, b) => b.data.date.getTime() - a.data.date.getTime(),
@@ -34,5 +34,5 @@ const posts = await Promise.all(pagePosts.map(toCardData));
   posts={posts}
   page={1}
   totalPages={totalPages}
-  nextUrl={totalPages > 1 ? '/posts/page/2/' : undefined}
+  nextUrl={totalPages > 1 ? "/posts/page/2/" : undefined}
 />

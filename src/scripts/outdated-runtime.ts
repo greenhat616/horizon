@@ -19,7 +19,7 @@
  *   initOutdatedNotices()  — call once on DOMContentLoaded
  */
 
-const rtf = new Intl.RelativeTimeFormat('zh-CN', { numeric: 'auto' });
+const rtf = new Intl.RelativeTimeFormat("zh-CN", { numeric: "auto" });
 
 /** Returns a human-readable relative string for a past date. */
 function relativeTime(pastMs: number): string {
@@ -28,33 +28,35 @@ function relativeTime(pastMs: number): string {
 
   if (Math.abs(diffMonths) >= 12) {
     const diffYears = diffMs / (1000 * 60 * 60 * 24 * 365.25);
-    return rtf.format(Math.round(diffYears), 'year');
+    return rtf.format(Math.round(diffYears), "year");
   }
-  return rtf.format(Math.round(diffMonths), 'month');
+  return rtf.format(Math.round(diffMonths), "month");
 }
 
 /** Scan all [data-outdated-notice] elements and reveal those past their stale date. */
 export function initOutdatedNotices(): void {
   const now = Date.now();
 
-  document.querySelectorAll<HTMLElement>('[data-outdated-notice]').forEach((el) => {
-    const staleAfterRaw = el.dataset['staleAfter'];
-    const lastmodRaw = el.dataset['lastmod'];
-    if (!staleAfterRaw || !lastmodRaw) return;
+  document
+    .querySelectorAll<HTMLElement>("[data-outdated-notice]")
+    .forEach((el) => {
+      const staleAfterRaw = el.dataset["staleAfter"];
+      const lastmodRaw = el.dataset["lastmod"];
+      if (!staleAfterRaw || !lastmodRaw) return;
 
-    const staleAfter = Date.parse(staleAfterRaw);
-    const lastmod = Date.parse(lastmodRaw);
-    if (isNaN(staleAfter) || isNaN(lastmod)) return;
+      const staleAfter = Date.parse(staleAfterRaw);
+      const lastmod = Date.parse(lastmodRaw);
+      if (isNaN(staleAfter) || isNaN(lastmod)) return;
 
-    if (now >= staleAfter) {
-      // reveal
-      el.removeAttribute('hidden');
+      if (now >= staleAfter) {
+        // reveal
+        el.removeAttribute("hidden");
 
-      // update relative-time span
-      const relSpan = el.querySelector<HTMLElement>('[data-relative-time]');
-      if (relSpan) {
-        relSpan.textContent = relativeTime(lastmod);
+        // update relative-time span
+        const relSpan = el.querySelector<HTMLElement>("[data-relative-time]");
+        if (relSpan) {
+          relSpan.textContent = relativeTime(lastmod);
+        }
       }
-    }
-  });
+    });
 }

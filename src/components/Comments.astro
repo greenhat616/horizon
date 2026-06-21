@@ -21,11 +21,13 @@ const { disabled = false } = Astro.props;
 ---
 
 <div class="post-comment-wrapper">
-  {disabled ? (
-    <p style="opacity:0.6; text-align:center">
-      <small>评论已关闭</small>
-    </p>
-  ) : (
-    <div id="artalk" data-comments />
-  )}
+  {
+    disabled ? (
+      <p style="opacity:0.6; text-align:center">
+        <small>评论已关闭</small>
+      </p>
+    ) : (
+      <div id="artalk" data-comments />
+    )
+  }
 </div>

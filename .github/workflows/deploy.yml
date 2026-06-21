@@ -2,7 +2,7 @@ name: Sync
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   deploy:
@@ -17,7 +17,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: "22"
 
       - name: Enable corepack and setup pnpm
         run: corepack enable pnpm

@@ -27,8 +27,8 @@
  * Props
  *   lastmod — last-modified Date of the article
  */
-import Notice from './Notice.astro';
-import { staleAfter, isStaleAt } from '../lib/outdated';
+import Notice from "./Notice.astro";
+import { staleAfter, isStaleAt } from "../lib/outdated";
 
 interface Props {
   lastmod: Date;
@@ -41,15 +41,15 @@ const buildNow = new Date();
 const staleAtBuild = isStaleAt(staleAfterDate, buildNow);
 
 // Build-time relative time fallback (zh-CN, shown until runtime updates it)
-const rtf = new Intl.RelativeTimeFormat('zh-CN', { numeric: 'auto' });
+const rtf = new Intl.RelativeTimeFormat("zh-CN", { numeric: "auto" });
 const diffMs = lastmod.getTime() - buildNow.getTime(); // negative for past
 const diffMonths = diffMs / (1000 * 60 * 60 * 24 * 30.4375);
 let buildTimeRelative: string;
 if (Math.abs(diffMonths) >= 12) {
   const diffYears = diffMs / (1000 * 60 * 60 * 24 * 365.25);
-  buildTimeRelative = rtf.format(Math.round(diffYears), 'year');
+  buildTimeRelative = rtf.format(Math.round(diffYears), "year");
 } else {
-  buildTimeRelative = rtf.format(Math.round(diffMonths), 'month');
+  buildTimeRelative = rtf.format(Math.round(diffMonths), "month");
 }
 ---
 
@@ -61,7 +61,8 @@ if (Math.abs(diffMonths) >= 12) {
   hidden={staleAtBuild ? undefined : true}
 >
   <p>
-    本文最后更新于 <span data-relative-time class="font-bold">{buildTimeRelative}</span>，
-    部分内容可能已经过时，请注意甄别。
+    本文最后更新于 <span data-relative-time class="font-bold"
+      >{buildTimeRelative}</span
+    >， 部分内容可能已经过时，请注意甄别。
   </p>
 </Notice>

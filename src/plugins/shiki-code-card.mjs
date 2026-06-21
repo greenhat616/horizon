@@ -29,14 +29,14 @@
 
 /** Build a hast element node. */
 const h = (tagName, properties = {}, children = []) => ({
-  type: 'element',
+  type: "element",
   tagName,
   properties,
   children,
 });
 
 /** Build a hast text node. */
-const t = (value) => ({ type: 'text', value });
+const t = (value) => ({ type: "text", value });
 
 /**
  * Inline SVG icon (clipboard / check). hast-util-to-html auto-switches to SVG
@@ -46,25 +46,33 @@ const t = (value) => ({ type: 'text', value });
  */
 function icon(kind) {
   const base = {
-    viewBox: '0 0 24 24',
-    width: '15',
-    height: '15',
-    fill: 'none',
-    stroke: 'currentColor',
-    strokeWidth: '2',
-    strokeLinecap: 'round',
-    strokeLinejoin: 'round',
-    'aria-hidden': 'true',
+    viewBox: "0 0 24 24",
+    width: "15",
+    height: "15",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    "aria-hidden": "true",
   };
-  if (kind === 'copy') {
-    return h('svg', { ...base, className: ['code-card__icon', 'code-card__icon--copy'] }, [
-      h('rect', { x: '9', y: '9', width: '13', height: '13', rx: '2' }),
-      h('path', { d: 'M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1' }),
-    ]);
+  if (kind === "copy") {
+    return h(
+      "svg",
+      { ...base, className: ["code-card__icon", "code-card__icon--copy"] },
+      [
+        h("rect", { x: "9", y: "9", width: "13", height: "13", rx: "2" }),
+        h("path", {
+          d: "M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1",
+        }),
+      ],
+    );
   }
-  return h('svg', { ...base, className: ['code-card__icon', 'code-card__icon--done'] }, [
-    h('polyline', { points: '20 6 9 17 4 12' }),
-  ]);
+  return h(
+    "svg",
+    { ...base, className: ["code-card__icon", "code-card__icon--done"] },
+    [h("polyline", { points: "20 6 9 17 4 12" })],
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -73,59 +81,59 @@ function icon(kind) {
 
 /** Friendly display names; falls back to UPPERCASE of the resolved lang id. */
 const LANG_LABELS = {
-  js: 'JavaScript',
-  javascript: 'JavaScript',
-  ts: 'TypeScript',
-  typescript: 'TypeScript',
-  jsx: 'JSX',
-  tsx: 'TSX',
-  html: 'HTML',
-  css: 'CSS',
-  scss: 'SCSS',
-  sass: 'Sass',
-  less: 'Less',
-  json: 'JSON',
-  json5: 'JSON5',
-  yaml: 'YAML',
-  yml: 'YAML',
-  toml: 'TOML',
-  ini: 'INI',
-  conf: 'INI',
-  md: 'Markdown',
-  markdown: 'Markdown',
-  mdx: 'MDX',
-  bash: 'Bash',
-  sh: 'Shell',
-  shell: 'Shell',
-  shellscript: 'Shell',
-  zsh: 'Zsh',
-  powershell: 'PowerShell',
-  ps1: 'PowerShell',
-  php: 'PHP',
-  py: 'Python',
-  python: 'Python',
-  go: 'Go',
-  rust: 'Rust',
-  rs: 'Rust',
-  java: 'Java',
-  kotlin: 'Kotlin',
-  c: 'C',
-  cpp: 'C++',
-  'c++': 'C++',
-  cs: 'C#',
-  csharp: 'C#',
-  sql: 'SQL',
-  diff: 'Diff',
-  docker: 'Dockerfile',
-  dockerfile: 'Dockerfile',
-  nginx: 'Nginx',
-  vue: 'Vue',
-  svelte: 'Svelte',
-  astro: 'Astro',
-  xml: 'XML',
-  text: 'TEXT',
-  plaintext: 'TEXT',
-  txt: 'TEXT',
+  js: "JavaScript",
+  javascript: "JavaScript",
+  ts: "TypeScript",
+  typescript: "TypeScript",
+  jsx: "JSX",
+  tsx: "TSX",
+  html: "HTML",
+  css: "CSS",
+  scss: "SCSS",
+  sass: "Sass",
+  less: "Less",
+  json: "JSON",
+  json5: "JSON5",
+  yaml: "YAML",
+  yml: "YAML",
+  toml: "TOML",
+  ini: "INI",
+  conf: "INI",
+  md: "Markdown",
+  markdown: "Markdown",
+  mdx: "MDX",
+  bash: "Bash",
+  sh: "Shell",
+  shell: "Shell",
+  shellscript: "Shell",
+  zsh: "Zsh",
+  powershell: "PowerShell",
+  ps1: "PowerShell",
+  php: "PHP",
+  py: "Python",
+  python: "Python",
+  go: "Go",
+  rust: "Rust",
+  rs: "Rust",
+  java: "Java",
+  kotlin: "Kotlin",
+  c: "C",
+  cpp: "C++",
+  "c++": "C++",
+  cs: "C#",
+  csharp: "C#",
+  sql: "SQL",
+  diff: "Diff",
+  docker: "Dockerfile",
+  dockerfile: "Dockerfile",
+  nginx: "Nginx",
+  vue: "Vue",
+  svelte: "Svelte",
+  astro: "Astro",
+  xml: "XML",
+  text: "TEXT",
+  plaintext: "TEXT",
+  txt: "TEXT",
 };
 
 /** @param {string} lang */
@@ -151,7 +159,8 @@ function parseMeta(meta) {
 /** Normalise a hast `className` property into a string array. */
 function toClassList(className) {
   if (Array.isArray(className)) return [...className];
-  if (typeof className === 'string') return className.split(/\s+/).filter(Boolean);
+  if (typeof className === "string")
+    return className.split(/\s+/).filter(Boolean);
   return [];
 }
 
@@ -164,39 +173,48 @@ function toClassList(className) {
  */
 export function transformerCodeCard() {
   return {
-    name: 'code-card',
+    name: "code-card",
     root(root) {
       const pre = root.children.find(
-        (node) => node.type === 'element' && node.tagName === 'pre',
+        (node) => node.type === "element" && node.tagName === "pre",
       );
       if (!pre) return;
 
-      const lang = String(this.options.lang || 'text').toLowerCase();
-      const meta = this.options?.meta?.__raw ?? '';
+      const lang = String(this.options.lang || "text").toLowerCase();
+      const meta = this.options?.meta?.__raw ?? "";
       const { title, noLineNumbers } = parseMeta(meta);
 
       // Line numbers: default ON via CSS counters; opt out per block.
       const cls = toClassList(pre.properties.className);
-      if (!noLineNumbers && !cls.includes('line-numbers')) cls.push('line-numbers');
+      if (!noLineNumbers && !cls.includes("line-numbers"))
+        cls.push("line-numbers");
       pre.properties.className = cls;
 
       // Header bar: language label, optional title, copy button.
-      const barChildren = [h('span', { className: ['code-card__lang'] }, [t(labelFor(lang))])];
+      const barChildren = [
+        h("span", { className: ["code-card__lang"] }, [t(labelFor(lang))]),
+      ];
       if (title) {
-        barChildren.push(h('span', { className: ['code-card__title'] }, [t(title)]));
+        barChildren.push(
+          h("span", { className: ["code-card__title"] }, [t(title)]),
+        );
       }
       barChildren.push(
         h(
-          'button',
-          { type: 'button', className: ['code-card__copy'], 'aria-label': '复制代码' },
-          [icon('copy'), icon('done')],
+          "button",
+          {
+            type: "button",
+            className: ["code-card__copy"],
+            "aria-label": "复制代码",
+          },
+          [icon("copy"), icon("done")],
         ),
       );
 
       const figure = h(
-        'figure',
-        { className: ['code-card'], 'data-lang': lang },
-        [h('div', { className: ['code-card__bar'] }, barChildren), pre],
+        "figure",
+        { className: ["code-card"], "data-lang": lang },
+        [h("div", { className: ["code-card__bar"] }, barChildren), pre],
       );
 
       root.children = [figure];
