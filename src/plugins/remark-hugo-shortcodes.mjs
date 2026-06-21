@@ -31,7 +31,7 @@
  *     Not used in current content; tags are stripped on fallback.
  */
 
-import { visit, SKIP, CONTINUE } from 'unist-util-visit';
+import { visit, SKIP, CONTINUE } from "unist-util-visit";
 
 // ---------------------------------------------------------------------------
 // Regex constants
@@ -73,7 +73,7 @@ const ANY_SHORTCODE_RE = /\{\{<[^>]*>\}\}/;
  * @returns {string} HTML fragment
  */
 function bilibiliEmbed(bvid, page) {
-  const pageParam = page ? `&page=${page}` : '';
+  const pageParam = page ? `&page=${page}` : "";
   return (
     `<div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;">` +
     `<iframe src="//player.bilibili.com/player.html?bvid=${bvid}${pageParam}&high_quality=1&danmaku=0" ` +
@@ -102,7 +102,7 @@ export function stripShortcodes(markdown) {
 
   // 1. Notice blocks — run first so nested row/friends are handled
   src = src.replace(NOTICE_RE, (_match, type, inner) => {
-    const escaped = type.toLowerCase().replace(/[^a-z0-9-]/g, '');
+    const escaped = type.toLowerCase().replace(/[^a-z0-9-]/g, "");
     return `<blockquote data-notice-type="${escaped}">\n\n${inner.trim()}\n\n</blockquote>`;
   });
 
@@ -112,11 +112,11 @@ export function stripShortcodes(markdown) {
   );
 
   // 3. row wrappers — strip the tags, keep whatever is between them
-  src = src.replace(ROW_OPEN_RE, '');
-  src = src.replace(ROW_CLOSE_RE, '');
+  src = src.replace(ROW_OPEN_RE, "");
+  src = src.replace(ROW_CLOSE_RE, "");
 
   // 4. friends / friends-list — remove entirely
-  src = src.replace(FRIENDS_RE, '');
+  src = src.replace(FRIENDS_RE, "");
 
   return src;
 }
@@ -144,14 +144,13 @@ export default function remarkHugoShortcodes() {
   // remark-parse (loaded by Astro) sets `this.parser` to a function:
   //   function parser(doc) { return fromMarkdown(doc, options) }
   // We replace it with a wrapper that cleans the source first.
-  const self = this;
-  const originalParser = self.parser;
+  const originalParser = this.parser;
 
-  if (typeof originalParser === 'function') {
-    self.parser = function shortcodesParser(doc, file) {
+  if (typeof originalParser === "function") {
+    this.parser = function shortcodesParser(doc, file) {
       const cleaned = stripShortcodes(String(doc));
       // Keep file.value consistent with what the parser will build from.
-      if (file && 'value' in file) file.value = cleaned;
+      if (file && "value" in file) file.value = cleaned;
       return originalParser.call(this, cleaned, file);
     };
   }
@@ -159,33 +158,33 @@ export default function remarkHugoShortcodes() {
   // --- (b) Transformer: defensive AST walk for residual tokens ---
   return function transformer(tree) {
     // Remove standalone paragraph nodes whose text is entirely a shortcode.
-    visit(tree, 'paragraph', (node, index, parent) => {
+    visit(tree, "paragraph", (node, index, parent) => {
       const rawText = node.children
-        .map((c) => ('value' in c ? c.value : ''))
-        .join('');
+        .map((c) => ("value" in c ? c.value : ""))
+        .join("");
 
       if (!ANY_SHORTCODE_RE.test(rawText)) return CONTINUE;
 
-      if (parent && typeof index === 'number') {
+      if (parent && typeof index === "number") {
         parent.children.splice(index, 1);
         return [SKIP, index];
       }
 
       // Inline fallback: scrub shortcode tokens from text children.
       for (const child of node.children) {
-        if (child.type === 'text' && ANY_SHORTCODE_RE.test(child.value)) {
-          child.value = child.value.replace(/\{\{<[^>]*>\}\}/g, '');
+        if (child.type === "text" && ANY_SHORTCODE_RE.test(child.value)) {
+          child.value = child.value.replace(/\{\{<[^>]*>\}\}/g, "");
         }
       }
       return CONTINUE;
     });
 
     // Clean or remove html nodes that are purely a shortcode token.
-    visit(tree, 'html', (node, index, parent) => {
+    visit(tree, "html", (node, index, parent) => {
       if (!ANY_SHORTCODE_RE.test(node.value)) return CONTINUE;
 
-      node.value = node.value.replace(/\{\{<[^>]*>\}\}/g, '');
-      if (!node.value.trim() && parent && typeof index === 'number') {
+      node.value = node.value.replace(/\{\{<[^>]*>\}\}/g, "");
+      if (!node.value.trim() && parent && typeof index === "number") {
         parent.children.splice(index, 1);
         return [SKIP, index];
       }
