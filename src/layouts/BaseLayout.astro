@@ -37,17 +37,17 @@
  *   totalPages      — total page count (list pages, for ExtraBar indicator)
  */
 
-import '../styles/global.css';
-import '../styles/dark-mode.scss';
+import "../styles/global.css";
+import "../styles/dark-mode.scss";
 
-import HeadMeta from '../components/HeadMeta.astro';
-import MobileHeader from '../components/MobileHeader.astro';
-import MobileDrawer from '../components/MobileDrawer.astro';
-import SidebarNav from '../components/SidebarNav.astro';
-import ExtraBar from '../components/ExtraBar.astro';
-import Footer from '../components/Footer.astro';
+import HeadMeta from "../components/HeadMeta.astro";
+import MobileHeader from "../components/MobileHeader.astro";
+import MobileDrawer from "../components/MobileDrawer.astro";
+import SidebarNav from "../components/SidebarNav.astro";
+import ExtraBar from "../components/ExtraBar.astro";
+import Footer from "../components/Footer.astro";
 
-import { SITE_DESCRIPTION } from '../site.config';
+import { SITE_DESCRIPTION } from "../site.config";
 
 interface Props {
   title?: string;
@@ -84,31 +84,38 @@ const pathname = Astro.url.pathname;
 <!doctype html>
 <html lang="zh-cn">
   <head>
-    {/*
+    {
+      /*
       No-FOUC dark mode detection — MUST run before any stylesheet renders.
       Reads the `night` cookie via native document.cookie (no js-cookie dep).
       Mirrors head.html's getNightRawMode() logic exactly.
-    */}
+    */
+    }
     <script is:inline>
       (function () {
         function getCookie(n) {
-          var m = document.cookie.match(new RegExp('(?:^|; )' + n + '=([^;]*)'));
+          const m = document.cookie.match(
+            new RegExp("(?:^|; )" + n + "=([^;]*)"),
+          );
           return m ? decodeURIComponent(m[1]) : undefined;
         }
-        var night = getCookie('night');
+        let night = getCookie("night");
         if (night === undefined) {
-          night = window.matchMedia('(prefers-color-scheme: dark)').matches ? '1' : '0';
+          night = window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "1"
+            : "0";
         }
-        if (night === '1') {
-          document.documentElement.classList.add('night', 'dark');
+        if (night === "1") {
+          document.documentElement.classList.add("night", "dark");
         } else {
-          document.documentElement.classList.remove('night', 'dark');
+          document.documentElement.classList.remove("night", "dark");
         }
         // create theme-color meta (mirrors head.html)
-        var meta = document.createElement('meta');
-        meta.name = 'theme-color';
-        meta.content = getComputedStyle(document.documentElement)
-          .getPropertyValue('--nav-bar-background-color');
+        const meta = document.createElement("meta");
+        meta.name = "theme-color";
+        meta.content = getComputedStyle(
+          document.documentElement,
+        ).getPropertyValue("--nav-bar-background-color");
         document.head.appendChild(meta);
       })();
     </script>
@@ -162,11 +169,11 @@ const pathname = Astro.url.pathname;
 
     {/* Runtime scripts — bundled by Astro, executed after DOM ready */}
     <script>
-      import { initTheme } from '../scripts/theme';
-      import { initNav } from '../scripts/nav';
-      import { initCodeCard } from '../scripts/code-card';
+      import { initTheme } from "../scripts/theme";
+      import { initNav } from "../scripts/nav";
+      import { initCodeCard } from "../scripts/code-card";
 
-      document.addEventListener('DOMContentLoaded', () => {
+      document.addEventListener("DOMContentLoaded", () => {
         initTheme();
         initNav();
         initCodeCard();
