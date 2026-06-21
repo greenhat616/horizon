@@ -1,0 +1,25 @@
+# Build output & generated
+dist/
+.astro/
+node_modules/
+pnpm-lock.yaml
+url-manifest.json
+
+# Content is authored prose — Prettier's Markdown reflow can change rendering
+# (tables, list markers, escaping). Never reformat it.
+src/content/
+**/*.md
+**/*.mdx
+
+# Local tooling / docs scaffolding
+.ccg/
+.claude/
+.serena/
+
+# prettier-plugin-astro cannot parse a <script> nested inside an Astro
+# expression ({cond && (<script>…</script>)}). Both files use that pattern
+# intentionally (conditional comments / KaTeX init) — hoisting the scripts to
+# top level would change emit behavior, so we skip formatting them instead.
+# ESLint still lints them normally.
+src/components/HeadMeta.astro
+src/layouts/PostLayout.astro
