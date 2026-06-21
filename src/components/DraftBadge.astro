@@ -1,0 +1,37 @@
+---
+/**
+ * DraftBadge.astro — "草稿" corner pill overlaid on a post's featured image.
+ *
+ * Absolutely positioned; the host must establish a positioning context
+ * (PostCard's .post-item-image / PostLayout's .post-head-wrapper). Pure
+ * static CSS — no client runtime. Dev-only in practice, since drafts are
+ * excluded from PROD builds.
+ */
+---
+
+<span class="draft-corner">草稿</span>
+
+<style>
+  .draft-corner {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    line-height: 1.6;
+    font-weight: 600;
+    color: #fff;
+    background: rgba(217, 119, 6, 0.92); /* amber-600 */
+    backdrop-filter: saturate(120%);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  :global(html.night) .draft-corner {
+    background: rgba(245, 158, 11, 0.92); /* amber-500 — brighter on dark */
+    color: #1a1a1a;
+  }
+</style>

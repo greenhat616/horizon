@@ -54,6 +54,7 @@
 
 import BaseLayout from './BaseLayout.astro';
 import PostMeta from '../components/PostMeta.astro';
+import DraftBadge from '../components/DraftBadge.astro';
 import OutdatedNotice from '../components/OutdatedNotice.astro';
 import TableOfContents from '../components/TableOfContents.astro';
 import CCLicense from '../components/CCLicense.astro';
@@ -153,6 +154,7 @@ const postHeadClass = hasFeaturedImage ? 'post-head-wrapper' : 'post-head-wrappe
         class={postHeadClass}
         style={hasFeaturedImage ? `background-image: url('${featuredImage}')` : undefined}
       >
+        {draft && hasFeaturedImage && <DraftBadge />}
         <div class="post-title">
           {title}
           {!disableMetaInfo && (

@@ -11,11 +11,10 @@
 
 import { getCollection, render } from 'astro:content';
 import PostLayout from '../../layouts/PostLayout.astro';
+import { isListable, postSlug } from '../../lib/posts';
 
 export async function getStaticPaths() {
-  const allPosts = (await getCollection('posts')).filter(
-    (p) => !p.data.draft && !p.data.hidden,
-  );
+  const allPosts = (await getCollection('posts')).filter(isListable);
 
   // Sort descending by date (newest first = index 0)
   const sorted = allPosts.sort(
@@ -29,12 +28,12 @@ export async function getStaticPaths() {
     const olderPost = index < sorted.length - 1 ? sorted[index + 1] : undefined;
 
     return {
-      params: { id: post.data.slug! },
+      params: { id: postSlug(post) },
       props: {
         post,
-        prevHref: olderPost ? `/posts/${olderPost.data.slug}/` : undefined,
+        prevHref: olderPost ? `/posts/${postSlug(olderPost)}/` : undefined,
         prevTitle: olderPost?.data.title,
-        nextHref: newerPost ? `/posts/${newerPost.data.slug}/` : undefined,
+        nextHref: newerPost ? `/posts/${postSlug(newerPost)}/` : undefined,
         nextTitle: newerPost?.data.title,
       },
     };
@@ -82,6 +81,7 @@ const effectiveLastmod: Date | undefined =
   disableCC={data.disableCC ?? false}
   disableOutdatedNotice={(data as { disableOutdatedNotice?: boolean }).disableOutdatedNotice ?? false}
   comment={data.comment}
+  draft={data.draft}
   prevHref={prevHref}
   prevTitle={prevTitle}
   nextHref={nextHref}

@@ -16,10 +16,11 @@ import { getCollection } from 'astro:content';
 import ListLayout from '../../layouts/ListLayout.astro';
 import { urlizeTerm } from '../../lib/taxonomy';
 import { toCardData } from '../../lib/post-card';
+import { isListable } from '../../lib/posts';
 
 export async function getStaticPaths() {
   const allPosts = await getCollection('posts');
-  const published = allPosts.filter((p) => !p.data.draft && !p.data.hidden);
+  const published = allPosts.filter(isListable);
 
   // Map urlized slug → { canonical raw term, posts[] }
   const tagMap = new Map<string, { label: string; posts: typeof published }>();
