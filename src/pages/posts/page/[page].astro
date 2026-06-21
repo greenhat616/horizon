@@ -10,13 +10,12 @@
 import { getCollection } from 'astro:content';
 import ListLayout from '../../../layouts/ListLayout.astro';
 import { toCardData } from '../../../lib/post-card';
+import { isListable } from '../../../lib/posts';
 
 export async function getStaticPaths() {
   const PAGE_SIZE = 10;
 
-  const allPosts = (await getCollection('posts')).filter(
-    (p) => !p.data.draft && !p.data.hidden,
-  );
+  const allPosts = (await getCollection('posts')).filter(isListable);
 
   const sorted = allPosts.sort(
     (a, b) => b.data.date.getTime() - a.data.date.getTime(),

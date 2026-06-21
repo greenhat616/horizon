@@ -11,9 +11,10 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { urlizeTerm } from '../../lib/taxonomy';
+import { isListable } from '../../lib/posts';
 
 const allPosts = await getCollection('posts');
-const published = allPosts.filter((p) => !p.data.draft && !p.data.hidden);
+const published = allPosts.filter(isListable);
 
 // Build urlized-slug → { label, count } map
 // When multiple raw terms share a slug, the first encountered wins as label.

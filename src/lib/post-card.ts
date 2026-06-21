@@ -14,6 +14,7 @@
  */
 
 import { render, type CollectionEntry } from 'astro:content';
+import { postSlug } from './posts';
 
 export interface PostCardData {
   href: string;
@@ -33,7 +34,7 @@ export async function toCardData(p: CollectionEntry<'posts'>): Promise<PostCardD
   const rs = remarkPluginFrontmatter?.readingSeconds;
 
   return {
-    href: `/posts/${p.data.slug}/`,
+    href: `/posts/${postSlug(p)}/`,
     title: p.data.title,
     summary: p.data.description ?? undefined,
     featuredImage: p.data.featured_image ?? undefined,

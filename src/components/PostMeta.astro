@@ -104,3 +104,25 @@ const readingTimeText =
     </>
   )}
 </div>
+
+<style>
+  /* Inline amber pill — visually consistent with DraftBadge. Used as the
+     fallback draft indicator on cards/headers with no featured image to
+     anchor the corner badge to. */
+  .draft-label {
+    display: inline-block;
+    padding: 0 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    line-height: 1.7;
+    font-weight: 600;
+    color: #fff;
+    background: rgba(217, 119, 6, 0.92); /* amber-600 */
+    vertical-align: middle;
+  }
+
+  :global(html.night) .draft-label {
+    background: rgba(245, 158, 11, 0.92); /* amber-500 */
+    color: #1a1a1a;
+  }
+</style>

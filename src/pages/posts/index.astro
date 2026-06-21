@@ -22,10 +22,9 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { formatDateDash } from '../../lib/dates';
+import { isListable, postSlug } from '../../lib/posts';
 
-const allPosts = (await getCollection('posts')).filter(
-  (p) => !p.data.draft && !p.data.hidden,
-);
+const allPosts = (await getCollection('posts')).filter(isListable);
 
 const sorted = allPosts.sort(
   (a, b) => b.data.date.getTime() - a.data.date.getTime(),
@@ -47,7 +46,7 @@ for (const p of sorted) {
     groups.push(group);
   }
   group.items.push({
-    href: `/posts/${p.data.slug}/`,
+    href: `/posts/${postSlug(p)}/`,
     title: p.data.title,
     monthDay: `${month}-${day}`,
   });
