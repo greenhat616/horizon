@@ -69,7 +69,7 @@ const readingTimeText =
   {showCategories && categories.length > 0 && (
     <>
       &emsp;
-      <i class="material-icons" style="font-size:14px; vertical-align:middle">folder</i>
+      <i class="material-icons">folder</i>
       {categories.map((cat) => (
         <a href={`/categories/${urlizeTerm(cat)}/`}>{cat}</a>
       ))}
@@ -79,7 +79,7 @@ const readingTimeText =
   {showTags && tags.length > 0 && (
     <>
       &emsp;
-      <i class="material-icons" style="font-size:14px; vertical-align:middle">label</i>
+      <i class="material-icons">label</i>
       {tags.map((tag, i) => (
         <>
           <a href={`/tags/${urlizeTerm(tag)}/`}>{tag}</a>
@@ -92,7 +92,7 @@ const readingTimeText =
   {showReadingTime && readingSeconds != null && (
     <>
       &emsp;
-      <i class="material-icons" style="font-size:10px; vertical-align:middle">schedule</i>
+      <i class="material-icons">schedule</i>
       {readingTimeText}
     </>
   )}
