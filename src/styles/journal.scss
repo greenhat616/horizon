@@ -25,6 +25,36 @@
   font-family: "Material Icons" !important;
 }
 
+// ─── Post-meta icons (folder / label / schedule) ────────────────────────────
+// Single source of truth for the meta-row icons in BOTH the article header
+// (.post-meta) and the list cards (.post-item-meta) — they share one Astro
+// component (PostMeta.astro), so they must render identically.
+//
+// Size: the old markup hard-coded mismatched inline sizes (14px folder/label
+// vs 10px schedule). Use one `em` value instead so all three are uniform and
+// track the surrounding meta font-size across the desktop/mobile breakpoints
+// (16px → 14px), staying a touch smaller than the text for a balanced look.
+//
+// Vertical centering: `vertical-align: middle` aligns the glyph to the text's
+// x-height midpoint, which for this font/line-height leaves it sitting low
+// against the (CJK-dominant) meta text; a small `position:relative` top nudge
+// lifts it onto the CJK glyphs' optical centre (empirically tuned — lifting all
+// the way to the line-box centre at ~0.18em reads slightly high, since CJK
+// glyphs sit a touch below that centre). `top` is `em` so it scales with the
+// icon across the desktop/mobile breakpoints; `transform` is avoided because it
+// has no effect on inline (non-replaced) elements. `line-height: 1` keeps the
+// icon's own box from inflating the line. Horizontal margin gives a small,
+// consistent gap on both sides (the trailing `&emsp;` provides the larger
+// inter-group spacing).
+@mixin post-meta-icon {
+  font-size: 0.875em;
+  line-height: 1;
+  vertical-align: middle;
+  position: relative;
+  top: -0.08em;
+  margin: 0 5px 0 3px;
+}
+
 // $color-accent: #1976d2;
 // $color-accent: #330000;
 $color-accent: #01506f;
@@ -743,6 +773,10 @@ a {
               @media screen and (max-width: $single-column-max-width) {
                 font-size: $single-column-post-meta-size;
               }
+
+              .material-icons {
+                @include post-meta-icon;
+              }
             }
           }
           .post-item-image-wrapper {
@@ -891,8 +925,7 @@ a {
             font-size: 16px;
           }
           .material-icons {
-            vertical-align: middle;
-            margin: 0 5px 5px 3px;
+            @include post-meta-icon;
           }
 
           @media screen and (max-width: $single-column-max-width) {
@@ -930,8 +963,7 @@ a {
             font-size: 16px;
           }
           .material-icons {
-            vertical-align: middle;
-            margin-bottom: 3px;
+            @include post-meta-icon;
           }
 
           @media screen and (max-width: $single-column-max-width) {
