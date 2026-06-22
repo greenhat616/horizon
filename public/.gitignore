@@ -1,0 +1,8 @@
+# Hugo production build output, kept here only as the URL-parity reference
+# baseline for the Astro migration (see scripts/freeze-urls.mjs, url-manifest.json).
+#
+# Astro defaults public/ to its static source dir, but the only genuine source
+# asset is images/cc.svg (already tracked — git never re-ignores tracked files).
+# Everything else here is generated; ignore it all.
+*
+!.gitignore
