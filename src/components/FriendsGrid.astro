@@ -86,7 +86,7 @@ const shuffled = [...friends].sort(() => Math.random() - 0.5);
           target="_blank"
           rel="noopener noreferrer"
           title={friend.name}
-          class="group flex items-center gap-3 rounded-xl border border-black/6 bg-white p-3 text-[#01313f] no-underline transition-all duration-300 hover:-translate-y-0.5 hover:bg-[rgba(1,80,111,0.05)] hover:text-[#012e3f] hover:shadow-md dark:border-white/6 dark:bg-[#2d2d2d] dark:text-neutral-100 dark:hover:bg-[#333333] dark:hover:text-[#7ec0db]"
+          class="group flex items-center gap-3 rounded-xl border border-black/6 bg-white p-3 no-underline transition-all duration-300 hover:-translate-y-0.5 hover:bg-[rgba(1,80,111,0.05)] hover:shadow-md dark:border-white/6 dark:bg-[#2d2d2d] dark:hover:bg-[#333333]"
         >
           <img
             loading="lazy"
@@ -98,11 +98,11 @@ const shuffled = [...friends].sort(() => Math.random() - 0.5);
             class="lazyload h-16 w-16 shrink-0 rounded-full! border border-gray-200 object-cover transition-transform duration-500 group-hover:rotate-360 dark:border-white/10"
           />
           <div class="flex min-w-0 flex-col justify-center">
-            <span class="truncate text-[0.95rem] leading-snug font-semibold">
+            <span class="truncate text-[0.95rem] leading-snug font-semibold text-[#01313f]! group-hover:text-[#012e3f]! dark:text-neutral-100! dark:group-hover:text-[#7ec0db]!">
               {friend.name}
             </span>
             {friend.desc && (
-              <span class="truncate text-xs leading-snug text-black/55 dark:text-white/50">
+              <span class="truncate text-xs leading-snug text-black/55! dark:text-white/50!">
                 {friend.desc}
               </span>
             )}
