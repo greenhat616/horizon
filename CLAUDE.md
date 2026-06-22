@@ -2,8 +2,9 @@
 
 > 本目录是 Hugo→Astro 迁移的 git worktree（分支 `worktree-astro-migration`）。在此 workspace 继续迁移的收尾与生产切换。
 
-## 状态（2026-06-20）
+## 状态（2026-06-22）
 Hugo（diary 主题）→ Astro 静态站迁移 **已实施、评审、修复并构建验证通过**，尚未切换生产。
+- **Hugo 残留已清除（2026-06-22）**：旧 Hugo 文件已删 —— 子模块 `themes/diary`+`themes/hugo-notice`（deinit + `git rm` + 清 `.git/modules/themes`）、`.gitmodules`、`content/`、`static/`、`archetypes/`、`config/`、`resources/`、`config.toml`、`.hugo_build.lock`。仓库现为纯 Astro 树（`src/` + `public/`）。删除已 `git rm` 暂存，git 可恢复。
 - 构建：`astro check` 0/0/0；`astro build` 74 页。
 - **URL 等价**：与生产 sitemap **精确匹配**（15 篇已发布文章 / 46 tags / 5 categories；9 篇草稿正确排除）。见 `url-manifest.json`，`node scripts/freeze-urls.mjs` 可重生成。
 - 评审：codex 首轮 50/100 揪出 5 个 Critical，已全部修复复验（嵌套 `<head>`、shortcode 泄漏、taxonomy 大小写 parity、裸日期时区、OutdatedNotice 兜底）。
@@ -42,7 +43,12 @@ Astro 7.0（Content Layer，Vite 8 + Rust 编译器 `@astrojs/compiler-rs`）+ T
 3b. **Astro 弃用提示（Info，非阻塞）**：`astro check` 提示 `z` from `astro:content` 已弃用（改直接 `import { z } from 'zod'`）、`markdown.remarkPlugins`/`rehypePlugins`/`remarkRehype` 配置已弃用（改用 `@astrojs/markdown-remark` 的 `unified({...})`）。仅前向兼容，不影响当前构建。
 4. **/workers/**：生产 sitemap 不含，按需保留或移除。
 5. **样式现代化（长期目标）**：逐步将「无层 `journal.scss`/`dark-mode.scss` + class」迁移为「Tailwind 工具类 + 组件 scoped `<style>`」，以根除上节「无层 SCSS 压过工具类 / 全局 `*` 刷色」这类级联坑（无层全局 `*`/`a`/`.post-body img` 是反复踩雷源）。按组件分批进行、每批跑视觉 parity，**勿**一次性重写。
-6. **生产切换**：合并 `worktree-astro-migration` → `master` 触发 CI（`.github/workflows/deploy.yml` 已改 Node+Astro、部署 `dist/`）；parity 接受后删 diary submodule（`.gitmodules` + `themes/`）+ 旧 Hugo 文件（`config.toml`、`content/`、`static/`、`archetypes/`、`config/`）。
+6. **生产切换**：合并 `worktree-astro-migration` → `master` 触发 CI（`.github/workflows/deploy.yml` 已改 Node+Astro、部署 `dist/`）。~~parity 接受后删 diary submodule + 旧 Hugo 文件~~ ✅ Hugo 文件已于 2026-06-22 清除（见状态段）。
+
+## 内容写作（务必）
+- **文章源**：唯一为 `src/content/posts/`（`content.config.ts` 的 `glob` base + `scripts/freeze-urls.mjs` 的 `POSTS_DIR` 均写死于此）。**勿**在仓库根写文章（旧 Hugo `content/` 已删；放别处 Astro 扫不到、且无任何 ERROR/WARNING，是静默陷阱）。
+- **新文章自检**：①`slug` 全站唯一（撞 slug 才会在 `astro build` 报 duplicate path，dev 不报）；②frontmatter 勿从他文复制残留；③未完成置 `draft: true`（构建排除）。
+- **`url-manifest.json`**：URL 等价基线，`freeze-urls.mjs` **不识别 `draft`** —— 仅在文章正式发布（`draft:false`）后才重跑 `node scripts/freeze-urls.mjs`，否则草稿 slug 会污染 parity 基线。
 
 ## 详细记录
 `.ccg/tasks/migrate-blog-to-astro/`：`requirements.md` · `analysis.md` · `plan.md` · `review.md` · `content-migration-report.md` · `task.json`。
