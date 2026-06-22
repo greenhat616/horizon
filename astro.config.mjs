@@ -25,6 +25,10 @@ export default defineConfig({
   output: "static",
   site: SITE_URL,
   trailingSlash: "always",
+  // Astro v7 changed the default to 'jsx', which strips whitespace between inline
+  // elements following JSX/React rules. Pin to the v6 HTML-aware behavior so the
+  // rendered output stays byte-equivalent with the parity baseline.
+  compressHTML: true,
   env: {
     schema: {
       PUBLIC_SITE_URL: envField.string({
@@ -54,6 +58,9 @@ export default defineConfig({
     plugins: [tailwindcss()],
   },
   markdown: {
+    // Astro v7 defaults to the native Sätteri pipeline, but our toolchain is built
+    // on remark/rehype. Setting remarkPlugins/rehypePlugins keeps Astro on the
+    // unified() pipeline (requires the now-explicit @astrojs/markdown-remark dep).
     // Hugo shortcode pre-processor must run first so remark sees clean Markdown
     remarkPlugins: [remarkHugoShortcodes, remarkModifiedTime],
     // VitePress-style ::: code-group tabs (wraps code blocks at the HAST level,

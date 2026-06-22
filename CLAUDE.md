@@ -9,7 +9,8 @@ Hugo（diary 主题）→ Astro 静态站迁移 **已实施、评审、修复并
 - 评审：codex 首轮 50/100 揪出 5 个 Critical，已全部修复复验（嵌套 `<head>`、shortcode 泄漏、taxonomy 大小写 parity、裸日期时区、OutdatedNotice 兜底）。
 
 ## 技术栈与命令
-Astro 5.18（Content Layer）+ Tailwind v4（`@tailwindcss/vite`）+ pnpm。
+Astro 7.0（Content Layer，Vite 8 + Rust 编译器 `@astrojs/compiler-rs`）+ Tailwind v4.3（`@tailwindcss/vite`）+ pnpm。
+> **v6→v7 升级（2026-06-22）**：核心升 `astro@7`/`@astrojs/mdx@7`/`@tailwindcss/vite@4.3`/`tailwindcss@4.3`。v7 默认 Markdown 处理器改为原生 Sätteri，本项目重度依赖 remark/rehype 自定义插件，故**显式新增 `@astrojs/markdown-remark@7`** 并保留 `markdown.remarkPlugins`/`rehypePlugins`（v7 下设此二选项即让 Astro 走 `unified()` 管线，但需该包）。`compressHTML` 默认从 `true` 变 `'jsx'`（按 JSX 规则吃行内空格），已显式 `compressHTML: true` 锁回 v6 行为保 parity。`astro check` 0/0/0、`astro build` 74 页、Shiki code-card/阅读时间/RSS 全文/sitemap 均复验通过。
 - `pnpm dev` → http://localhost:4321 · `pnpm build` → `dist/` · `pnpm preview` · `pnpm astro check`
 - **质量门禁**（Astro 官方栈）：`pnpm lint`(ESLint flat config `eslint.config.js`：`@eslint/js`+typescript-eslint+`eslint-plugin-astro` recommended，`.astro` frontmatter/`<script>` 用 TS parser，模板亦覆盖) · `pnpm fmt`/`fmt:check`(Prettier + `prettier-plugin-astro`，`.prettierignore` 排除 `src/content` 与全部 md/mdx；scss/css/astro/ts/js/json 均格式化) · `pnpm typecheck`(=`astro check`)。
 - **Git 钩子**(husky v9)：pre-commit → lint-staged（`.lintstagedrc.json`：`*.{js,mjs,cjs,ts,astro}` 跑 `eslint --fix`+`prettier --write`，`*.{json,css,scss}` 跑 `prettier --write`）；commit-msg → commitlint（`@commitlint/config-conventional`，须 Conventional Commits）。`prepare:husky` 在 `pnpm install` 时自动装钩子。
