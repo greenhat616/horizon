@@ -11,10 +11,11 @@
 
 import { getCollection, render } from "astro:content";
 import PostLayout from "../../layouts/PostLayout.astro";
-import { isListable, postSlug } from "../../lib/posts";
+import { assertUniqueSlugs, isListable, postSlug } from "../../lib/posts";
 
 export async function getStaticPaths() {
   const allPosts = (await getCollection("posts")).filter(isListable);
+  assertUniqueSlugs(allPosts);
 
   // Sort descending by date (newest first = index 0)
   const sorted = allPosts.sort(

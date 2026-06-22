@@ -30,3 +30,29 @@ export function postSlug(p: CollectionEntry<"posts">): string {
 export function isListable(p: CollectionEntry<"posts">): boolean {
   return !p.data.hidden && (SHOW_DRAFTS || !p.data.draft);
 }
+
+/**
+ * Assert every routable post resolves to a unique URL segment.
+ *
+ * Two posts sharing a `slug` collide on `/posts/<slug>/`: Astro's
+ * getStaticPaths would emit duplicate params and fail the build with a cryptic
+ * message that names only the URL. This runs on every dev/build (it's called
+ * from the detail route's getStaticPaths) and fails fast, naming BOTH files.
+ *
+ * Scope matches the routable set (post-`isListable`), so in dev it also catches
+ * draft-vs-draft collisions, and in prod only published posts are checked.
+ */
+export function assertUniqueSlugs(posts: CollectionEntry<"posts">[]): void {
+  const seen = new Map<string, string>(); // slug -> first file id that claimed it
+  for (const p of posts) {
+    const slug = postSlug(p);
+    const prev = seen.get(slug);
+    if (prev) {
+      throw new Error(
+        `Duplicate post slug "${slug}":\n  - ${prev}\n  - ${p.id}\n` +
+          `Each post needs a unique slug (it determines the /posts/<slug>/ URL).`,
+      );
+    }
+    seen.set(slug, p.id);
+  }
+}
