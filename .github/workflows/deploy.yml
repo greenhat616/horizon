@@ -69,5 +69,8 @@ jobs:
           access_key: ${{ secrets.DOGECLOUD_ACCESS_KEY }}
           secret_key: ${{ secrets.DOGECLOUD_SECRET_KEY }}
           type: "path"
-          urls:
-            - ${{ steps.site.outputs.root }}
+          # `urls` is a scalar string input; the action splits it on newlines/commas.
+          # A YAML sequence here is rejected by the workflow parser ("A sequence was
+          # not expected"), so pass a block scalar even for a single URL.
+          urls: |
+            ${{ steps.site.outputs.root }}
