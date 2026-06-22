@@ -47,3 +47,27 @@ jobs:
           protocol: ${{ secrets.FTP_PROTOCOL }}
           server-dir: ${{ secrets.FTP_SERVER_DIR }}
           local-dir: ./dist/
+
+      # Normalize the site origin to exactly one trailing slash so the directory
+      # refresh below targets the site root regardless of how PUBLIC_SITE_URL is
+      # stored (with or without a trailing slash). A double slash would address a
+      # different path and miss the cache.
+      - name: Normalize site URL
+        id: site
+        run: |
+          base="${{ vars.PUBLIC_SITE_URL }}"
+          echo "root=${base%/}/" >> "$GITHUB_OUTPUT"
+
+      # Purge the DogeCloud CDN edge cache after a successful deploy. A `path`
+      # refresh on the site root recursively invalidates every cached file, so a
+      # single entry covers the whole site (and stays within the daily quota).
+      # Requires repository Secrets DOGECLOUD_ACCESS_KEY / DOGECLOUD_SECRET_KEY
+      # (Console → 用户中心 → 密钥管理). Pinned to a commit SHA for supply-chain safety.
+      - name: Refresh DogeCloud CDN cache
+        uses: seatonjiang/dogecloud-cdn-action@c8b84d5e99199aa1514e2f3b1e35c476a3f4809e # 2025.12.10
+        with:
+          access_key: ${{ secrets.DOGECLOUD_ACCESS_KEY }}
+          secret_key: ${{ secrets.DOGECLOUD_SECRET_KEY }}
+          type: "path"
+          urls:
+            - ${{ steps.site.outputs.root }}
