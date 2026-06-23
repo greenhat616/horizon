@@ -48,7 +48,11 @@ Astro 7.0（Content Layer，Vite 8 + Rust 编译器 `@astrojs/compiler-rs`）+ T
 
 ## 内容写作（务必）
 - **文章源**：唯一为 `src/content/posts/`（`content.config.ts` 的 `glob` base + `scripts/freeze-urls.mjs` 的 `POSTS_DIR` 均写死于此）。**勿**在仓库根写文章（旧 Hugo `content/` 已删；放别处 Astro 扫不到、且无任何 ERROR/WARNING，是静默陷阱）。
-- **新文章自检**：①`slug` 全站唯一（撞 slug 才会在 `astro build` 报 duplicate path，dev 不报）；②frontmatter 勿从他文复制残留；③未完成置 `draft: true`（构建排除）。
+- **`post:` 指令族**（`scripts/new-post.mjs`/`publish-post.mjs`，零依赖 `node:readline/promises`，非 TTY 预读 stdin 故可脚本化）：
+  - `pnpm post:new` —— 交互式 scaffold（标题/slug/描述/标签/分类/文件名），写 `draft: true`、`date` 为当前 Asia/Shanghai ISO（`…+08:00`，匹配语料），并做 slug 撞车校验；`lastmod` 故意留空交给 git。
+  - `pnpm post:publish [slug|文件名]` —— draft→正式：置 `draft: false` 并把 `date`（= created-at）重写为发布时刻；无参时列出全部草稿交互选择。**发布后须** `pnpm freeze-urls`（= `node scripts/freeze-urls.mjs`）刷新 parity 基线。
+- **created/lastmod 双时间机制**：`date`=创建/发布时间（人工，publish 指令重写）；`lastmod`/`updated`=显式覆盖，缺省则由 `plugins/remark-modified-time.ts` 取 git `%cI`。**显式优先**两处保证——插件在源 frontmatter 已有 `lastmod`/`updated` 时直接短路跳过 git；消费端 `posts/[...id].astro` 取 `data.lastmod ?? data.updated ?? gitLastModified`。git 方案依赖 CI `fetch-depth: 0`（已配）。
+- **新文章自检**：①`slug` 全站唯一（撞 slug 才会在 `astro build` 报 duplicate path，dev 不报；`post:new` 已预检）；②frontmatter 勿从他文复制残留；③未完成置 `draft: true`（构建排除）。
 - **`url-manifest.json`**：URL 等价基线，`freeze-urls.mjs` **不识别 `draft`** —— 仅在文章正式发布（`draft:false`）后才重跑 `node scripts/freeze-urls.mjs`，否则草稿 slug 会污染 parity 基线。
 
 ## 详细记录

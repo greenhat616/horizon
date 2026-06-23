@@ -26,10 +26,16 @@ const postSchema = z.object({
   // title and date are required for published posts but bare-draft files may
   // omit them; default to empty/epoch so the schema doesn't reject them.
   title: z.string().default(""),
+  // `date` is the canonical created-at / publish date (author-controlled). For
+  // drafts it holds the draft-creation time; `pnpm post:publish` rewrites it to
+  // the publish moment when flipping `draft: false`.
   date: z.preprocess(
     (v) => (typeof v === "string" ? toDate(v) : v),
     z.date().default(new Date(0)),
   ),
+  // Explicit last-modified override. When either is set it wins over the
+  // git-derived lastModified (see plugins/remark-modified-time.ts and the
+  // `data.lastmod ?? data.updated ?? gitLastModified` chain in posts/[...id]).
   lastmod: optionalDateField,
   updated: optionalDateField,
   slug: z.string().nullish(),
