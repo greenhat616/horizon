@@ -6,7 +6,9 @@
  * src/content/pages/friends.md, this script:
  *   1. Fetches the URL (follows redirects, browser-like UA, per-request timeout).
  *   2. Classifies the HTTP outcome:
- *        OK    — 2xx and no parking/sale/placeholder signature in the body.
+ *        OK    — 2xx and no parking/sale/placeholder/spam signature in the body.
+ *        SPAM  — domain squatted by a black-hat actor: page stuffed with
+ *                gambling/adult/grey-market content (黑灰产抢注页).
  *        SOLD  — body matches a domain-parking / "for sale" / broker signature,
  *                or the request landed on a known domain-parking/broker host
  *                (域名被域名商持有、挂高价停放/出售页).
@@ -18,17 +20,22 @@
  *        whois=available  — 域名已无注册记录（可被重新注册，建议移除友链）
  *        whois=registered — 域名仍在注册中（站点只是暂时宕机/迁移）
  *        whois=unknown    — WHOIS 无定论（服务器限流/格式未识别）
+ *   4. For DEAD links still registered (or WHOIS inconclusive), probes HTTP
+ *      (port 80) and the apex/www domain — a dead subdomain whose apex is now
+ *      squatted (SPAM) or parked (SOLD) is upgraded accordingly.
  *
- * Zero dependencies — Node >=18 (global fetch, AbortSignal.timeout, node:net).
+ * Zero dependencies — Node >=18 (global fetch, AbortSignal.timeout,
+ * node:net/https/http).
  *
  * Usage:
- *   node scripts/check-friends.mjs                 # check all (+ whois on DEAD)
+ *   node scripts/check-friends.mjs                 # check all (+ whois & probe)
  *   node scripts/check-friends.mjs --json          # machine-readable output
  *   node scripts/check-friends.mjs --no-whois      # skip the WHOIS pass
+ *   node scripts/check-friends.mjs --no-probe      # skip HTTP/apex fallback probe
  *   node scripts/check-friends.mjs --timeout 20000 # per-request HTTP timeout (ms)
  *   node scripts/check-friends.mjs --concurrency 4
  *
- * Exit code: 0 if every link is OK, 1 if any SOLD/WARN/DEAD found.
+ * Exit code: 0 if every link is OK, 1 if any SPAM/SOLD/WARN/DEAD found.
  */
 
 import { readFileSync } from "node:fs";
@@ -52,6 +59,7 @@ const FRIENDS_MD = join(
 const argv = process.argv.slice(2);
 const asJson = argv.includes("--json");
 const noWhois = argv.includes("--no-whois");
+const noProbe = argv.includes("--no-probe");
 function numArg(flag, fallback) {
   const i = argv.indexOf(flag);
   if (i !== -1 && argv[i + 1]) {
@@ -172,8 +180,26 @@ function hostMatches(hostname, list) {
 }
 
 function findSignature(body, list) {
-  const lower = body.toLowerCase();
+  const lower = decodeEntities(body).toLowerCase();
   return list.find((s) => lower.includes(s.toLowerCase()));
+}
+
+/**
+ * Decode numeric HTML entities (&#xHEX; and &#DEC;) so keyword scans see the
+ * real text. Squatter pages routinely entity-encode their Chinese spam
+ * (e.g. &#x6210;&#x4eba; → 成人) specifically to evade naive substring filters.
+ */
+function decodeEntities(s) {
+  return s
+    .replace(/&#x([0-9a-f]+);/gi, (_, h) => fromCp(parseInt(h, 16)))
+    .replace(/&#(\d+);/g, (_, d) => fromCp(parseInt(d, 10)));
+}
+function fromCp(cp) {
+  try {
+    return String.fromCodePoint(cp);
+  } catch {
+    return "";
+  }
 }
 
 /**
@@ -186,15 +212,97 @@ function detectForSale(body) {
   const sig = findSignature(body, STRONG_SALE_SIGNATURES);
   if (sig) return `页面含出售/停放特征: "${sig}"`;
 
+  const text = decodeEntities(body);
   const hasSaleWord =
     /\b(for sale|make an offer|buy now|purchase this|this domain)\b/i.test(
-      body,
-    ) || /(域名出售|一口价|域名竞价|购买域名|该域名)/.test(body);
+      text,
+    ) || /(域名出售|一口价|域名竞价|购买域名|该域名)/.test(text);
   const priceMatch =
-    body.match(/(?:\$|usd\s?|￥|¥|€|£)\s?[\d][\d,]{2,}(?:\.\d+)?/i) ||
-    body.match(/[\d][\d,]{3,}\s?(?:usd|dollars|元|rmb)/i);
-  if (hasSaleWord && priceMatch && body.trim().length < 8000) {
+    text.match(/(?:\$|usd\s?|￥|¥|€|£)\s?[\d][\d,]{2,}(?:\.\d+)?/i) ||
+    text.match(/[\d][\d,]{3,}\s?(?:usd|dollars|元|rmb)/i);
+  if (hasSaleWord && priceMatch && text.trim().length < 8000) {
     return `疑似域名交易页（短页面含售价 "${priceMatch[0].trim()}" + 出售关键词，正文 ${body.trim().length} bytes）`;
+  }
+  return null;
+}
+
+// High-confidence black-hat / squatter content (赌博 / 色情 / 灰产). Squatted
+// domains are typically stuffed with many of these; require ≥2 distinct hits to
+// avoid flagging a legit page that merely mentions one term.
+const SPAM_KEYWORDS = [
+  // 赌博 / 博彩
+  "博彩",
+  "赌博",
+  "赌场",
+  "娱乐城",
+  "时时彩",
+  "六合彩",
+  "幸运飞艇",
+  "葡京",
+  "威尼斯人",
+  "太阳城",
+  "真人荷官",
+  "百家乐",
+  "老虎机",
+  "电子游艺",
+  "现金网",
+  "体育投注",
+  "首存优惠",
+  "注册送彩金",
+  "菠菜",
+  "bet365",
+  "澳门金沙",
+  "澳门威尼斯",
+  // 色情
+  "三级片",
+  "成人电影",
+  "成人视频",
+  "av在线",
+  "av天堂",
+  "天堂网",
+  "苍井空",
+  "a片",
+  "aa片",
+  "无码",
+  "国产精品",
+  "亚洲精品",
+  "巨乳",
+  "乱伦",
+  "自慰",
+  "做爱",
+  "情色",
+  "裸聊",
+  "一夜情",
+  "约炮",
+  "免费观看",
+  "在线播放",
+  "porn",
+  "escort",
+  "viagra",
+  "cialis",
+  // 灰产
+  "传奇私服",
+  "代孕",
+  "代开发票",
+  "办理证件",
+  "外围女",
+];
+
+/**
+ * Detect black-hat / squatter spam content (黑灰产抢注页面常充斥赌博/色情内容).
+ * HTML entities are decoded first — squatter pages entity-encode their spam to
+ * dodge naive substring filters. Returns a reason when ≥2 distinct keywords
+ * match, else null.
+ */
+function detectSpam(body) {
+  const lower = decodeEntities(body).toLowerCase();
+  const hits = [];
+  for (const k of SPAM_KEYWORDS) {
+    if (lower.includes(k.toLowerCase())) hits.push(k);
+    if (hits.length >= 6) break;
+  }
+  if (hits.length >= 2) {
+    return `命中赌博/色情/灰产关键词 ×${hits.length}: ${hits.slice(0, 6).join("、")}`;
   }
   return null;
 }
@@ -259,6 +367,22 @@ function rawGet(url, { timeout, insecure, redirectsLeft = 5 }) {
       reject(err);
       return;
     }
+    // Guarantee the promise always settles exactly once, even if the response
+    // stream errors after headers (error emits on `res`, not `req`) — otherwise
+    // the awaiting probe would hang forever ("unsettled top-level await").
+    let settled = false;
+    const done = (fn, val) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(hardTimer);
+      fn(val);
+    };
+    const hardTimer = setTimeout(() => {
+      req.destroy(new Error("timeout"));
+      done(reject, new Error("hard timeout"));
+    }, timeout + 1000);
+    hardTimer.unref?.(); // don't keep the event loop alive on this timer alone
+
     const mod = u.protocol === "http:" ? http : https;
     const req = mod.get(
       url,
@@ -281,7 +405,10 @@ function rawGet(url, { timeout, insecure, redirectsLeft = 5 }) {
             timeout,
             insecure,
             redirectsLeft: redirectsLeft - 1,
-          }).then(resolve, reject);
+          }).then(
+            (v) => done(resolve, v),
+            (e) => done(reject, e),
+          );
           return;
         }
         const chunks = [];
@@ -291,17 +418,102 @@ function rawGet(url, { timeout, insecure, redirectsLeft = 5 }) {
           if (size <= 400_000) chunks.push(c);
         });
         res.on("end", () =>
-          resolve({
+          done(resolve, {
             status,
             finalUrl: url,
             body: Buffer.concat(chunks).toString("utf8"),
           }),
         );
+        res.on("error", (e) => done(reject, e)); // mid-body stream failure
       },
     );
     req.setTimeout(timeout, () => req.destroy(new Error("timeout")));
-    req.on("error", reject);
+    req.on("error", (e) => done(reject, e));
   });
+}
+
+/**
+ * Build fallback probe URLs for an unreachable link:
+ *   1. HTTP (port 80) variant of the original — site may serve plain HTTP only.
+ *   2. The registrable domain + its www. variant over both https and http —
+ *      a dead subdomain (e.g. blog.example.cn) may have its apex squatted.
+ * The exact original https URL is excluded (already tried in checkLink).
+ */
+function buildProbeUrls(href) {
+  let u;
+  try {
+    u = new URL(href);
+  } catch {
+    return [];
+  }
+  const host = u.hostname;
+  const apex = registrableDomain(host);
+  const urls = new Set();
+
+  if (u.protocol === "https:") urls.add(`http://${host}${u.pathname}`);
+  for (const t of [apex, `www.${apex}`]) {
+    if (t === host) continue; // apex == original host → its https already tried
+    urls.add(`https://${t}/`);
+    urls.add(`http://${t}/`);
+  }
+  urls.delete(href);
+  return [...urls];
+}
+
+/**
+ * Probe HTTP / apex / www fallbacks for an unreachable link and report the most
+ * significant finding (priority: SPAM > SOLD > reachable). TLS validation is
+ * relaxed so a squatter's broken-cert page is still inspected.
+ * Returns { kind, url, finalUrl, status, reason } or null if nothing reachable.
+ */
+async function fallbackProbe(href) {
+  const urls = buildProbeUrls(href);
+  let reachable = null;
+  for (const url of urls) {
+    let r;
+    try {
+      r = await rawGet(url, { timeout: TIMEOUT_MS, insecure: true });
+    } catch {
+      continue; // this variant unreachable; try the next
+    }
+    if (!r || !r.status) continue;
+    let finalHost = "";
+    try {
+      finalHost = new URL(r.finalUrl).hostname;
+    } catch {
+      /* ignore */
+    }
+    const spam = detectSpam(r.body);
+    if (spam) {
+      return {
+        kind: "SPAM",
+        url,
+        finalUrl: r.finalUrl,
+        status: r.status,
+        reason: spam,
+      };
+    }
+    const c = classifyBody({ status: r.status, body: r.body, finalHost });
+    if (c.verdict === "SOLD") {
+      return {
+        kind: "SOLD",
+        url,
+        finalUrl: r.finalUrl,
+        status: r.status,
+        reason: c.reason,
+      };
+    }
+    if (!reachable && (c.verdict === "OK" || c.verdict === "WARN")) {
+      reachable = {
+        kind: c.verdict,
+        url,
+        finalUrl: r.finalUrl,
+        status: r.status,
+        reason: c.reason,
+      };
+    }
+  }
+  return reachable; // a merely-reachable variant, or null
 }
 
 // ── WHOIS (RFC 3912, port 43) ────────────────────────────────────────────────
@@ -649,13 +861,18 @@ const results = await mapLimit(friends, CONCURRENCY, async (f) => {
   return r;
 });
 
-// ── WHOIS pass on DEAD links — confirm whether the domain is still registered ─
+// ── DEAD-link post-pass: WHOIS + HTTP/apex fallback probe ─────────────────────
+// 1. WHOIS confirms whether the domain is still registered.
+// 2. If it IS still registered (or WHOIS inconclusive), probe HTTP (port 80)
+//    and the apex/www domain — a dead subdomain whose apex has been squatted by
+//    a black-hat actor (spam content) or parked is upgraded to SPAM / SOLD.
 const deadLinks = results.filter((r) => r.verdict === "DEAD");
-if (!noWhois && deadLinks.length) {
+if (deadLinks.length) {
   if (!asJson) {
-    console.log(
-      `\n── WHOIS 复核（确认 ${deadLinks.length} 个失效域名是否仍注册）──`,
-    );
+    const what = [!noWhois && "WHOIS 复核", !noProbe && "HTTP/一级域名回落探测"]
+      .filter(Boolean)
+      .join(" + ");
+    console.log(`\n── ${deadLinks.length} 个失效链接：${what} ──`);
   }
   // Sequential-ish (low concurrency) to avoid registry rate limits.
   await mapLimit(deadLinks, 3, async (r) => {
@@ -665,24 +882,61 @@ if (!noWhois && deadLinks.length) {
     } catch {
       /* malformed href; leave host empty */
     }
-    const w = host
-      ? await whoisLookup(host)
-      : { status: "unknown", note: "无效 URL" };
-    r.whois = w;
-    if (!asJson) {
-      const wIcon = { available: "🟢", registered: "🔵", unknown: "⚪" }[
-        w.status
-      ];
-      const wText = {
-        available: "域名已无注册记录（可重新注册，建议移除友链）",
-        registered: "域名仍在注册中（站点暂时宕机/迁移）",
-        unknown: `WHOIS 无定论${w.note ? ` — ${w.note}` : ""}`,
-      }[w.status];
-      console.log(
-        `  ${wIcon} ${(r.name || "(无名)").padEnd(14)} ${w.domain ?? host}  →  ${wText}`,
-      );
+
+    if (!noWhois) {
+      r.whois = host
+        ? await whoisLookup(host)
+        : { status: "unknown", note: "无效 URL" };
     }
-    return w;
+
+    // Probe fallbacks unless WHOIS proved the domain is gone (no point probing).
+    if (!noProbe && r.whois?.status !== "available") {
+      const fb = await fallbackProbe(r.href);
+      if (fb) {
+        r.fallback = fb;
+        if (fb.kind === "SPAM") {
+          r.verdict = "SPAM";
+          r.reason = `原 URL 不可达，但同域 ${fb.url} 疑似被黑灰产抢注：${fb.reason}`;
+          r.finalUrl = fb.finalUrl;
+        } else if (fb.kind === "SOLD") {
+          r.verdict = "SOLD";
+          r.reason = `原 URL 不可达，但 ${fb.url} 已停放/出售：${fb.reason}`;
+          r.finalUrl = fb.finalUrl;
+        }
+        // OK/WARN: keep DEAD (the specific friend URL is still down); the note
+        // is printed below and in the final report.
+      }
+    }
+
+    if (!asJson) {
+      const name = (r.name || "(无名)").padEnd(14);
+      if (r.whois) {
+        const wIcon = { available: "🟢", registered: "🔵", unknown: "⚪" }[
+          r.whois.status
+        ];
+        const wText = {
+          available: "域名已无注册记录（可重新注册，建议移除友链）",
+          registered: "域名仍在注册中",
+          unknown: `WHOIS 无定论${r.whois.note ? ` — ${r.whois.note}` : ""}`,
+        }[r.whois.status];
+        console.log(
+          `  ${wIcon} ${name} ${r.whois.domain ?? host}  →  ${wText}`,
+        );
+      }
+      if (r.fallback) {
+        const fIcon = { SPAM: "🛑", SOLD: "💰", OK: "🟡", WARN: "🟡" }[
+          r.fallback.kind
+        ];
+        const fText =
+          r.fallback.kind === "SPAM"
+            ? `回落探测：${r.fallback.url} 疑似黑灰产抢注 → ${r.fallback.reason}`
+            : r.fallback.kind === "SOLD"
+              ? `回落探测：${r.fallback.url} 已停放/出售 → ${r.fallback.reason}`
+              : `回落探测：${r.fallback.url} 可访问（HTTP ${r.fallback.status}）→ 原站可能仅 HTTP 可用/已迁移`;
+        console.log(`     ${fIcon} ${" ".repeat(13)} ${fText}`);
+      }
+    }
+    return r;
   });
 }
 
@@ -692,14 +946,16 @@ if (asJson) {
   const by = (v) => results.filter((r) => r.verdict === v);
   const ok = by("OK");
   const sold = by("SOLD");
+  const spam = by("SPAM");
   const warn = by("WARN");
   const dead = by("DEAD");
 
   console.log("\n────────────── 汇总 ──────────────");
-  console.log(`✅ 正常 (OK)     : ${ok.length}`);
+  console.log(`✅ 正常 (OK)      : ${ok.length}`);
+  console.log(`🛑 疑似抢注 (SPAM): ${spam.length}`);
   console.log(`💰 疑似出售 (SOLD): ${sold.length}`);
-  console.log(`⚠️  异常 (WARN)   : ${warn.length}`);
-  console.log(`❌ 失效 (DEAD)   : ${dead.length}`);
+  console.log(`⚠️  异常 (WARN)    : ${warn.length}`);
+  console.log(`❌ 失效 (DEAD)    : ${dead.length}`);
   if (!noWhois && dead.length) {
     const avail = dead.filter((r) => r.whois?.status === "available").length;
     const reg = dead.filter((r) => r.whois?.status === "registered").length;
@@ -708,7 +964,7 @@ if (asJson) {
     );
   }
 
-  const flagged = [...sold, ...dead, ...warn];
+  const flagged = [...spam, ...sold, ...dead, ...warn];
   if (flagged.length) {
     console.log("\n需要关注的友链：");
     for (const r of flagged) {
@@ -719,10 +975,15 @@ if (asJson) {
       if (r.whois) {
         const wText = {
           available: "WHOIS: 域名已无注册记录 → 建议移除",
-          registered: "WHOIS: 域名仍注册 → 可能只是暂时宕机",
+          registered: "WHOIS: 域名仍注册",
           unknown: `WHOIS: 无定论${r.whois.note ? ` (${r.whois.note})` : ""}`,
         }[r.whois.status];
         console.log(`       ↳ ${wText}`);
+      }
+      if (r.fallback && r.verdict === "DEAD") {
+        console.log(
+          `       ↳ 回落: ${r.fallback.url} 可访问（HTTP ${r.fallback.status}）→ 原站可能仅 HTTP/已迁移`,
+        );
       }
     }
   }
