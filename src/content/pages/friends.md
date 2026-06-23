@@ -1,6 +1,5 @@
 ---
 title: '朋友们'
-lastmod: '2022-11-23T19:03:03+08:00'
 date: 2019-10-02T23:40:03+08:00
 slug: friends
 disablePagination: true
@@ -9,7 +8,7 @@ disableOutdatedNotice: true
 disableImageViewer: true
 disableToC: true
 disableCC: true
-hidden: true
+hidden: false
 friends:
   - href: 'https://blog.woc.moe'
     name: 啪皮
@@ -19,7 +18,7 @@ friends:
     name: freejishu
     desc: 一个全新的境界
     hash: 998a4820101c5491c986a7faf10457c8
-  - href: 'https://xiaolin.in'
+  - href: 'https://www.xiaolin.in'
     name: 小霖
     desc: 听说是一个很软的萝莉呢~
     icon: 'https://avatars.githubusercontent.com/u/20554060'
@@ -131,7 +130,7 @@ friends:
     name: 辣椒の酱
     desc: 后端开发，技术分享
     icon: 'https://removeif.github.io/images/avatar.jpg'
-  - href: 'https://blog.ni-co.moe/'
+  - href: 'http://blog.ni-co.moe/'
     name: 神楽坂 白
     desc: 二次元/死胖子(暂时)/拖延症/sony教徒/lovelive教徒/本子铺已经被我干死了
     hash: 533d17d4b0d291a444a62a70a959014e
@@ -182,6 +181,7 @@ friends:
 ---
 
 以下友人使用洗牌算法打乱，排名不分先后。如果站点无法访问，可能遭到移除。  
-**目前暂不接受友链请求。**  
+
+将定期通过 [脚本](https://github.com/greenhat616/horizon/blob/master/scripts/check-friends.mjs) 进行连接探测，进行清理，防止站点被出售，被恶意篡改。
 
 {{<friends-list>}}
