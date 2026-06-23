@@ -15,6 +15,7 @@
     "post:new": "node scripts/new-post.mjs",
     "post:publish": "node scripts/publish-post.mjs",
     "freeze-urls": "node scripts/freeze-urls.mjs",
+    "check:friends": "node scripts/check-friends.mjs",
     "prepare": "husky"
   },
   "dependencies": {
