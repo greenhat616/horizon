@@ -23,12 +23,19 @@
  * into a tab panel; group-scoped CSS hides the now-redundant per-card label.
  */
 
+import type { ShikiTransformer } from "shiki";
+import type { Element, ElementContent, Properties, Text } from "hast";
+
 // ---------------------------------------------------------------------------
 // hast helpers
 // ---------------------------------------------------------------------------
 
 /** Build a hast element node. */
-const h = (tagName, properties = {}, children = []) => ({
+const h = (
+  tagName: string,
+  properties: Properties = {},
+  children: ElementContent[] = [],
+): Element => ({
   type: "element",
   tagName,
   properties,
@@ -36,16 +43,14 @@ const h = (tagName, properties = {}, children = []) => ({
 });
 
 /** Build a hast text node. */
-const t = (value) => ({ type: "text", value });
+const t = (value: string): Text => ({ type: "text", value });
 
 /**
  * Inline SVG icon (clipboard / check). hast-util-to-html auto-switches to SVG
  * space for `<svg>` descendants, so camelCased props map to correct attributes.
- *
- * @param {'copy'|'done'} kind
  */
-function icon(kind) {
-  const base = {
+function icon(kind: "copy" | "done"): Element {
+  const base: Properties = {
     viewBox: "0 0 24 24",
     width: "15",
     height: "15",
@@ -80,7 +85,7 @@ function icon(kind) {
 // ---------------------------------------------------------------------------
 
 /** Friendly display names; falls back to UPPERCASE of the resolved lang id. */
-const LANG_LABELS = {
+const LANG_LABELS: Record<string, string> = {
   js: "JavaScript",
   javascript: "JavaScript",
   ts: "TypeScript",
@@ -136,8 +141,7 @@ const LANG_LABELS = {
   txt: "TEXT",
 };
 
-/** @param {string} lang */
-function labelFor(lang) {
+function labelFor(lang: string): string {
   return LANG_LABELS[lang] || lang.toUpperCase();
 }
 
@@ -145,11 +149,8 @@ function labelFor(lang) {
 // Meta parsing
 // ---------------------------------------------------------------------------
 
-/**
- * Parse the raw fence meta (`title="x" no-line-numbers`).
- * @param {string} meta
- */
-function parseMeta(meta) {
+/** Parse the raw fence meta (`title="x" no-line-numbers`). */
+function parseMeta(meta: string): { title?: string; noLineNumbers: boolean } {
   const titleMatch = meta.match(/title=(?:"([^"]*)"|'([^']*)')/);
   const title = titleMatch ? (titleMatch[1] ?? titleMatch[2]) : undefined;
   const noLineNumbers = /(?:^|\s)no-line-numbers(?:\s|$)/i.test(meta);
@@ -157,8 +158,8 @@ function parseMeta(meta) {
 }
 
 /** Normalise a hast `className` property into a string array. */
-function toClassList(className) {
-  if (Array.isArray(className)) return [...className];
+function toClassList(className: Properties[string]): string[] {
+  if (Array.isArray(className)) return className.map(String);
   if (typeof className === "string")
     return className.split(/\s+/).filter(Boolean);
   return [];
@@ -168,20 +169,18 @@ function toClassList(className) {
 // Transformer
 // ---------------------------------------------------------------------------
 
-/**
- * @returns {import('@shikijs/types').ShikiTransformer}
- */
-export function transformerCodeCard() {
+export function transformerCodeCard(): ShikiTransformer {
   return {
     name: "code-card",
     root(root) {
       const pre = root.children.find(
-        (node) => node.type === "element" && node.tagName === "pre",
+        (node): node is Element =>
+          node.type === "element" && node.tagName === "pre",
       );
       if (!pre) return;
 
       const lang = String(this.options.lang || "text").toLowerCase();
-      const meta = this.options?.meta?.__raw ?? "";
+      const meta = this.options.meta?.__raw ?? "";
       const { title, noLineNumbers } = parseMeta(meta);
 
       // Line numbers: default ON via CSS counters; opt out per block.
@@ -191,7 +190,7 @@ export function transformerCodeCard() {
       pre.properties.className = cls;
 
       // Header bar: language label, optional title, copy button.
-      const barChildren = [
+      const barChildren: ElementContent[] = [
         h("span", { className: ["code-card__lang"] }, [t(labelFor(lang))]),
       ];
       if (title) {

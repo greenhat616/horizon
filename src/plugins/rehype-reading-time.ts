@@ -22,15 +22,18 @@
  * Keep the counting logic in sync with src/lib/reading-time.ts.
  */
 
+import type { RehypePlugin } from "@astrojs/markdown-remark";
+import type { Nodes } from "hast";
+
 /** Hugo's reading speed, words per minute. */
 const WORDS_PER_MINUTE = 220;
 
 const encoder = new TextEncoder();
 
 /** Concatenate the text content of a hast tree (ignoring tags, comments, raw). */
-function hastText(node) {
+function hastText(node: Nodes): string {
   if (node.type === "text") return node.value;
-  if (node.children) {
+  if ("children" in node) {
     let out = "";
     for (const child of node.children) out += hastText(child);
     return out;
@@ -43,7 +46,7 @@ function hastText(node) {
  * pure-ASCII tokens contribute 1. Mirrors strings.Fields + the per-token
  * `len(word) == RuneCount` test (byte length vs rune count).
  */
-function countWordsHugo(text) {
+function countWordsHugo(text: string): number {
   let count = 0;
   for (const token of text.split(/\s+/)) {
     if (!token) continue;
@@ -55,8 +58,8 @@ function countWordsHugo(text) {
 }
 
 /** rehype plugin factory — no options required. */
-export default function rehypeReadingTime() {
-  return function (tree, file) {
+const rehypeReadingTime: RehypePlugin = () => {
+  return (tree, file) => {
     const words = countWordsHugo(hastText(tree));
     const readingSeconds = (words / WORDS_PER_MINUTE) * 60;
 
@@ -66,4 +69,6 @@ export default function rehypeReadingTime() {
     file.data.astro.frontmatter.readingSeconds = readingSeconds;
     file.data.astro.frontmatter.wordCount = words;
   };
-}
+};
+
+export default rehypeReadingTime;

@@ -21,7 +21,7 @@ import rss from "@astrojs/rss";
 import { getCollection } from "astro:content";
 import type { APIContext } from "astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../site.config";
-import { stripShortcodes } from "../plugins/remark-hugo-shortcodes.mjs";
+import { stripShortcodes } from "../plugins/remark-hugo-shortcodes.ts";
 
 // Build-time markdown→HTML processor.
 // We initialise lazily to avoid top-level await and keep imports tree-shakeable.

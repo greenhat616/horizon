@@ -32,6 +32,9 @@
  */
 
 import { visit, SKIP, CONTINUE } from "unist-util-visit";
+import type { RemarkPlugin } from "@astrojs/markdown-remark";
+import type { Processor } from "unified";
+import type { VFile } from "vfile";
 
 // ---------------------------------------------------------------------------
 // Regex constants
@@ -67,12 +70,8 @@ const ANY_SHORTCODE_RE = /\{\{<[^>]*>\}\}/;
 
 /**
  * Emit a responsive 16:9 Bilibili iframe embed string.
- *
- * @param {string} bvid  BV identifier
- * @param {string|undefined} page  Optional page number
- * @returns {string} HTML fragment
  */
-function bilibiliEmbed(bvid, page) {
+function bilibiliEmbed(bvid: string, page?: string): string {
   const pageParam = page ? `&page=${page}` : "";
   return (
     `<div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;">` +
@@ -93,22 +92,23 @@ function bilibiliEmbed(bvid, page) {
  *
  * Safe to call outside of any unified context — no AST involved.
  * The RSS pipeline calls this before passing body text to `bodyToHtml`.
- *
- * @param {string} markdown  Raw Markdown source
- * @returns {string}         Markdown with shortcodes removed or replaced
  */
-export function stripShortcodes(markdown) {
+export function stripShortcodes(markdown: string): string {
   let src = markdown;
 
   // 1. Notice blocks — run first so nested row/friends are handled
-  src = src.replace(NOTICE_RE, (_match, type, inner) => {
-    const escaped = type.toLowerCase().replace(/[^a-z0-9-]/g, "");
-    return `<blockquote data-notice-type="${escaped}">\n\n${inner.trim()}\n\n</blockquote>`;
-  });
+  src = src.replace(
+    NOTICE_RE,
+    (_match: string, type: string, inner: string) => {
+      const escaped = type.toLowerCase().replace(/[^a-z0-9-]/g, "");
+      return `<blockquote data-notice-type="${escaped}">\n\n${inner.trim()}\n\n</blockquote>`;
+    },
+  );
 
   // 2. Bilibili embeds
-  src = src.replace(BILIBILI_RE, (_match, bvid, page) =>
-    bilibiliEmbed(bvid, page),
+  src = src.replace(
+    BILIBILI_RE,
+    (_match: string, bvid: string, page?: string) => bilibiliEmbed(bvid, page),
   );
 
   // 3. row wrappers — strip the tags, keep whatever is between them
@@ -136,10 +136,8 @@ export function stripShortcodes(markdown) {
  *
  * A defensive transformer also walks the resulting mdast to catch any residual
  * tokens (e.g. if the parser is substituted later by another plugin).
- *
- * @this {import('unified').Processor}
  */
-export default function remarkHugoShortcodes() {
+const remarkHugoShortcodes: RemarkPlugin = function (this: Processor) {
   // --- (a) Wrap this.parser to pre-process raw Markdown ---
   // remark-parse (loaded by Astro) sets `this.parser` to a function:
   //   function parser(doc) { return fromMarkdown(doc, options) }
@@ -147,7 +145,11 @@ export default function remarkHugoShortcodes() {
   const originalParser = this.parser;
 
   if (typeof originalParser === "function") {
-    this.parser = function shortcodesParser(doc, file) {
+    this.parser = function shortcodesParser(
+      this: Processor,
+      doc: string,
+      file: VFile,
+    ) {
       const cleaned = stripShortcodes(String(doc));
       // Keep file.value consistent with what the parser will build from.
       if (file && "value" in file) file.value = cleaned;
@@ -156,7 +158,7 @@ export default function remarkHugoShortcodes() {
   }
 
   // --- (b) Transformer: defensive AST walk for residual tokens ---
-  return function transformer(tree) {
+  return (tree) => {
     // Remove standalone paragraph nodes whose text is entirely a shortcode.
     visit(tree, "paragraph", (node, index, parent) => {
       const rawText = node.children
@@ -191,4 +193,6 @@ export default function remarkHugoShortcodes() {
       return CONTINUE;
     });
   };
-}
+};
+
+export default remarkHugoShortcodes;

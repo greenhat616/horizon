@@ -11,14 +11,15 @@
  */
 
 import { execFileSync } from "node:child_process";
+import type { RemarkPlugin } from "@astrojs/markdown-remark";
 
 /** remark plugin factory — no options required. */
-export default function remarkModifiedTime() {
-  return function (_tree, file) {
+const remarkModifiedTime: RemarkPlugin = () => {
+  return (_tree, file) => {
     // file.history[0] is the absolute path to the source file
     const filepath = file.history[0];
 
-    let lastModified;
+    let lastModified: string;
 
     if (filepath) {
       try {
@@ -46,4 +47,6 @@ export default function remarkModifiedTime() {
 
     file.data.astro.frontmatter.lastModified = lastModified;
   };
-}
+};
+
+export default remarkModifiedTime;

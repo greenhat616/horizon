@@ -29,6 +29,7 @@ Astro 7.0（Content Layer，Vite 8 + Rust 编译器 `@astrojs/compiler-rs`）+ T
 - **零客户端框架**：旧 Vue/Bootstrap/dayjs/js-cookie 全弃；页面纯静态 HTML + 内联微脚本 + 按需懒加载。
 
 ## 关键策略（务必保持）
+- **TypeScript 类型纪律**：非必要不使用 `unknown`/`any`；若确需使用，**必须**就近注释说明原因（如 catch 子句的 `error` 天然为 `unknown`，须先 narrow 再取属性）。`astro.config.ts` 与 `src/plugins/*.ts` 已全面 TS 化（参照官方 [astro.config.ts](https://github.com/withastro/docs/blob/main/astro.config.ts)）：插件复用 `@astrojs/markdown-remark` 的 `RemarkPlugin`/`RehypePlugin` 类型、Shiki 用 `ShikiTransformer`、节点用 `hast`/`mdast` 类型；`tsconfig` 为 Astro strict（`verbatimModuleSyntax` → 类型导入须 `import type`；`allowImportingTsExtensions` → 本地导入写 `.ts` 显式扩展名）。改动后须过 `astro check`（0 errors）+ `pnpm build` + `pnpm lint`/`fmt:check`。
 - **CDN 策略**：主 zstatic → 备 cdnjs，全 SRI，`__cdnfb` onerror 兜底；**禁用** staticfile/bytecdntp/BootCDN（已投毒）。`lib/cdn.ts` 实现。
 - **URL 等价**：文章路由用 frontmatter `slug`（已全小写、与生产一致）；taxonomy 用 `urlizeTerm`（ASCII 小写、CJK 保留）。切换前跑完整 sitemap diff。
 - **暗色与 Tailwind**：站点暗色用 `html.night`（非 `prefers-color-scheme`）。`global.css` 已加 `@custom-variant dark (&:where(.night, .night *))`，故组件内可直接用 `dark:` 工具类（如 `FriendsGrid.astro`）。`.night` 全局规则仍在 `dark-mode.scss`。**注意**：`.post-body img{border-radius:5px}`（特异性 0,1,1）会压过单类 Tailwind 工具，post-body 内的图片若要改圆角须用 `rounded-full!` 等 important 变体（友链头像即如此）。

@@ -3,10 +3,10 @@ import sitemap from "@astrojs/sitemap";
 import mdx from "@astrojs/mdx";
 import tailwindcss from "@tailwindcss/vite";
 import rehypeCodeGroup from "rehype-code-group";
-import rehypeReadingTime from "./src/plugins/rehype-reading-time.mjs";
-import remarkModifiedTime from "./src/plugins/remark-modified-time.mjs";
-import remarkHugoShortcodes from "./src/plugins/remark-hugo-shortcodes.mjs";
-import { transformerCodeCard } from "./src/plugins/shiki-code-card.mjs";
+import rehypeReadingTime from "./src/plugins/rehype-reading-time.ts";
+import remarkModifiedTime from "./src/plugins/remark-modified-time.ts";
+import remarkHugoShortcodes from "./src/plugins/remark-hugo-shortcodes.ts";
+import { transformerCodeCard } from "./src/plugins/shiki-code-card.ts";
 
 // The canonical origin must be known here (it feeds `site:` → sitemap / RSS /
 // canonical URLs), but astro:env/client isn't available during config bootstrap.
@@ -17,7 +17,12 @@ try {
 } catch (error) {
   // A missing .env (e.g. CI, where the var is injected) is expected; any other
   // failure (malformed/unreadable file) is real and must not be swallowed.
-  if (error?.code !== "ENOENT") throw error;
+  // `error` is typed `unknown` in catch clauses; narrow before reading `.code`.
+  if (
+    error instanceof Error &&
+    (error as NodeJS.ErrnoException).code !== "ENOENT"
+  )
+    throw error;
 }
 const SITE_URL = process.env.PUBLIC_SITE_URL;
 
