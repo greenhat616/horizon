@@ -20,12 +20,20 @@
  *        whois=available  — 域名已无注册记录（可被重新注册，建议移除友链）
  *        whois=registered — 域名仍在注册中（站点只是暂时宕机/迁移）
  *        whois=unknown    — WHOIS 无定论（服务器限流/格式未识别）
- *   4. For DEAD links still registered (or WHOIS inconclusive), probes HTTP
- *      (port 80) and the apex/www domain — a dead subdomain whose apex is now
- *      squatted (SPAM) or parked (SOLD) is upgraded accordingly.
+ *   4. For DEAD links (still registered) and inconclusive WARN links (blocked /
+ *      empty / placeholder), probes HTTP (port 80) and the apex/www domain —
+ *      a subdomain whose apex is squatted (SPAM) or parked (SOLD) is upgraded.
+ *
+ * Content checks (spam / for-sale / parking) run on EVERY reachable response,
+ * including healthy 2xx pages — a still-up friend domain may have been quietly
+ * squatted. Bodies are decoded by their charset (Content-Type / <meta charset>),
+ * so GBK/GB18030/Big5 Chinese spam pages are scanned correctly, and numeric
+ * HTML entities are decoded before keyword matching. Requests use a full
+ * current-Chrome header set (UA + Accept + Sec-Fetch); IP/region-based WAF
+ * blocks (e.g. a 403 to datacenter IPs) still cannot be bypassed.
  *
  * Zero dependencies — Node >=18 (global fetch, AbortSignal.timeout,
- * node:net/https/http).
+ * node:net/https/http, ICU-backed TextDecoder for GBK/Big5).
  *
  * Usage:
  *   node scripts/check-friends.mjs                 # check all (+ whois & probe)
@@ -72,9 +80,24 @@ const TIMEOUT_MS = numArg("--timeout", 15000);
 const CONCURRENCY = numArg("--concurrency", 8);
 const WHOIS_TIMEOUT_MS = numArg("--whois-timeout", 10000);
 
-const UA =
-  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
-  "(KHTML, like Gecko) Chrome/124.0 Safari/537.36";
+// A full, current-Chrome header set. WAFs that gate on a missing/odd UA or the
+// absence of Sec-Fetch/Accept headers will serve real content (e.g. squatter
+// sites that 403 a bare client). IP/region-based blocks still can't be bypassed.
+// NB: no Accept-Encoding — node:http won't auto-decompress, so we ask for plain.
+const BROWSER_HEADERS = {
+  "User-Agent":
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
+    "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+  Accept:
+    "text/html,application/xhtml+xml,application/xml;q=0.9," +
+    "image/avif,image/webp,image/apng,*/*;q=0.8",
+  "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+  "Upgrade-Insecure-Requests": "1",
+  "Sec-Fetch-Dest": "document",
+  "Sec-Fetch-Mode": "navigate",
+  "Sec-Fetch-Site": "none",
+  "Sec-Fetch-User": "?1",
+};
 
 // ── Parking / "for sale" detection ───────────────────────────────────────────
 // Hostnames that strongly indicate a parked / sold / brokered domain.
@@ -202,6 +225,40 @@ function fromCp(cp) {
   }
 }
 
+/** Normalise a charset label to one TextDecoder understands. */
+function normalizeCharset(cs) {
+  if (!cs) return "utf-8";
+  const c = cs.trim().toLowerCase();
+  if (c === "utf8" || c === "utf-8") return "utf-8";
+  if (c === "gb2312" || c === "gb-2312" || c === "gbk") return "gbk";
+  if (c === "gb18030") return "gb18030";
+  if (c === "big5" || c === "big5-hkscs" || c === "cp950") return "big5";
+  if (c === "euc-jp" || c === "shift_jis" || c === "sjis") return c;
+  return c; // unknown → let TextDecoder try; decodeBody falls back to utf-8
+}
+
+/**
+ * Decode a response body honouring its charset. Chinese spam/squatter sites are
+ * frequently served as GBK/GB18030/Big5, not UTF-8 — decoding those as UTF-8
+ * yields mojibake and keyword scans miss everything. Charset is taken from the
+ * Content-Type header, else from a <meta charset> in the document head.
+ */
+function decodeBody(buf, contentType = "") {
+  let charset = (/charset=["']?([\w-]+)/i.exec(contentType) || [])[1];
+  if (!charset) {
+    const head = buf.subarray(0, 4096).toString("latin1");
+    charset =
+      (/<meta[^>]+charset=["']?([\w-]+)/i.exec(head) || [])[1] ||
+      (/<meta[^>]+content=["'][^"']*charset=([\w-]+)/i.exec(head) || [])[1];
+  }
+  const label = normalizeCharset(charset);
+  try {
+    return new TextDecoder(label).decode(buf);
+  } catch {
+    return buf.toString("utf8");
+  }
+}
+
 /**
  * Detect a for-sale / broker landing page in the body.
  * Returns a human-readable reason, or null. Combines explicit signatures with
@@ -323,6 +380,11 @@ function classifyBody({ status, statusText = "", body, finalHost }) {
   const saleReason = detectForSale(body);
   if (saleReason) return { verdict: "SOLD", reason: saleReason };
 
+  // Content check applies to ALL responses (incl. 2xx) — a still-reachable
+  // friend domain may have been quietly squatted and now serves spam.
+  const spamReason = detectSpam(body);
+  if (spamReason) return { verdict: "SPAM", reason: spamReason };
+
   if (status >= 200 && status < 300) {
     const placeholder = findSignature(body, PLACEHOLDER_SIGNATURES);
     if (placeholder) {
@@ -388,12 +450,7 @@ function rawGet(url, { timeout, insecure, redirectsLeft = 5 }) {
       url,
       {
         rejectUnauthorized: !insecure, // ignored by node:http
-        headers: {
-          "User-Agent": UA,
-          Accept:
-            "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-          "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
-        },
+        headers: BROWSER_HEADERS,
       },
       (res) => {
         const status = res.statusCode ?? 0;
@@ -421,7 +478,10 @@ function rawGet(url, { timeout, insecure, redirectsLeft = 5 }) {
           done(resolve, {
             status,
             finalUrl: url,
-            body: Buffer.concat(chunks).toString("utf8"),
+            body: decodeBody(
+              Buffer.concat(chunks),
+              res.headers["content-type"],
+            ),
           }),
         );
         res.on("error", (e) => done(reject, e)); // mid-body stream failure
@@ -483,20 +543,11 @@ async function fallbackProbe(href) {
     } catch {
       /* ignore */
     }
-    const spam = detectSpam(r.body);
-    if (spam) {
-      return {
-        kind: "SPAM",
-        url,
-        finalUrl: r.finalUrl,
-        status: r.status,
-        reason: spam,
-      };
-    }
+    // classifyBody already runs spam + sale + parking detection on the body.
     const c = classifyBody({ status: r.status, body: r.body, finalHost });
-    if (c.verdict === "SOLD") {
+    if (c.verdict === "SPAM" || c.verdict === "SOLD") {
       return {
-        kind: "SOLD",
+        kind: c.verdict,
         url,
         finalUrl: r.finalUrl,
         status: r.status,
@@ -700,12 +751,7 @@ async function checkLink({ name, href }) {
     res = await fetch(href, {
       redirect: "follow",
       signal: AbortSignal.timeout(TIMEOUT_MS),
-      headers: {
-        "User-Agent": UA,
-        Accept:
-          "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
-      },
+      headers: BROWSER_HEADERS,
     });
   } catch (err) {
     // err is naturally `unknown` in a catch clause; narrow before reading.
@@ -759,13 +805,13 @@ async function checkLink({ name, href }) {
     /* res.url should always be valid; ignore */
   }
 
-  // Read body (best-effort; cap to ~400KB for signature scan).
+  // Read body (best-effort; cap to ~400KB; decode by the response's charset).
   let body = "";
   try {
-    const buf = await res.arrayBuffer();
-    body = new TextDecoder("utf-8", { fatal: false }).decode(
-      buf.byteLength > 400_000 ? buf.slice(0, 400_000) : buf,
-    );
+    const bytes = Buffer.from(await res.arrayBuffer());
+    const capped =
+      bytes.byteLength > 400_000 ? bytes.subarray(0, 400_000) : bytes;
+    body = decodeBody(capped, res.headers.get("content-type") ?? "");
   } catch {
     /* body unreadable; signature scan simply finds nothing */
   }
@@ -849,7 +895,9 @@ const results = await mapLimit(friends, CONCURRENCY, async (f) => {
   const r = await checkLink(f);
   done++;
   if (!asJson) {
-    const icon = { OK: "✅", SOLD: "💰", WARN: "⚠️ ", DEAD: "❌" }[r.verdict];
+    const icon = { OK: "✅", SPAM: "🛑", SOLD: "💰", WARN: "⚠️ ", DEAD: "❌" }[
+      r.verdict
+    ];
     const tag = r.verdict.padEnd(4);
     const label = (r.name || "(无名)").padEnd(14);
     let line = `${icon} [${tag}] ${label} ${r.href}`;
@@ -861,21 +909,28 @@ const results = await mapLimit(friends, CONCURRENCY, async (f) => {
   return r;
 });
 
-// ── DEAD-link post-pass: WHOIS + HTTP/apex fallback probe ─────────────────────
-// 1. WHOIS confirms whether the domain is still registered.
-// 2. If it IS still registered (or WHOIS inconclusive), probe HTTP (port 80)
-//    and the apex/www domain — a dead subdomain whose apex has been squatted by
-//    a black-hat actor (spam content) or parked is upgraded to SPAM / SOLD.
-const deadLinks = results.filter((r) => r.verdict === "DEAD");
-if (deadLinks.length) {
+// ── Post-pass for DEAD / inconclusive-WARN links: WHOIS + HTTP/apex probe ──────
+// 1. WHOIS (DEAD only) confirms whether the domain is still registered.
+// 2. Probe HTTP (port 80) and the apex/www domain. A dead subdomain — or one
+//    that returned a blocking/empty response — whose apex now serves squatter
+//    spam (SPAM) or a parking page (SOLD) is upgraded accordingly.
+const inconclusiveWarn = (r) =>
+  r.verdict === "WARN" &&
+  ((typeof r.status === "number" && (r.status === 0 || r.status >= 400)) ||
+    /占位|建设中|内容过少/.test(r.reason ?? ""));
+const postPass = results.filter(
+  (r) => r.verdict === "DEAD" || inconclusiveWarn(r),
+);
+if (postPass.length) {
   if (!asJson) {
     const what = [!noWhois && "WHOIS 复核", !noProbe && "HTTP/一级域名回落探测"]
       .filter(Boolean)
       .join(" + ");
-    console.log(`\n── ${deadLinks.length} 个失效链接：${what} ──`);
+    console.log(`\n── ${postPass.length} 个失效/异常链接：${what} ──`);
   }
   // Sequential-ish (low concurrency) to avoid registry rate limits.
-  await mapLimit(deadLinks, 3, async (r) => {
+  await mapLimit(postPass, 3, async (r) => {
+    const isDead = r.verdict === "DEAD";
     let host = "";
     try {
       host = new URL(r.href).hostname;
@@ -883,7 +938,7 @@ if (deadLinks.length) {
       /* malformed href; leave host empty */
     }
 
-    if (!noWhois) {
+    if (isDead && !noWhois) {
       r.whois = host
         ? await whoisLookup(host)
         : { status: "unknown", note: "无效 URL" };
@@ -894,17 +949,15 @@ if (deadLinks.length) {
       const fb = await fallbackProbe(r.href);
       if (fb) {
         r.fallback = fb;
-        if (fb.kind === "SPAM") {
-          r.verdict = "SPAM";
-          r.reason = `原 URL 不可达，但同域 ${fb.url} 疑似被黑灰产抢注：${fb.reason}`;
-          r.finalUrl = fb.finalUrl;
-        } else if (fb.kind === "SOLD") {
-          r.verdict = "SOLD";
-          r.reason = `原 URL 不可达，但 ${fb.url} 已停放/出售：${fb.reason}`;
+        if (fb.kind === "SPAM" || fb.kind === "SOLD") {
+          const verb = fb.kind === "SPAM" ? "疑似被黑灰产抢注" : "已停放/出售";
+          const orig = isDead ? "URL 不可达" : `URL 返回 HTTP ${r.status}`;
+          r.verdict = fb.kind;
+          r.reason = `原 ${orig}，但同域 ${fb.url} ${verb}：${fb.reason}`;
           r.finalUrl = fb.finalUrl;
         }
-        // OK/WARN: keep DEAD (the specific friend URL is still down); the note
-        // is printed below and in the final report.
+        // OK/WARN: keep the original verdict (the specific friend URL is still
+        // down/blocked); the note is printed below and in the final report.
       }
     }
 
@@ -980,7 +1033,11 @@ if (asJson) {
         }[r.whois.status];
         console.log(`       ↳ ${wText}`);
       }
-      if (r.fallback && r.verdict === "DEAD") {
+      if (
+        r.fallback &&
+        (r.verdict === "DEAD" || r.verdict === "WARN") &&
+        (r.fallback.kind === "OK" || r.fallback.kind === "WARN")
+      ) {
         console.log(
           `       ↳ 回落: ${r.fallback.url} 可访问（HTTP ${r.fallback.status}）→ 原站可能仅 HTTP/已迁移`,
         );
