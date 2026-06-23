@@ -70,10 +70,10 @@ friends:
     name: FGHRSH
     desc: FGHRSH 的博客
     icon: 'https://fp1.fghrsh.net/2017/10/11/d383a9ad4318c5b4332fe02845f5323a.jpg'
-  - href: https://blog.moeqike.cn/
-    name: YiQike's Blog
-    desc: 世界无限大.且行且珍惜w
-    hash: 51a1dd78504892cbe131d08a45f3bdc9
+  # - href: https://blog.moeqike.cn/
+  #   name: YiQike's Blog
+  #   desc: 世界无限大.且行且珍惜w
+  #   hash: 51a1dd78504892cbe131d08a45f3bdc9
   - href: 'https://ji.ci/'
     name: 记此
     desc: 修己安人。
@@ -94,10 +94,10 @@ friends:
   #  name: Ledemon
   #  desc: 时间仍在，是我们在飞逝~~~
   #  email: 'https://blog.demonxu.com/images/avatar.jpg'
-  - href: 'https://www.ohyhello.com/'
-    name: ohyhello
-    desc: 路过此站的人， 上船，上船！
-    icon: https://cdn-p.freejishu.com/img/2021/08/31/5J7.jpg
+  # - href: 'https://www.ohyhello.com/'
+  #   name: ohyhello
+  #   desc: 路过此站的人， 上船，上船！
+  #   icon: https://cdn-p.freejishu.com/img/2021/08/31/5J7.jpg
   - href: 'https://typeof.pw'
     name: '@typeof'
     desc: 你好，世界。
@@ -180,7 +180,7 @@ friends:
     icon: https://static.acgxt.com/images/favicon.png
 ---
 
-以下友人使用洗牌算法打乱，排名不分先后。如果站点无法访问，可能遭到移除。  
+以下友人使用洗牌算法打乱，排名不分先后。  
 
 将定期通过 [脚本](https://github.com/greenhat616/horizon/blob/master/scripts/check-friends.mjs) 进行连接探测，进行清理，防止站点被出售，被恶意篡改。
 
