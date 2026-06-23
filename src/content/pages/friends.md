@@ -165,7 +165,7 @@ friends:
   - href: https://nexmoe.com/
     name: 折影轻梦
     desc: 纯粹、热爱
-    icon: https://cravatar.cn/avatar/c7fd185f8c967dec20c29c75a40b9e09?s=400
+    hash: c7fd185f8c967dec20c29c75a40b9e09
   - href: https://reki.me
     name: 羽子
     desc: 没有猫的云养猫患者兼戒猫委员会欠费会员

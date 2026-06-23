@@ -36,6 +36,7 @@ const { friends } = Astro.props;
 
 const DEFAULT_AVATAR =
   "https://static.a632079.me/assets/images/default_icon.png";
+const GRAVATAR_HOST = "gravatar.loli.net";
 
 /** MD5 hex digest — matches Go template md5 and Gravatar/Cravatar convention. */
 function md5(str: string): string {
@@ -47,10 +48,10 @@ function resolveAvatar(f: Friend): string {
     return `https://q2.qlogo.cn/headimg_dl?dst_uin=${f.qq}&spec=640`;
   }
   if (f.hash) {
-    return `https://cravatar.cn/avatar/${f.hash}?d=mm&s=640`;
+    return `https://${GRAVATAR_HOST}/avatar/${f.hash}?d=mm&s=640`;
   }
   if (f.email) {
-    return `https://cravatar.cn/avatar/${md5(f.email)}?d=mm&s=640`;
+    return `https://${GRAVATAR_HOST}/avatar/${md5(f.email)}?d=mm&s=640`;
   }
   if (f.icon) return f.icon;
   return DEFAULT_AVATAR;
