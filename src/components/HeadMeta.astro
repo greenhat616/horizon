@@ -27,8 +27,11 @@
  */
 
 import { CDNFB_SCRIPT } from '../lib/cdn';
-import { SITE_TITLE, SITE_DESCRIPTION, SITE_URL, FAVICON_URL } from '../site.config';
+import { SITE_URL } from '../lib/site';
+import site from '../../site.config';
 import ExternalAsset from './ExternalAsset.astro';
+
+const { title: SITE_TITLE, description: SITE_DESCRIPTION, favicon: FAVICON_URL } = site;
 
 interface Props {
   title?: string;

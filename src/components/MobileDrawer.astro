@@ -16,22 +16,13 @@
  *                                        journal.scss forces display:block!important)
  *   .drawer-content → .drawer-menu → .drawer-menu-item (+ .active)
  *
- * TODO: 后续从 config 注入菜单项
+ * Nav items come from the single site config (site.config.ts), pre-sorted by
+ * weight — same list as the desktop SidebarNav.
  */
 
-interface NavItem {
-  url: string;
-  name: string;
-  weight: number;
-}
+import site from "../../site.config";
 
-// Mirrors config/_default/menu.toml [main] entries, sorted by weight.
-const NAV_ITEMS: NavItem[] = [
-  { url: "https://github.com/greenhat616", name: "Github", weight: 1 },
-  { url: "/friends/", name: "朋友们", weight: 2 },
-  { url: "/posts/", name: "文章", weight: 4 },
-  { url: "/index.xml", name: "RSS", weight: 5 },
-].sort((a, b) => a.weight - b.weight);
+const { nav: NAV_ITEMS } = site;
 
 interface Props {
   /** Current page pathname — used to highlight the active nav item. */

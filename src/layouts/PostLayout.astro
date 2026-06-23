@@ -61,7 +61,10 @@ import CCLicense from '../components/CCLicense.astro';
 import PostPager from '../components/PostPager.astro';
 import Comments from '../components/Comments.astro';
 
-import { SITE_TITLE, SITE_URL } from '../site.config';
+import { SITE_URL } from '../lib/site';
+import site from '../../site.config';
+
+const { title: SITE_TITLE } = site;
 
 interface Heading {
   depth: number;

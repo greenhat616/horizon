@@ -47,7 +47,9 @@ import SidebarNav from "../components/SidebarNav.astro";
 import ExtraBar from "../components/ExtraBar.astro";
 import Footer from "../components/Footer.astro";
 
-import { SITE_DESCRIPTION } from "../site.config";
+import site from "../../site.config";
+
+const { description: SITE_DESCRIPTION } = site;
 
 interface Props {
   title?: string;

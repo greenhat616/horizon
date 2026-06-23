@@ -16,7 +16,10 @@
  */
 
 import { CDN } from "../lib/cdn";
-import { ARTALK_SERVER, ARTALK_SITE } from "../site.config";
+import { ARTALK_SERVER } from "../lib/site";
+import site from "../../site.config";
+
+const ARTALK_SITE = site.artalkSite;
 
 // Resolve CDN entries at module load time (build-time constants via cdn.ts).
 const ARTALK_CSS = CDN["artalk-css"];

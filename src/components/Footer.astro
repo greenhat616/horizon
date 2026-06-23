@@ -24,6 +24,7 @@
  */
 
 import PostPager from "./PostPager.astro";
+import site from "../../site.config";
 
 interface Props {
   prevUrl?: string;
@@ -34,8 +35,7 @@ interface Props {
 
 const { prevUrl, nextUrl, page = 1, totalPages = 1 } = Astro.props;
 
-// TODO: 后续从 config 注入
-const SITE_COPYRIGHT = "2026 a632079";
+const { copyright: SITE_COPYRIGHT } = site;
 ---
 
 {/* Mobile paginator (page X/Y) — mirrors mobile-paginator.html */}

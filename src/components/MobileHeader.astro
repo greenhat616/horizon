@@ -13,14 +13,13 @@
  * Hidden on desktop via journal.scss `.single-column-nav-container { display:none }`
  * (shown only when viewport ≤ $single-column-max-width = 1020px).
  *
- * TODO: 后续从 config 注入站点标题/副标题
+ * Title/subtitle come from the single site config (site.config.ts).
  */
 
 import DarkModeToggle from "./DarkModeToggle.astro";
+import site from "../../site.config";
 
-// TODO: 后续从 Astro config 注入
-const SITE_TITLE = "藤之青";
-const SITE_SUBTITLE = "亲眼所见，亦非真实";
+const { title: SITE_TITLE, subtitle: SITE_SUBTITLE } = site;
 ---
 
 {/* Sticky top nav — shown only on mobile */}
