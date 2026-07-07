@@ -3,6 +3,8 @@ import sitemap from "@astrojs/sitemap";
 import mdx from "@astrojs/mdx";
 import tailwindcss from "@tailwindcss/vite";
 import rehypeCodeGroup from "rehype-code-group";
+import remarkDirective from "remark-directive";
+import remarkRubyDirective from "remark-ruby-directive";
 import rehypeReadingTime from "./src/plugins/rehype-reading-time.ts";
 import remarkModifiedTime from "./src/plugins/remark-modified-time.ts";
 import remarkHugoShortcodes from "./src/plugins/remark-hugo-shortcodes.ts";
@@ -67,7 +69,12 @@ export default defineConfig({
     // on remark/rehype. Setting remarkPlugins/rehypePlugins keeps Astro on the
     // unified() pipeline (requires the now-explicit @astrojs/markdown-remark dep).
     // Hugo shortcode pre-processor must run first so remark sees clean Markdown
-    remarkPlugins: [remarkHugoShortcodes, remarkModifiedTime],
+    remarkPlugins: [
+      remarkHugoShortcodes,
+      remarkDirective,
+      remarkRubyDirective,
+      remarkModifiedTime,
+    ],
     // VitePress-style ::: code-group tabs (wraps code blocks at the HAST level,
     // injects its own switch script/style into <head>; we override its classes).
     // rehypeReadingTime counts the rendered HTML text (Hugo's countwords .Content).

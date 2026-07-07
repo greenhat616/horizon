@@ -10,7 +10,8 @@
  *               guid=absolute link (matches Hugo .Permalink)
  *
  * Full-content strategy: render each post's .body through a
- * remark-parse → remark-gfm → remark-rehype → rehype-stringify pipeline.
+ * remark-parse → remark-gfm → remark-directive → remark-ruby-directive →
+ * remark-rehype → rehype-stringify pipeline.
  * Hugo shortcodes are stripped via `stripShortcodes` before the pipeline
  * runs so the feed never contains raw `{{< >}}` tokens.
  * The resulting HTML is placed in the `content` field of @astrojs/rss,
@@ -39,12 +40,16 @@ async function getProcessor() {
     { unified },
     { default: remarkParse },
     { default: remarkGfm },
+    { default: remarkDirective },
+    { default: remarkRubyDirective },
     { default: remarkRehype },
     { default: rehypeStringify },
   ] = await Promise.all([
     import("unified"),
     import("remark-parse"),
     import("remark-gfm"),
+    import("remark-directive"),
+    import("remark-ruby-directive"),
     import("remark-rehype"),
     import("rehype-stringify"),
   ]);
@@ -53,6 +58,8 @@ async function getProcessor() {
   _processor = (unified() as any)
     .use(remarkParse)
     .use(remarkGfm)
+    .use(remarkDirective)
+    .use(remarkRubyDirective)
     .use(remarkRehype, { allowDangerousHtml: true })
     .use(rehypeStringify, { allowDangerousHtml: true });
 
