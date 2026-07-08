@@ -12,3 +12,27 @@
   --color-text: #000e14; /* darken(#01506f, 50%) approx */
   --color-link: #01506f;
 }
+
+/* Footnote references — the rehype-footnote-refs plugin tags each in-text ref
+   anchor (GFM emits `<sup><a data-footnote-ref>N</a></sup>`) with `.footnote-ref`.
+   Render them as a compact accent pill so they read as tappable references
+   instead of a faint superscript number. GFM emits adjacent refs back-to-back
+   (`<sup>…</sup><sup>…</sup>`) with no separation, so `mx-0.5` supplies the gap.
+
+   Specificity note (journal.scss / dark-mode.scss are unlayered, so they outrank
+   Tailwind's @layer utilities — see CLAUDE.md): `.footnote-ref` (0,1,0) already
+   beats the unlayered `a { color }` (0,0,1) in light mode, and the dark rule uses
+   `html.night .footnote-ref` (0,2,1) to beat `html.night a` (0,1,2). No
+   !important needed. */
+.footnote-ref {
+  @apply mx-0.5 inline-block min-w-[1.25em] rounded-sm bg-accent/10 px-0.5 text-center text-[0.85em] font-medium text-accent no-underline transition-colors;
+}
+.footnote-ref:hover {
+  @apply bg-accent/20;
+}
+html.night .footnote-ref {
+  @apply bg-sky-400/15 text-sky-300;
+}
+html.night .footnote-ref:hover {
+  @apply bg-sky-400/25;
+}

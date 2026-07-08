@@ -6,6 +6,7 @@ import rehypeCodeGroup from "rehype-code-group";
 import remarkDirective from "remark-directive";
 import remarkRubyDirective from "remark-ruby-directive";
 import rehypeReadingTime from "./src/plugins/rehype-reading-time.ts";
+import rehypeFootnoteRefs from "./src/plugins/rehype-footnote-refs.ts";
 import remarkModifiedTime from "./src/plugins/remark-modified-time.ts";
 import remarkHugoShortcodes from "./src/plugins/remark-hugo-shortcodes.ts";
 import { transformerCodeCard } from "./src/plugins/shiki-code-card.ts";
@@ -78,7 +79,8 @@ export default defineConfig({
     // VitePress-style ::: code-group tabs (wraps code blocks at the HAST level,
     // injects its own switch script/style into <head>; we override its classes).
     // rehypeReadingTime counts the rendered HTML text (Hugo's countwords .Content).
-    rehypePlugins: [rehypeCodeGroup, rehypeReadingTime],
+    // rehypeFootnoteRefs tags in-text footnote references so they render as pills.
+    rehypePlugins: [rehypeCodeGroup, rehypeReadingTime, rehypeFootnoteRefs],
     shikiConfig: {
       // Dual theme: light site mode → a light palette (github-light); dark site
       // mode (html.night) → monokai. Shiki inlines the light colors as the
