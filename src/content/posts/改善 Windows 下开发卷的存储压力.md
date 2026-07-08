@@ -1,16 +1,20 @@
 ---
-title: "改善 Windows 下开发卷的存储压力"
-slug: windows-dev-drive-storage-pressure
+title: "Windows 开发卷存储优化：ReFS/NTFS 的压缩与去重实战"
+slug: windows-dev-drive-storage-optimization
 date: 2026-07-07T01:16:03+08:00
-description:
+description: "针对 Rust 开发场景的磁盘膨胀问题，本文以“压缩”与“去重”为核心策略，系统梳理 Windows 下 ReFS DevDrive 的 ZSTD 压缩与块级去重、NTFS 的 Compact OS 及硬链接合并操作，并补充应用层通过 pnpm、Kache 共享编译产物与依赖的实践方案，实测可释放近 200GiB 空间。"
 tags:
   - windows
-  - dev
   - dev-drive
   - storage
+  - refs
+  - ntfs
+  - dedup
+  - compression
+  - rust
 categories:
   - 技术分享
-featured_image:
+featured_image: https://static-a-moebako.a632079.me/20260708/b95370585b214e65c50196bf855bb9cd.avif
 draft: true
 ---
 
@@ -35,7 +39,7 @@ draft: true
 
 * CoW（**C**opy-**o**n-**W**rite，写时复制）—— 在文件系统中，只有修改文件才会新建副本
   * 需要文件系统支持
-  * 可以理解为一种高级的，自动化的硬链接机制。
+  * 与硬链接不同：硬链接改一处、所有入口都会跟着变；CoW 则在写入时**自动分裂出新副本**、源文件不受影响——这正是它能安全去重的原因
 * 块级
   * 需要 文件系统 或 操作系统 支持
   * 也是 [Windows Server Data Deduplication](https://learn.microsoft.com/en-us/windows-server/storage/data-deduplication/understand) 的实现机制
@@ -66,7 +70,9 @@ Windows 下能作为开发人员使用的卷，且存在优化潜力的文件系
 
 如果有单独的磁盘，或者某个磁盘还拥有大量的空闲空间，可以考虑新建一个 **开发人员卷** 来获得专门优化的 ReFS 卷。
 
-支持直接新建 VHDX 文件。然后给 VHDX 的分区，或者磁盘分区格式化为带有 :ruby[开发人员驱动器(DevDrive)] 属性的 ReFS 卷。
+支持直接新建 :ruby[虚拟硬盘(VHDX)] 文件。然后给 VHDX 的分区，或者磁盘分区格式化为带有 :ruby[开发人员驱动器(DevDrive)] 属性的 ReFS 卷。
+
+> VHDX 是 Windows 原生的虚拟磁盘文件，双击即可挂载成一个独立盘符。**没有多余物理磁盘时，用它就能凭空得到一个 ReFS 开发人员卷来试验**，无需对现有分区动刀。
 
 ![image-20260707194120142](https://static-a-moebako.a632079.me/20260707/0974fe3caa18aa814871e7ee6f57ada5.png)
 
@@ -77,6 +83,8 @@ Windows 下能作为开发人员使用的卷，且存在优化潜力的文件系
 ### ReFS（DevDrive）
 
 ReFS 是一种支持 CoW 技术，并支持压缩，透明读取，支持块级去重的文件系统。
+
+> 这里的 **透明（Transparent）**、**在线（Online）** 指：通过操作系统的 :ruby[过滤器(Filter)]、驱动或文件系统实现——在调用如 [ReadFile](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile)、或更底层的 [DeviceIoControl](https://learn.microsoft.com/zh-cn/windows/win32/api/ioapiset/nf-ioapiset-deviceiocontrol) 等系统调用时，能直接读到解压后的文件内容，写入时对应用也无感。具体而言，Windows 用 **微筛选器（minifilter）** 在文件系统驱动之上挂钩文件 I/O——压缩、去重、乃至杀软的实时扫描，都是靠这一层拦截来实现「透明」的。
 
 > 或许是出于对写入性能的考量，ReFS 当前不支持透明压缩（即文件写入时就自动压缩），也不支持即时去重。
 
@@ -90,6 +98,10 @@ ReFS 是一种支持 CoW 技术，并支持压缩，透明读取，支持块级�
 当前附加到此开发人员卷的筛选器：
     KLIF.K4W-21-24
 ```
+
+> **DevDrive 不只是 ReFS**：把卷标记为「受信任」后，Microsoft Defender 会对它启用**性能模式**——实时扫描从「同步阻塞」改为「异步后台」，`cargo` / `npm` 这类海量小文件操作可提速约 30%，且文件仍会被扫描（不同于直接排除目录那样完全跳过）。
+>
+> 注意：**性能模式仅 Microsoft Defender 独享**。第三方杀软（如上面输出里的 Kaspersky `KLIF` 筛选器）默认仍会附加自己的筛选器、也不会自动进入性能模式；如需调优，可用 `fsutil devdrv setfiltersallowed` 管理允许附加的筛选器[^22]。
 
 以及几个获取卷信息的常用指令：
 ```shell
@@ -138,6 +150,8 @@ REFS 驱动程序受支持的最大版本 :    3.14
 元数据校验和类型 :                   CHECKSUM_TYPE_CRC64
 数据校验和类型 :                       CHECKSUM_TYPE_NONE
 ```
+
+> 输出里的 **簇(cluster)** 是文件系统的最小分配单位（这里 `每个簇的字节数 = 4096`，即 4KB），**扇区(sector)** 则是磁盘物理层的最小读写单位；后文的压缩、去重都以「簇 / 块」为粒度进行。
 
 
 
@@ -313,6 +327,8 @@ Total shared data: 149.60 GiB
 Space savings percent (no compression): 22%
 ```
 
+> 输出里成片的 `Source has maximum allowed references, no longer dedupable` 是**正常现象**，不是报错：ReFS 单个数据块有最大引用计数上限，被极度重复引用的块达到上限后就不再继续共享。
+
 
 
 #### 定期计划
@@ -461,7 +477,7 @@ NTFS 是一种支持透明压缩的文件系统。为了维持长期兼容，NTF
 
 Windows 安装镜像长期能维持在数 GiB 规模，主要得益于 WIM/ESD 这类文件级镜像格式本身支持压缩与单实例存储：同一份文件资源只需保存一次，镜像导出时也可选择 `fast`、`max`、`recovery` 等不同压缩策略[^8][^9]。到了 Windows 10，微软进一步引入 Compact OS：系统文件不仅是“被压缩在安装镜像”，还支持透明解压，即以压缩状态，直接通过 FS IO 系统调用正常读取[^10]。
 
-对应到用户侧，`compact.exe` 提供了统一入口。它原本就是 NTFS 压缩的命令行工具；在 Windows 10/11 中，还可以通过 `/CompactOS` 查询或切换系统压缩状态，并通过 `/EXE:XPRESS4K|XPRESS8K|XPRESS16K|LZX` 对文件使用面向可执行文件的压缩算法[^11]。这些文件在读取时由 Windows Overlay Filter / NTFS 路径按需解压，因此对普通应用通常表现为“透明读取”；但写入时可能触发回退为普通未压缩文件，不能把它理解为所有文件系统、所有写入场景下都无感透明[^12]。
+对应到用户侧，`compact.exe` 提供了统一入口。它原本就是 NTFS 压缩的命令行工具；在 Windows 10/11 中，还可以通过 `/CompactOS` 查询或切换系统压缩状态，并通过 `/EXE:XPRESS4K|XPRESS8K|XPRESS16K|LZX` 对文件使用面向可执行文件的压缩算法[^11]。这些文件在读取时由 Windows Overlay Filter（WOF）/ NTFS 路径按需解压，因此对普通应用通常表现为“透明读取”；但写入时可能触发回退为普通未压缩文件，不能把它理解为所有文件系统、所有写入场景下都无感透明[^12]。
 
 
 
@@ -478,6 +494,8 @@ Windows 安装镜像长期能维持在数 GiB 规模，主要得益于 WIM/ESD �
 * XPRESS8K —— 约 49% 压缩率
 * XPRESS16K —— 约 46% 压缩率
 * LZX —— 约 38% 压缩率，压缩质量最好，也最慢
+
+> `XPRESS` 后的数字（4K / 8K / 16K）是**压缩块大小**：块越大，压缩后体积越小（压缩比越高），但读取时需要整块解压、随机读越慢；`LZX` 块最大、压缩比最高、也最慢。开发场景一般 `XPRESS8K` / `XPRESS16K` 是速度与体积的不错平衡。
 
 
 
@@ -504,6 +522,14 @@ Windows 安装镜像长期能维持在数 GiB 规模，主要得益于 WIM/ESD �
 Windows Server 有一个非常好用的功能：[Windows Server Data Deduplication](https://learn.microsoft.com/en-us/windows-server/storage/data-deduplication/understand)，通过驱动注入过滤器，来实现透明读取；并支持定期去重功能。但这个功能在消费端 Windows 不可用。因此，我们只能找一个更通用的，针对文件的去重方法：**硬链接合并**。
 
 * 通过扫描整个磁盘的文件，并计算 :ruby[哈希(Hash)] 来计算完全相同的文件，然后通过创建硬链接来使得多份文件只需要一份空间
+
+> **动手前先理解硬链接**：硬链接不是「复制」也不是「快捷方式」，而是**同一份磁盘数据的多个文件名入口**。因此有三个必须记住的性质：
+>
+> 1. **原地修改任意一个，其余全部一起变**——所以硬链接去重只对「只读 / 写一次」的文件（编译产物、依赖包）安全；切勿对会被就地改写的文件做合并，否则会「殃及」所有副本；
+> 2. **只有删掉最后一个入口，空间才真正释放**；
+> 3. **不能跨卷**——`fclones` 只能在同一个盘符内合并，跨 `D:` / `E:` 会失败。
+>
+> 这也是 pnpm、Kache 都强调「内容不可变」的原因：正是为了规避第 1 点。
 
 这里推荐使用一个 Rust 编写的小工具：https://github.com/pkolaczk/fclones
 
@@ -606,14 +632,6 @@ Get-Content F:\dupes.txt | fclones link
 
 然后依次点击 **扫描**、**清理**，即可完成空间释放：
 ![image-20260708185025810](https://static-a-moebako.a632079.me/20260708/b96a7d037976ac9f6970a5d467e52651.avif)
-
-
-
-### 补充知识
-
-#### 透明、在线 XX
-
-这里指的是 `Transparent`、`Online` ——通过操作系统的 :ruby[过滤器(Filter)]、驱动，或文件系统实现：在调用系统调用，如 ReadFile](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile)，或是更底层的 [DeviceIoControl](https://learn.microsoft.com/zh-cn/windows/win32/api/ioapiset/nf-ioapiset-deviceiocontrol) 时，能直接获取到未压缩的文件内容，或是在写入文件无感。
 
 
 
@@ -724,17 +742,19 @@ Remote:     not configured
 
 #### Node.js
 
-Node.js 之前也饱受膨胀问题的困扰，不过现在通过 `pnpm`、`bun`、`yarn`、`deno` 进行管理都可以缓解存储空间，文件深度问题的困扰。
+Node.js 之前也饱受膨胀问题的困扰，不过现在通过 `pnpm`[^16]、`bun`[^18]、`yarn`[^15]、`deno`[^19] 进行管理都可以缓解存储空间，文件深度问题的困扰。
 
 #### Python
 
-Python 也有类似的问题，随着 `uv` 的推出，很好的缓解了 `conda`、`poetry` 带来的存储开销，也解决了一些其未能解决的问题。
+Python 也有类似的问题，随着 `uv` 的推出，很好的缓解了 `conda`、`poetry` 带来的存储开销[^20]，也解决了一些其未能解决的问题[^21]。
 
 
 
 ## 总结
 
-洋洋洒洒也大几千字了。总之，在清理完缓存、无用的垃圾后，不管什么出于什么目的，想减少空间占用都是这两把斧。下图为，经过 ReFS 两把斧处理后的成果，效果还是非常显著的。
+洋洋洒洒也大几千字了。总之，在清理完缓存、无用的垃圾后，不管什么出于什么目的，想减少空间占用都是这两把斧：「压缩」、「去重」。
+
+如图，笔者的开发卷（ReFS）在经过上述操作后，效果还是非常显著的。
 
 ![image-20260708202055716](https://static-a-moebako.a632079.me/20260708/33c80d6c8f4ea2d3c04cd40d4b7ea8ce.png)
 
@@ -762,3 +782,12 @@ Python 也有类似的问题，随着 `uv` 的推出，很好的缓解了 `conda
 [^15]: Yarn 官方文档说明，PnP 会生成 `.pnp.cjs` Node.js loader，用它记录依赖树、包在磁盘上的位置，并解析 `require` / `import`；同时 Yarn PnP loader 会直接引用 cache path，而 Yarn 的 cache 文件已改为 zip，选择 zip 的原因之一是其随机访问性能优于 tgz。参见： [Yarn: Plug'n'Play](https://yarnpkg.com/features/pnp)、[Yarn Changelog: cache files are now zip instead of tgz](https://yarnpkg.com/advanced/changelog)
 [^16]: 参见： [pnpm Motivation: Saving disk space](https://pnpm.io/motivation)、[pnpm: Symlinked `node_modules` structure](https://pnpm.io/symlinked-node-modules-structure)
 [^17]: GPT5.5 —— Sccache 对比 Kache：https://chatgpt.com/c/6a4e3f8e-58e8-83ea-ab71-bd00905d46e5
+[^18]: Bun 的 `bun install` 将下载的包存入全局缓存（`~/.bun/install/cache`）；安装到项目 `node_modules` 时，默认在 Linux/Windows 以 **硬链接**、在 macOS 以 `clonefile`（写时复制）落地，使同一包版本在多个项目间共享物理存储（可用 `--backend` 调整）。https://bun.sh/docs/pm/global-cache
+[^19]: Deno 默认将 `npm:`、`jsr:` 与远程模块统一缓存于全局目录（`DENO_DIR`）；在没有 `package.json` 时不生成本地 `node_modules`，从而跨项目共享依赖、规避深层目录问题（行为可经 `nodeModulesDir` 配置）。https://docs.deno.com/runtime/packages/
+[^20]: uv 维护一个全局的、内容寻址（content-addressed）的缓存以对依赖去重；将包安装进虚拟环境时按 `link-mode` 落地——默认在 macOS/Linux 为 `clone`（写时复制）、Windows 为 `hardlink`，故同一包版本仅存一份（要求缓存与环境位于同一文件系统，否则回退为拷贝）。
+    * https://docs.astral.sh/uv/concepts/cache/
+    * https://docs.astral.sh/uv/reference/settings/
+[^21]: uv 以 Rust 实现，安装与依赖解析较 pip / Poetry 快约一到两个数量级，并提供跨平台的「通用解析」（universal resolution），产出可移植的 `uv.lock`；同时以单一二进制取代 pip、pip-tools、pipx、poetry、pyenv、virtualenv 等碎片化工具链——这些正是 Poetry 与 Conda 在纯 Python 工作流下未能兼顾之处。
+    * https://docs.astral.sh/uv/
+    * https://docs.astral.sh/uv/concepts/resolution/
+[^22]: DevDrive「性能模式」仅 Microsoft Defender 支持异步扫描，第三方杀软需用 `fsutil devdrv setfiltersallowed` 手动管理允许的筛选器：https://learn.microsoft.com/en-us/windows/dev-drive/ ；Defender 性能模式（同步→异步扫描）说明：https://learn.microsoft.com/en-us/defender-endpoint/microsoft-defender-endpoint-antivirus-performance-mode
