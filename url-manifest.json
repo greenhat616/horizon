@@ -119,6 +119,13 @@
     "hadExplicitSlug": true
   },
   {
+    "file": "如何防止根域名 IP 泄露.md",
+    "title": "防止根域名 IP 泄露",
+    "slug": "prevent-root-domain-ip-leak",
+    "url": "/posts/prevent-root-domain-ip-leak/",
+    "hadExplicitSlug": true
+  },
+  {
     "file": "备案完成.md",
     "title": "备案完成",
     "slug": "start",
@@ -158,6 +165,13 @@
     "title": "win10 去除字体 Hinting， 带来美妙体验",
     "slug": "win10-remove-font-hinting",
     "url": "/posts/win10-remove-font-hinting/",
+    "hadExplicitSlug": true
+  },
+  {
+    "file": "改善 Windows 下开发卷的存储压力.md",
+    "title": "Windows 开发卷存储优化：ReFS/NTFS 的压缩与去重实战",
+    "slug": "windows-dev-drive-storage-optimization",
+    "url": "/posts/windows-dev-drive-storage-optimization/",
     "hadExplicitSlug": true
   },
   {

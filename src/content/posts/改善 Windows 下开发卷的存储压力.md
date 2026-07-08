@@ -1,7 +1,7 @@
 ---
 title: "Windows 开发卷存储优化：ReFS/NTFS 的压缩与去重实战"
 slug: windows-dev-drive-storage-optimization
-date: 2026-07-07T01:16:03+08:00
+date: 2026-07-08T22:13:40+08:00
 description: "针对 Rust 开发场景的磁盘膨胀问题，本文以“压缩”与“去重”为核心策略，系统梳理 Windows 下 ReFS DevDrive 的 ZSTD 压缩与块级去重、NTFS 的 Compact OS 及硬链接合并操作，并补充应用层通过 pnpm、Kache 共享编译产物与依赖的实践方案，实测可释放近 200GiB 空间。"
 tags:
   - windows
@@ -15,7 +15,7 @@ tags:
 categories:
   - 技术分享
 featured_image: https://static-a-moebako.a632079.me/20260708/b95370585b214e65c50196bf855bb9cd.avif
-draft: true
+draft: false
 ---
 
 
