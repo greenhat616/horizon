@@ -60,7 +60,7 @@ draft: true
 
 ## 文件系统
 
-> 通常，在这一层操作能获得大幅的空间占用效率提升。也因此，APFS、btrfs、zfs 在默认预设下就能获得比较满意的开发体验[^3]。
+> 通常，在这一层操作能获得大幅的空间占用效率提升。也因此，APFS、btrfs、zfs 在默认预设下就能获得比较满意的开发体验[^1]。
 >
 > 譬如，笔者通过在这一层的优化，能获得近 **200GiB** 的空闲空间。
 
@@ -101,7 +101,7 @@ ReFS 是一种支持 CoW 技术，并支持压缩，透明读取，支持块级�
 
 > **DevDrive 不只是 ReFS**：把卷标记为「受信任」后，Microsoft Defender 会对它启用**性能模式**——实时扫描从「同步阻塞」改为「异步后台」，`cargo` / `npm` 这类海量小文件操作可提速约 30%，且文件仍会被扫描（不同于直接排除目录那样完全跳过）。
 >
-> 注意：**性能模式仅 Microsoft Defender 独享**。第三方杀软（如上面输出里的 Kaspersky `KLIF` 筛选器）默认仍会附加自己的筛选器、也不会自动进入性能模式；如需调优，可用 `fsutil devdrv setfiltersallowed` 管理允许附加的筛选器[^22]。
+> 注意：**性能模式仅 Microsoft Defender 独享**。第三方杀软（如上面输出里的 Kaspersky `KLIF` 筛选器）默认仍会附加自己的筛选器、也不会自动进入性能模式；如需调优，可用 `fsutil devdrv setfiltersallowed` 管理允许附加的筛选器[^2]。
 
 以及几个获取卷信息的常用指令：
 ```shell
@@ -237,7 +237,7 @@ Eg: refsutil dedup D: /d /cpu 50
 
 > 请注意：
 >
-> 当你使用基于 PowerShell 的 ReFS 管理工具为卷开启了 **DedupAndCompress** 的功能类型后，将无法通过 `refsutil dedup` 指令操作磁盘 [^1]。
+> 当你使用基于 PowerShell 的 ReFS 管理工具为卷开启了 **DedupAndCompress** 的功能类型后，将无法通过 `refsutil dedup` 指令操作磁盘 [^3]。
 >
 > 当执行时，会出现这个错误，这是正常的：
 > ```shell
@@ -333,7 +333,7 @@ Space savings percent (no compression): 22%
 
 #### 定期计划
 
-上文讲过，ReFS 没有透明压缩，透明去重，所有的操作都需要手动异步执行。不过好在，Microsoft 在 PowerShell 提供了管理工具[^2]可以开启管理计划。
+上文讲过，ReFS 没有透明压缩，透明去重，所有的操作都需要手动异步执行。不过好在，Microsoft 在 PowerShell 提供了管理工具[^4]可以开启管理计划。
 
 在本节主要使用其中的 `Enable-ReFSDedup`、`Set-ReFSDedupSchedule`、`Start-ReFSDedupJob`、`Get-ReFSDedupStatus` 指令。
 
@@ -463,7 +463,7 @@ Start-ReFSDedupJob `
 
 ### NTFS
 
-NTFS 是一种支持透明压缩的文件系统。为了维持长期兼容，NTFS 的核心磁盘格式演进相当克制[^4]。这使得 NTFS 尽管功能在不断更新，但都是由 `ntfs.sys` 文件系统驱动及其上层过滤驱动提供[^5]。也因此，压缩的算法只能使用 `Lempel-Ziv`[^6]，而不能使用新的高效算法，难以像新兴文件系统那样直接获得原生 CoW、reflink clone 或内建去重等能力[^7]。
+NTFS 是一种支持透明压缩的文件系统。为了维持长期兼容，NTFS 的核心磁盘格式演进相当克制[^5]。这使得 NTFS 尽管功能在不断更新，但都是由 `ntfs.sys` 文件系统驱动及其上层过滤驱动提供[^6]。也因此，压缩的算法只能使用 `Lempel-Ziv`[^7]，而不能使用新的高效算法，难以像新兴文件系统那样直接获得原生 CoW、reflink clone 或内建去重等能力[^8]。
 
 
 
@@ -475,9 +475,9 @@ NTFS 是一种支持透明压缩的文件系统。为了维持长期兼容，NTF
 
 #### 压缩
 
-Windows 安装镜像长期能维持在数 GiB 规模，主要得益于 WIM/ESD 这类文件级镜像格式本身支持压缩与单实例存储：同一份文件资源只需保存一次，镜像导出时也可选择 `fast`、`max`、`recovery` 等不同压缩策略[^8][^9]。到了 Windows 10，微软进一步引入 Compact OS：系统文件不仅是“被压缩在安装镜像”，还支持透明解压，即以压缩状态，直接通过 FS IO 系统调用正常读取[^10]。
+Windows 安装镜像长期能维持在数 GiB 规模，主要得益于 WIM/ESD 这类文件级镜像格式本身支持压缩与单实例存储：同一份文件资源只需保存一次，镜像导出时也可选择 `fast`、`max`、`recovery` 等不同压缩策略[^9][^10]。到了 Windows 10，微软进一步引入 Compact OS：系统文件不仅是“被压缩在安装镜像”，还支持透明解压，即以压缩状态，直接通过 FS IO 系统调用正常读取[^11]。
 
-对应到用户侧，`compact.exe` 提供了统一入口。它原本就是 NTFS 压缩的命令行工具；在 Windows 10/11 中，还可以通过 `/CompactOS` 查询或切换系统压缩状态，并通过 `/EXE:XPRESS4K|XPRESS8K|XPRESS16K|LZX` 对文件使用面向可执行文件的压缩算法[^11]。这些文件在读取时由 Windows Overlay Filter（WOF）/ NTFS 路径按需解压，因此对普通应用通常表现为“透明读取”；但写入时可能触发回退为普通未压缩文件，不能把它理解为所有文件系统、所有写入场景下都无感透明[^12]。
+对应到用户侧，`compact.exe` 提供了统一入口。它原本就是 NTFS 压缩的命令行工具；在 Windows 10/11 中，还可以通过 `/CompactOS` 查询或切换系统压缩状态，并通过 `/EXE:XPRESS4K|XPRESS8K|XPRESS16K|LZX` 对文件使用面向可执行文件的压缩算法[^12]。这些文件在读取时由 Windows Overlay Filter（WOF）/ NTFS 路径按需解压，因此对普通应用通常表现为“透明读取”；但写入时可能触发回退为普通未压缩文件，不能把它理解为所有文件系统、所有写入场景下都无感透明[^13]。
 
 
 
@@ -612,7 +612,7 @@ Get-Content F:\dupes.txt | fclones link
 
 * https://github.com/Chuyu-Team/Dism-Multi-language
 
-它内置的 CompactOS，硬链接合并功能都考虑到了系统分区的一些问题，做了针对性处理[^13][^14]。
+它内置的 CompactOS，硬链接合并功能都考虑到了系统分区的一些问题，做了针对性处理[^14][^15]。
 
 解压完，启动，选中这两个项目：
 ![image-20260708184753808](https://static-a-moebako.a632079.me/20260708/8215b50f0a6de5f6f293ba6ea427fb9f.avif)
@@ -641,8 +641,8 @@ Get-Content F:\dupes.txt | fclones link
 
 譬如：
 
-* `yarn@berry` 的 PnP 模式不再展开传统 `node_modules`，而是生成 `.pnp.cjs` loader；该 loader 记录依赖树与包在磁盘上的位置，并让 `require` / `import` 按这些位置解析。Yarn 的包缓存使用 zip，并通过 ZipFS / FakeFS 这类透明文件系统层支持从 zip 内读取包内容[^15]。
-* `pnpm` 把包文件放入 [Content-addressable storage](https://en.wikipedia.org/wiki/Content-addressable_storage)，再把 `node_modules` 中的包文件硬链接到该 store；因此相同包、甚至不同版本中内容相同的文件，可以在多个项目之间共享磁盘占用[^16]。
+* `yarn@berry` 的 PnP 模式不再展开传统 `node_modules`，而是生成 `.pnp.cjs` loader；该 loader 记录依赖树与包在磁盘上的位置，并让 `require` / `import` 按这些位置解析。Yarn 的包缓存使用 zip，并通过 ZipFS / FakeFS 这类透明文件系统层支持从 zip 内读取包内容[^16]。
+* `pnpm` 把包文件放入 [Content-addressable storage](https://en.wikipedia.org/wiki/Content-addressable_storage)，再把 `node_modules` 中的包文件硬链接到该 store；因此相同包、甚至不同版本中内容相同的文件，可以在多个项目之间共享磁盘占用[^17]。
 
 **压缩**，需要使用方支持，比如说 [sqlite-zstd](https://github.com/phiresky/sqlite-zstd) 必须每个客户端都安装了，才能获得读取、写入的能力，亦或是直接 **修改、劫持** 运行时的 **IO 调用**——这意味着，这在大多数场景在是不可接受的。
 
@@ -681,7 +681,7 @@ Cargo Layout V1 的 **粗粒度结构设计** 导致持续增量构建，会出�
 
 #### Kache
 
-Kache 是当前新推出的库。与 sccache 不同的是，它通过 [Content-addressable storage](https://en.wikipedia.org/wiki/Content-addressable_storage) 来处理构建产物，使用 Blake3 计算 :ruby[哈希(Hash)]，相同输入会通过 CoW（ReFS），硬链接（NTFS）来将原始产物映射到 `target/` 下，从而避免重复编译，以及重复存储开销[^17]。
+Kache 是当前新推出的库。与 sccache 不同的是，它通过 [Content-addressable storage](https://en.wikipedia.org/wiki/Content-addressable_storage) 来处理构建产物，使用 Blake3 计算 :ruby[哈希(Hash)]，相同输入会通过 CoW（ReFS），硬链接（NTFS）来将原始产物映射到 `target/` 下，从而避免重复编译，以及重复存储开销[^18]。
 
 * https://github.com/kunobi-ninja/kache
 * 官方的安装文档：https://kunobi.ninja/docs/kache/getting-started/installation
@@ -742,11 +742,11 @@ Remote:     not configured
 
 #### Node.js
 
-Node.js 之前也饱受膨胀问题的困扰，不过现在通过 `pnpm`[^16]、`bun`[^18]、`yarn`[^15]、`deno`[^19] 进行管理都可以缓解存储空间，文件深度问题的困扰。
+Node.js 之前也饱受膨胀问题的困扰，不过现在通过 `pnpm`[^17]、`bun`[^19]、`yarn`[^16]、`deno`[^20] 进行管理都可以缓解存储空间，文件深度问题的困扰。
 
 #### Python
 
-Python 也有类似的问题，随着 `uv` 的推出，很好的缓解了 `conda`、`poetry` 带来的存储开销[^20]，也解决了一些其未能解决的问题[^21]。
+Python 也有类似的问题，随着 `uv` 的推出，很好的缓解了 `conda`、`poetry` 带来的存储开销[^21]，也解决了一些其未能解决的问题[^22]。
 
 
 
@@ -760,34 +760,53 @@ Python 也有类似的问题，随着 `uv` 的推出，很好的缓解了 `conda
 
 ## 参考
 
-[^1]: 关闭 PowerShell 的管理模块以使 refsutil 指令生效：https://github.com/microsoft/devhome/issues/3584#issuecomment-2585651654
-[^2]: PowerShell 的 ReFS 管理模块：https://learn.microsoft.com/en-us/powershell/module/microsoft.refsdedup.commands/?view=windowsserver2025-ps
-[^3]: 横向对比可参考 GPT5.5 收集的资料：https://chatgpt.com/share/6a4d3b5b-7f00-83ea-97b1-81a337419f12
-[^4]: Windows XP 可以直接打开，修改，使用在 Windows 11 格式化，并进行深度使用的 NTFS 卷
-[^5]: Microsoft 文档说明，Windows 的文件系统是作为 “file system drivers” 实现的，NTFS 属于系统提供的文件系统之一；另一个调试文档明确称 `ntfs.sys` 是让系统读写 NTFS 卷的驱动文件。旧 KB 310749 还提到，Windows NT 4.0 SP4 中更新的 `Ntfs.sys` 驱动使 NT 4.0 能读写 Windows XP 的 NTFS 卷，并说明 NTFS 3.0/3.1 具备兼容的磁盘格式。
+[^1]: 横向对比可参考 GPT5.5 收集的资料：https://chatgpt.com/share/6a4d3b5b-7f00-83ea-97b1-81a337419f12
+
+[^2]: DevDrive「性能模式」仅 Microsoft Defender 支持异步扫描，第三方杀软需用 `fsutil devdrv setfiltersallowed` 手动管理允许的筛选器：https://learn.microsoft.com/en-us/windows/dev-drive/ ；Defender 性能模式（同步→异步扫描）说明：https://learn.microsoft.com/en-us/defender-endpoint/microsoft-defender-endpoint-antivirus-performance-mode
+
+[^3]: 关闭 PowerShell 的管理模块以使 refsutil 指令生效：https://github.com/microsoft/devhome/issues/3584#issuecomment-2585651654
+
+[^4]: PowerShell 的 ReFS 管理模块：https://learn.microsoft.com/en-us/powershell/module/microsoft.refsdedup.commands/?view=windowsserver2025-ps
+
+[^5]: Windows XP 可以直接打开，修改，使用在 Windows 11 格式化，并进行深度使用的 NTFS 卷
+
+[^6]: Microsoft 文档说明，Windows 的文件系统是作为 “file system drivers” 实现的，NTFS 属于系统提供的文件系统之一；另一个调试文档明确称 `ntfs.sys` 是让系统读写 NTFS 卷的驱动文件。旧 KB 310749 还提到，Windows NT 4.0 SP4 中更新的 `Ntfs.sys` 驱动使 NT 4.0 能读写 Windows XP 的 NTFS 卷，并说明 NTFS 3.0/3.1 具备兼容的磁盘格式。
     * https://learn.microsoft.com/en-us/windows-hardware/drivers/ifs/about-file-system-drivers
     * https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/bug-check-0x24--ntfs-file-system
     * https://www.betaarchive.com/wiki/index.php/Microsoft_KB_Archive/310749
 
-[^6]: Microsoft 对 NTFS 系统压缩的解释：https://learn.microsoft.com/en-us/windows/win32/fileio/file-compression-and-decompression
-[^7]: 新特性仅针对 ReFS 引入：https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-fscc/d4bc551b-7aaf-4b4f-ba0e-3a75e7c528f0
-[^8]: `/Append-Image` 说明：WIM 会比较已有资源并只保存唯一文件副本；同一 WIM 只能有一种压缩类型。https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/dism-image-management-command-line-options-s14 
-[^9]:  `/Export-Image` 说明：支持 `/Compress:{fast|max|none|recovery}`，其中 `recovery` 要求目标为 `.esd`，体积更小。https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/dism-image-management-command-line-options-s14
-[^10]: Compact OS 允许 Windows 从压缩后的系统文件运行。https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/compact-os
-[^11]: `compact` 用于显示或修改 NTFS 分区中文件/目录的压缩状态，并列出 `/EXE` 支持的 XPRESS 与 LZX 算法。https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/compact
-[^12]: WOF 会在打开读取时按需解压；若以写入方式打开，文件可能回退为普通文件。https://devblogs.microsoft.com/oldnewthing/20190618-00/?p=102597
+[^7]: Microsoft 对 NTFS 系统压缩的解释：https://learn.microsoft.com/en-us/windows/win32/fileio/file-compression-and-decompression
 
-[^13]: CompactOS 仅作用于系统文件：https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/compact
-[^14]: 硬链接合并屏蔽 WindowsApps目录，以免某些程序无法启动：https://github.com/Chuyu-Team/Dism-Multi-language/blob/master/UpdateHistory.md
-[^15]: Yarn 官方文档说明，PnP 会生成 `.pnp.cjs` Node.js loader，用它记录依赖树、包在磁盘上的位置，并解析 `require` / `import`；同时 Yarn PnP loader 会直接引用 cache path，而 Yarn 的 cache 文件已改为 zip，选择 zip 的原因之一是其随机访问性能优于 tgz。参见： [Yarn: Plug'n'Play](https://yarnpkg.com/features/pnp)、[Yarn Changelog: cache files are now zip instead of tgz](https://yarnpkg.com/advanced/changelog)
-[^16]: 参见： [pnpm Motivation: Saving disk space](https://pnpm.io/motivation)、[pnpm: Symlinked `node_modules` structure](https://pnpm.io/symlinked-node-modules-structure)
-[^17]: GPT5.5 —— Sccache 对比 Kache：https://chatgpt.com/c/6a4e3f8e-58e8-83ea-ab71-bd00905d46e5
-[^18]: Bun 的 `bun install` 将下载的包存入全局缓存（`~/.bun/install/cache`）；安装到项目 `node_modules` 时，默认在 Linux/Windows 以 **硬链接**、在 macOS 以 `clonefile`（写时复制）落地，使同一包版本在多个项目间共享物理存储（可用 `--backend` 调整）。https://bun.sh/docs/pm/global-cache
-[^19]: Deno 默认将 `npm:`、`jsr:` 与远程模块统一缓存于全局目录（`DENO_DIR`）；在没有 `package.json` 时不生成本地 `node_modules`，从而跨项目共享依赖、规避深层目录问题（行为可经 `nodeModulesDir` 配置）。https://docs.deno.com/runtime/packages/
-[^20]: uv 维护一个全局的、内容寻址（content-addressed）的缓存以对依赖去重；将包安装进虚拟环境时按 `link-mode` 落地——默认在 macOS/Linux 为 `clone`（写时复制）、Windows 为 `hardlink`，故同一包版本仅存一份（要求缓存与环境位于同一文件系统，否则回退为拷贝）。
+[^8]: 新特性仅针对 ReFS 引入：https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-fscc/d4bc551b-7aaf-4b4f-ba0e-3a75e7c528f0
+
+[^9]: `/Append-Image` 说明：WIM 会比较已有资源并只保存唯一文件副本；同一 WIM 只能有一种压缩类型。https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/dism-image-management-command-line-options-s14
+
+[^10]:  `/Export-Image` 说明：支持 `/Compress:{fast|max|none|recovery}`，其中 `recovery` 要求目标为 `.esd`，体积更小。https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/dism-image-management-command-line-options-s14
+
+[^11]: Compact OS 允许 Windows 从压缩后的系统文件运行。https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/compact-os
+
+[^12]: `compact` 用于显示或修改 NTFS 分区中文件/目录的压缩状态，并列出 `/EXE` 支持的 XPRESS 与 LZX 算法。https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/compact
+
+[^13]: WOF 会在打开读取时按需解压；若以写入方式打开，文件可能回退为普通文件。https://devblogs.microsoft.com/oldnewthing/20190618-00/?p=102597
+
+[^14]: CompactOS 仅作用于系统文件：https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/compact
+
+[^15]: 硬链接合并屏蔽 WindowsApps目录，以免某些程序无法启动：https://github.com/Chuyu-Team/Dism-Multi-language/blob/master/UpdateHistory.md
+
+[^16]: Yarn 官方文档说明，PnP 会生成 `.pnp.cjs` Node.js loader，用它记录依赖树、包在磁盘上的位置，并解析 `require` / `import`；同时 Yarn PnP loader 会直接引用 cache path，而 Yarn 的 cache 文件已改为 zip，选择 zip 的原因之一是其随机访问性能优于 tgz。参见： [Yarn: Plug'n'Play](https://yarnpkg.com/features/pnp)、[Yarn Changelog: cache files are now zip instead of tgz](https://yarnpkg.com/advanced/changelog)
+
+[^17]: 参见： [pnpm Motivation: Saving disk space](https://pnpm.io/motivation)、[pnpm: Symlinked `node_modules` structure](https://pnpm.io/symlinked-node-modules-structure)
+
+[^18]: GPT5.5 —— Sccache 对比 Kache：https://chatgpt.com/share/6a4e4298-2bdc-83ea-bed0-d2639afb8f18
+
+[^19]: Bun 的 `bun install` 将下载的包存入全局缓存（`~/.bun/install/cache`）；安装到项目 `node_modules` 时，默认在 Linux/Windows 以 **硬链接**、在 macOS 以 `clonefile`（写时复制）落地，使同一包版本在多个项目间共享物理存储（可用 `--backend` 调整）。https://bun.sh/docs/pm/global-cache
+
+[^20]: Deno 默认将 `npm:`、`jsr:` 与远程模块统一缓存于全局目录（`DENO_DIR`）；在没有 `package.json` 时不生成本地 `node_modules`，从而跨项目共享依赖、规避深层目录问题（行为可经 `nodeModulesDir` 配置）。https://docs.deno.com/runtime/packages/
+
+[^21]: uv 维护一个全局的、内容寻址（content-addressed）的缓存以对依赖去重；将包安装进虚拟环境时按 `link-mode` 落地——默认在 macOS/Linux 为 `clone`（写时复制）、Windows 为 `hardlink`，故同一包版本仅存一份（要求缓存与环境位于同一文件系统，否则回退为拷贝）。
     * https://docs.astral.sh/uv/concepts/cache/
     * https://docs.astral.sh/uv/reference/settings/
-[^21]: uv 以 Rust 实现，安装与依赖解析较 pip / Poetry 快约一到两个数量级，并提供跨平台的「通用解析」（universal resolution），产出可移植的 `uv.lock`；同时以单一二进制取代 pip、pip-tools、pipx、poetry、pyenv、virtualenv 等碎片化工具链——这些正是 Poetry 与 Conda 在纯 Python 工作流下未能兼顾之处。
+
+[^22]: uv 以 Rust 实现，安装与依赖解析较 pip / Poetry 快约一到两个数量级，并提供跨平台的「通用解析」（universal resolution），产出可移植的 `uv.lock`；同时以单一二进制取代 pip、pip-tools、pipx、poetry、pyenv、virtualenv 等碎片化工具链——这些正是 Poetry 与 Conda 在纯 Python 工作流下未能兼顾之处。
     * https://docs.astral.sh/uv/
     * https://docs.astral.sh/uv/concepts/resolution/
-[^22]: DevDrive「性能模式」仅 Microsoft Defender 支持异步扫描，第三方杀软需用 `fsutil devdrv setfiltersallowed` 手动管理允许的筛选器：https://learn.microsoft.com/en-us/windows/dev-drive/ ；Defender 性能模式（同步→异步扫描）说明：https://learn.microsoft.com/en-us/defender-endpoint/microsoft-defender-endpoint-antivirus-performance-mode
