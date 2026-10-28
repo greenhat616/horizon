@@ -113,7 +113,7 @@ importers:
         version: 0.14.1
       prettier-plugin-tailwindcss:
         specifier: ^0.8.0
-        version: 0.8.0(prettier-plugin-astro@0.14.1)(prettier@3.8.4)
+        version: 0.8.1(prettier-plugin-astro@0.14.1)(prettier@3.8.4)
       tailwindcss:
         specifier: ^4.3.1
         version: 4.3.1
@@ -2786,8 +2786,8 @@ packages:
     resolution: {integrity: sha512-RiBETaaP9veVstE4vUwSIcdATj6dKmXljouXc/DDNwBSPTp8FRkLGDSGFClKsAFeeg+13SB0Z1JZvbD76bigJw==}
     engines: {node: ^14.15.0 || >=16.0.0}
 
-  prettier-plugin-tailwindcss@0.8.0:
-    resolution: {integrity: sha512-V8ITGH87yuBDF6JpEZTOVlUz/saAwqb8f3HRgUj8Lh+tGCcrmorhsLpYqzygwFwK0PE2Ib6Mv3M7T/uE2tZV1g==}
+  prettier-plugin-tailwindcss@0.8.1:
+    resolution: {integrity: sha512-iaFMYqDsE4ffdDkn5qup0j5f2aCEBFZrdrZnvu9QKTlWx/iGPeQ4HHu7b7fCPMxeo9nwQBiOAh2nSypdFYWJkw==}
     engines: {node: '>=20.19'}
     peerDependencies:
       '@ianvs/prettier-plugin-sort-imports': '*'
@@ -3445,16 +3445,22 @@ packages:
     resolution: {integrity: sha512-IdD13Z9N2Bu8EM6CM0fDV1E69olEYGHDU25X51YXmq8Y0CmJ2LNj6gOiBJgpS5JGUqFzECVhMNBW7R0sPdRTMQ==}
     peerDependencies:
       '@volar/language-service': ~2.4.0
+      typescript: '*'
     peerDependenciesMeta:
       '@volar/language-service':
+        optional: true
+      typescript:
         optional: true
 
   volar-service-typescript@0.0.70:
     resolution: {integrity: sha512-l46Bx4cokkUedTd74ojO5H/zqHZJ8SUuyZ0IB8JN4jfRqUM3bQFBHoOwlZCyZmOeO0A3RQNkMnFclxO4c++gsg==}
     peerDependencies:
       '@volar/language-service': ~2.4.0
+      typescript: '*'
     peerDependenciesMeta:
       '@volar/language-service':
+        optional: true
+      typescript:
         optional: true
 
   volar-service-yaml@0.0.70:
@@ -3696,8 +3702,8 @@ snapshots:
       volar-service-emmet: 0.0.70(@volar/language-service@2.4.28)
       volar-service-html: 0.0.70(@volar/language-service@2.4.28)
       volar-service-prettier: 0.0.70(@volar/language-service@2.4.28)(prettier@3.8.4)
-      volar-service-typescript: 0.0.70(@volar/language-service@2.4.28)
-      volar-service-typescript-twoslash-queries: 0.0.70(@volar/language-service@2.4.28)
+      volar-service-typescript: 0.0.70(@volar/language-service@2.4.28)(typescript@6.0.3)
+      volar-service-typescript-twoslash-queries: 0.0.70(@volar/language-service@2.4.28)(typescript@6.0.3)
       volar-service-yaml: 0.0.70(@volar/language-service@2.4.28)
       vscode-html-languageservice: 5.6.2
       vscode-uri: 3.1.0
@@ -6595,7 +6601,7 @@ snapshots:
       prettier: 3.8.4
       sass-formatter: 0.7.9
 
-  prettier-plugin-tailwindcss@0.8.0(prettier-plugin-astro@0.14.1)(prettier@3.8.4):
+  prettier-plugin-tailwindcss@0.8.1(prettier-plugin-astro@0.14.1)(prettier@3.8.4):
     dependencies:
       prettier: 3.8.4
     optionalDependencies:
@@ -7289,13 +7295,14 @@ snapshots:
       '@volar/language-service': 2.4.28
       prettier: 3.8.4
 
-  volar-service-typescript-twoslash-queries@0.0.70(@volar/language-service@2.4.28):
+  volar-service-typescript-twoslash-queries@0.0.70(@volar/language-service@2.4.28)(typescript@6.0.3):
     dependencies:
       vscode-uri: 3.1.0
     optionalDependencies:
       '@volar/language-service': 2.4.28
+      typescript: 6.0.3
 
-  volar-service-typescript@0.0.70(@volar/language-service@2.4.28):
+  volar-service-typescript@0.0.70(@volar/language-service@2.4.28)(typescript@6.0.3):
     dependencies:
       path-browserify: 1.0.1
       semver: 7.8.4
@@ -7305,6 +7312,7 @@ snapshots:
       vscode-uri: 3.1.0
     optionalDependencies:
       '@volar/language-service': 2.4.28
+      typescript: 6.0.3
 
   volar-service-yaml@0.0.70(@volar/language-service@2.4.28):
     dependencies:
