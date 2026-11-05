@@ -36,7 +36,7 @@ jobs:
           PUBLIC_ARTALK_SERVER: ${{ vars.PUBLIC_ARTALK_SERVER }}
 
       - name: Deploy via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
           # All connection parameters are provided via repository Secrets:
           #   Settings → Secrets and variables → Actions → Secrets.
